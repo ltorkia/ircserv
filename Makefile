@@ -126,4 +126,4 @@ debug: fclean
 
 -include ${DEPS}
 
-.PHONY: all clean fclean re debug bonus
+.PHONY: all clean fclean re debug
