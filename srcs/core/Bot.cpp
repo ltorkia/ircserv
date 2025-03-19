@@ -82,42 +82,6 @@ void Bot::_initBot()
 
 void Bot::_listenActivity()
 {
-	while (1)
-	{
-		if (_server.isSignalReceived())
-			break;
-	
-		fd_set readFds = _server.getReadFds();
-		int maxFd = _server.getMaxFd();
-		struct timeval timeout = {0, 500000};
-	
-		if (select(maxFd + 1, &readFds, NULL, NULL, &timeout) < 0 && errno != EINTR)
-			throw std::runtime_error(ERR_SELECT_SOCKET);
-	
-		for (int fd = 0; fd <= maxFd; fd++)
-		{
-			if (_server.isSignalReceived())
-				break;
-			if (FD_ISSET(fd, &readFds))
-			{
-				if (fd != _server.getServerSocketFd())
-				{
-					std::map<int, Client*>::iterator it = _clients.find(fd);
-					if (it != _clients.end())
-					{
-						_client = it->second;
-						_clientFd = _client->getFd();
-						_readInput();
-					}
-				}
-	
-			}
-		}
-	}
-}
-
-void Bot::_listenActivity()
-{
 	while (true)
 	{
 		if (_server.isSignalReceived())
@@ -146,7 +110,7 @@ void Bot::_readInput()
 {
 	char buffer[server::BUFFER_SIZE];
 	std::memset(buffer, 0, sizeof(buffer));
-	
+
 	int bytesRead = recv(_server.getServerSocketFd(), buffer, sizeof(buffer) - 1, 0);
 
 	if (bytesRead <= 0)
@@ -169,7 +133,8 @@ void Bot::_readInput()
 	// // std::cout << "---> " << message << std::endl;
 
 	_parseInput(message);
-	_handleCommand(message);
+	std::string response = _handleCommand(message);
+	sendMessage(response, this);
 }
 
 void Bot::_parseInput(std::string& input)
