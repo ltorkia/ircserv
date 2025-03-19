@@ -127,7 +127,7 @@ class MessageHandler {
 		// === MODE ===
 		static std::string ircChannelModeIs(const std::string& nickname, const std::string& channel, const std::string& displaymode);
 		static std::string ircCreationTime(const std::string& nickname, const std::string& channel, time_t time);
-		static std::string ircInvalidModeParams(const std::string &nickname, const std::string& channel, const std::string& mode_char, const std::string&param, const std::string &description);
+		static std::string ircInvalidModeParams(const std::string &nickname, const std::string& channel, const std::string& mode_char, const std::string&param);
 		static std::string ircInvalidPasswordFormat(const std::string &nickname, const std::string& channel);
 		static std::string ircBannedList(const std::string &nickname, const std::string &channel, const std::string &who, time_t time_channel);
 		static std::string ircEndOfBannedList(const std::string &nickname, const std::string &channel);
@@ -168,5 +168,6 @@ class MessageHandler {
 		
 		static std::string msgSendFile(const std::string& filename, const std::string &client, const std::string &adr, const int &port);
 		static std::string errorMsgSendFile(const std::string& filename);
-		static std::string MsgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int &port);
+		static std::string msgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int &port);
+		static std::string botGetAge(int years, int months, int days);
 };

@@ -4,44 +4,68 @@
 #include <sstream>				// gestion flux -> std::ostringstream
 #include <fstream>				// gestion fichiers -> std::ifstream, std::ofstream
 #include <vector>				// container vector
+#include <map>					// container map
 
 // === NAMESPACES ===
 #include "../config/irc_config.hpp"
 #include "../config/server_messages.hpp"
+#include "../config/commands.hpp"
 
 // === CLASSES ===
 #include "IrcHelper.hpp"
-// #include "MessageHandler.hpp"
-// #include "Client.hpp"
+#include "MessageHandler.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
 
-class Bot {
+class Server;
+class Client;
+class Bot : public Client {
 
 	public:
 	
-		Bot(const std::string& nick, const std::string& user, const std::string& realName);
+		Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real, Server& server);
 		~Bot();
-
-		std::string getBotMask() const;
-		std::string handleCommand(const std::string& command);
-		std::string getJoke();
-        std::string getAge(const std::string &input);
-		std::string splitBuff(std::string buff, std::string &date);
-		int parseAge(std::string age);
-		void ageCalculator(std::string age, std::string Nickname,int ircsock);
-		int getQuotes(std::string filename);
-		std::string getQuotes(std::vector<std::string>& quotes, int size);
 	
 	private:
 
-		Bot();
-		Bot(const Bot& src);
-		Bot& operator=(Bot& src);
+		// === SERVER / CLIENTS / CHANNELS ===
+		Server& _server;
+		std::map<int, Client*>& _clients;
+		std::map<std::string, Channel*>& _channels;
 
-		std::string _nickname;
-		std::string _username;
-		std::string _realName;
-		std::string _hostname;
-		std::string _ipAdress;
+		// === CURRENT CLIENT ===
+		Client* _client;
+		int _clientFd;
+
+		// === CURRENT CHANNEL ===
+		Channel* _channel;
+
+		// === CLIENT INPUT ===
+		std::string _input;
+		std::string _command;
+		std::string _ageArg;
 		
+		// === QUOTES FOR JOKES ===
 		std::vector<std::string> _quotes;
-	};	
+
+		// ================================================================================
+
+		// === INIT / LISTEN ===
+		void _initBot();
+		void _listenActivity();
+
+		// === COMMAND HANDLER ===
+		void _readInput();
+		void _parseInput(std::string& input);
+		std::string _handleCommand(std::string& input);
+
+		// === JOKE COMMAND ===
+		std::string _getJoke();
+		std::vector<std::string> _getQuotes(std::string filename);
+		std::string _getRandomQuote();
+
+		// === AGE COMMAND ===
+        std::string _getAge();
+		bool _parseAge();
+		std::string _ageCalculator();
+};	

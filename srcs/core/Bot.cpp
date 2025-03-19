@@ -1,199 +1,311 @@
 #include "../../incs/classes/Bot.hpp"
 
-Bot::Bot(const std::string& nick, const std::string& user, const std::string& realName)
-	: _nickname(nick), _username(user), _realName(realName), _hostname(nick), _ipAdress(server::LOCALHOST) {}
-Bot::Bot() {}
-Bot::Bot(const Bot& src) {(void) src;}
-Bot & Bot::operator=(Bot& src) {(void) src; return *this;}
+// === NAMESPACES ===
+using namespace server_messages;
+
+// =========================================================================================
+
+// --- PUBLIC
+Bot::Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real, Server& server)
+	:  Client(botFd), _server(server), _clients(_server.getClients()), _channels(_server.getChannels())
+{
+	_authenticated = true;
+	_clientSocketFd = botFd;
+	_nickname = nick;
+	_username = user;
+	_realName = real;
+	_hostname = nick;
+	_clientIp = _hostname;
+}
 Bot::~Bot() {}
 
-std::string Bot::getBotMask() const
+
+// --- PRIVATE
+
+// === INIT AND LISTEN ===
+
+void Bot::_initBot()
 {
-	return _nickname + "!~" + _username + "@" + _ipAdress;
+	// std::string welcome;
+	// ssize_t recivedBytes;
+	// std::string nickname, command;
+
+	// _Loggedin = false;
+	// char buffer[1024];
+	// std::vector<std::string> buff;
+	// std::string botmask = nick + "!" + '~' + user + "@" + adr;
+	// welcome = MessageHandler::ircWelcomeMessage(user, botmask);
+	// while(true)
+	// {
+	// 	bzero(buffer, sizeof(buffer));
+	// 	recivedBytes = recv(sock, buffer, (sizeof(buffer) - 1), 0);
+	// 	if(recivedBytes <= 0)
+	// 	{
+	// 		perror("Bot :");
+	// 		return ;
+	// 	}
+	// 	if (buffer[0])
+	// 		buff.push_back(std::string(buffer));
+	// 	while(!buff.empty() && !_Loggedin)
+	// 	{
+	// 		if (buff.back().find(welcome, 0) == std::string::npos)
+	// 			buff.pop_back();
+	// 		else
+	// 		{
+	// 			std::cout << "\nBOT Is Connected!\n" << std::endl;
+	// 			_Loggedin = true;
+	// 		}
+	// 	}
+	// 	if (!_Loggedin)
+	// 	{
+	// 		std::cout << "Error while connecting." << std::endl;
+	// 		return ;
+	// 	}
+	// 	else if (buff.back().find(MessageHandler::ircPing()) != std::string::npos)
+	// 	{
+	// 		std::stringstream ss;
+	// 		ss << MessageHandler::ircPong();
+	// 		sendMessage(ss.str(), sock);
+	// 	}
+	// 	else if(buff.back().find("PRIVMSG") != std::string::npos && _Loggedin)
+	// 	{
+	// 		if (commandHandler(buff, nickname, command, sock) == 1)
+	// 			continue ;
+	// 	}
+	// 	else if (buff.back().find("NOTICE") != std::string::npos && _Loggedin && buff.back().find("PRIVMSG") == std::string::npos)
+	// 	{
+	// 		if (getInviteHandler(buff, nickname, command, sock) == 1)
+	// 			continue;
+	// 	}
+	// }
 }
 
-std::string Bot::handleCommand(const std::string& command)
+void Bot::_listenActivity()
 {
-	if (command == "!joke")
-		return getJoke();
-	if (command == "!time")
-		return getJoke();
-	if (command == "!age")
-		return IrcHelper::getCurrentTime();
-	return "Unknown command.";
-	// throw std::invalid_argument(MessageHandler::ircUnknownCommand(nickname, stringSent));
-}
-
-std::string Bot::getJoke()
-{
-	return "Why do Java developers wear glasses? Because they don't see sharp!";
-}
-
-std::string Bot::getAge(const std::string &input)
-{
-	return "I am 1 year old!";
-}
-
-	/**
- * @brief Splits the input buffer string into two parts: the first word and the rest of the string.
- *
- * This function takes an input buffer string and splits it into two parts. The first word
- * (token) is returned, and the rest of the string is stored in the provided date reference.
- *
- * @param buff The input buffer string to be split.
- * @param date A reference to a string where the rest of the buffer will be stored.
- * @return The first word (token) from the input buffer string.
- */
-std::string Bot::splitBuff(std::string buff, std::string &date)
-{
-	std::istringstream stm(buff);
-	std::string token;
-	stm >> token;
-	stm >> date;
-	return token;
-}
-
-/**
- * @brief Parses and validates a given age string in the format "YYYY-MM-DD".
- *
- * This function checks if the input string is a valid date in the format "YYYY-MM-DD".
- * It ensures that the year is between 1900 and 2024, the month is between 1 and 12,
- * and the day is valid for the given month, including leap year considerations.
- *
- * @param age The age string to be parsed and validated.
- * @return Returns 1 if the age string is valid, otherwise returns 0.
- */
-int Bot::parseAge(std::string age)
-{
-	std::string year, month, day, age1;
-	age1 = age;
-	std::stringstream ss(age);
-
-	int flag = 0;
-	while (std::getline(ss, age, '-'))
+	while (1)
 	{
-		flag++;
-		for (size_t i = 0; i < age.size(); ++i)
+		if (_server.isSignalReceived())
+			break;
+	
+		fd_set readFds = _server.getReadFds();
+		int maxFd = _server.getMaxFd();
+		struct timeval timeout = {0, 500000};
+	
+		if (select(maxFd + 1, &readFds, NULL, NULL, &timeout) < 0 && errno != EINTR)
+			throw std::runtime_error(ERR_SELECT_SOCKET);
+	
+		for (int fd = 0; fd <= maxFd; fd++)
 		{
-			if (!isdigit(age[i]) && age[i] != '-') 
-				return 0;
+			if (_server.isSignalReceived())
+				break;
+			if (FD_ISSET(fd, &readFds))
+			{
+				if (fd != _server.getServerSocketFd())
+				{
+					std::map<int, Client*>::iterator it = _clients.find(fd);
+					if (it != _clients.end())
+					{
+						_client = it->second;
+						_clientFd = _client->getFd();
+						_readInput();
+					}
+				}
+	
+			}
 		}
 	}
-	if (flag != 3) 
-		return 0;
-
-	int found = age1.find("-");
-	year = age1.substr(0, found);
-	age1 = age1.substr(found+1);
-	found = age1.find("-");
-	month = age1.substr(0, found);
-	day = age1.substr(found+1);
-
-	if (std::atoi(year.c_str()) > 2024 || std::atoi(year.c_str()) < 1900)  
-		return 0;
-	if (std::atoi(year.c_str()) == 2024 && std::atoi(month.c_str()) > 1) 
-		return 0;
-	if (std::atoi(month.c_str()) > 12 || std::atoi(month.c_str()) < 1 || std::atoi(day.c_str()) > 31 || std::atoi(day.c_str()) < 1 ) 
-		return 0;
-	if (std::atoi(month.c_str()) == 4 || std::atoi(month.c_str()) == 6 || std::atoi(month.c_str()) == 9 || std::atoi(month.c_str()) == 11)
-	{
-		if (std::atoi(day.c_str()) > 30) 
-			return 0;
-	}
-	if ((std::atoi(year.c_str()) % 4 == 0 && std::atoi(year.c_str()) % 100 != 0) || std::atoi(year.c_str()) % 400 == 0)
-	{
-		if (std::atoi(month.c_str()) == 2 && std::atoi(day.c_str()) > 29) 
-			return 0;
-	}
-	else
-	{
-			if (std::atoi(month.c_str()) == 2 && std::atoi(day.c_str()) > 28) 
-				return 0;
-	}
-	return 1;
 }
 
-/**
- * @brief Calculates the age of a user based on their birth date and sends a message with the result.
- * 
- * @param age The birth date of the user in the format "year-month-day".
- * @param Nickname The nickname of the user to whom the message will be sent.
- * @param ircsock The IRC socket used to send the message.
- * 
- * This function parses the provided birth date, calculates the age in years, months, and days,
- * and sends a private message to the user with the calculated age. If the date format is invalid,
- * it sends an error message to the user.
- */
-void Bot::ageCalculator(std::string age, std::string Nickname,int ircsock)
+void Bot::_listenActivity()
 {
-	if (!parseAge(age))
+	while (true)
 	{
-		// Bot::send_privmsg("Invalid date format(!age <year-month-day>).", Nickname, ircsock);
-		return;
+		if (_server.isSignalReceived())
+			break;
+
+		int serverSocketFd = _server.getServerSocketFd();
+		fd_set readServerFd;
+		FD_ZERO(&readServerFd);
+		FD_SET(serverSocketFd, &readServerFd);
+		struct timeval timeout = {0, 500000};
+
+		// Attend un message du serveur
+		int activity = select(serverSocketFd + 1, &readServerFd, NULL, NULL, &timeout);
+		if (activity < 0 && errno != EINTR)
+			throw std::runtime_error(ERR_SELECT_SOCKET);
+
+		if (FD_ISSET(serverSocketFd, &readServerFd))
+			_readInput();
 	}
+}
 
-	int year, month, day;
-	year = std::atoi(age.substr(0, 4).c_str());
-	month = std::atoi(age.substr(5, 2).c_str());
-	day = std::atoi(age.substr(8, 2).c_str());
 
-	std::tm birth_date;
-	memset(&birth_date, 0, sizeof(birth_date));
-	birth_date.tm_year = year - 1900;
-	birth_date.tm_mon = month - 1;
-	birth_date.tm_mday = day;
+// === COMMAND HANDLER ===
 
-	std::time_t birth_time = mktime(&birth_date);
-	std::time_t current_time;
-	std::time(&current_time);
-
-	double seconds = difftime(current_time, birth_time);
-	int years = static_cast<int>(seconds / (365.25 * 24 * 60 * 60));
-	int months = static_cast<int>((seconds - years * 365.25 * 24 * 60 * 60) / (30.44 * 24 * 60 * 60));
-	int days = static_cast<int>((seconds - years * 365.25 * 24 * 60 * 60 - months * 30.44 * 24 * 60 * 60) / (24 * 60 * 60));
+void Bot::_readInput()
+{
+	char buffer[server::BUFFER_SIZE];
+	std::memset(buffer, 0, sizeof(buffer));
 	
-	std::stringstream ss;
-	ss << "You are : " << years << " years, " << months << " months, " << days << " days old";
-	// Bot::send_privmsg(ss.str(), Nickname, ircsock);
+	int bytesRead = recv(_server.getServerSocketFd(), buffer, sizeof(buffer) - 1, 0);
+
+	if (bytesRead <= 0)
+		throw std::runtime_error(ERR_READ_SERVER);
+
+	buffer[bytesRead] = '\0';
+
+	std::string message(buffer);
+
+	std::cout << "Bot received: " << message << std::endl;
+
+	// std::string bufferMessage(buffer);
+	// size_t pos = bufferMessage.find('\n');
+	// std::string message = bufferMessage.substr(0, pos);
+
+	// if (!message.empty() && message[message.size() - 1] == '\r')
+	// 	message.erase(message.size() - 1);
+
+	// // Debug : affiche le message reçu
+	// // std::cout << "---> " << message << std::endl;
+
+	_parseInput(message);
+	_handleCommand(message);
 }
 
-/**
- * @brief Reads quotes from a file and stores them in the _quotes vector.
- * 
- * This function opens the specified file, reads each line, and stores it in the _quotes vector.
- * If the file cannot be opened, an error message is printed to the standard error stream.
- * 
- * @param filename The name of the file to read quotes from.
- * @return int Returns 1 if the file was successfully read, otherwise returns 0.
- */
-int Bot::getQuotes(std::string filename)
+void Bot::_parseInput(std::string& input)
 {
+	std::vector<std::string> args = Utils::getTokens(input, splitter::SENTENCE);
+	if (args.size() < 1)
+		throw std::invalid_argument(ERR_INVALID_CMD_FORMAT);
+	std::vector<std::string>::iterator itArg = args.begin();
+	_command = *itArg;
+	++itArg;
+	if (itArg != args.end())
+		_ageArg = *itArg;
+}
+
+std::string Bot::_handleCommand(std::string& input)
+{
+	if (_command == bot::JOKE_CMD)
+		return _getJoke();
+	if (_command == bot::AGE_CMD)
+		return _getAge();
+	if (_command == bot::TIME_CMD)
+		return IrcHelper::getCurrentTime();
+	if (_command == commands::PING)
+		return IrcHelper::getCurrentTime();
+	return MessageHandler::ircUnknownCommand(_client->getNickname(), input);
+}
+
+
+// === JOKE COMMAND ===
+
+std::string Bot::_getJoke()
+{
+	_quotes = _getQuotes(bot::QUOTES_PATH);
+	return _getRandomQuote();
+}
+
+std::vector<std::string> Bot::_getQuotes(std::string filename)
+{
+	std::vector<std::string> res;
 	std::string line;
 	std::ifstream file(filename.c_str());
 
 	if (!file.is_open())
-	{
-		std::cerr << "Failed to open file" << std::endl;
-		return 0;
-	}
+		throw std::invalid_argument(ERR_OPEN_FILE);
+
 	while (std::getline(file, line))
-		_quotes.push_back(line);
+		res.push_back(line);
 	file.close();
-	return 1;
+
+	return res;
 }
 
-/**
- * @brief Selects a random quote from the provided list of quotes.
- *
- * This function initializes the random number generator with the current time,
- * then selects and returns a random quote from the given vector of quotes.
- *
- * @param _quotes A vector containing the list of quotes to choose from.
- * @param size The number of quotes in the vector.
- * @return A randomly selected quote from the vector.
- */
-std::string Bot::getQuotes(std::vector<std::string>& quotes, int size)
+std::string Bot::_getRandomQuote()
 {
 	std::srand(static_cast<unsigned int>(std::time(NULL)));
-	return quotes[std::rand() % size];
+	return _quotes[std::rand() % _quotes.size()];
+}
+
+
+// === AGE COMMAND ===
+
+std::string Bot::_getAge()
+{
+	std::string res;
+	if (_parseAge())
+		throw std::invalid_argument(INVALID_DATE_FORMAT);
+
+	res = _ageCalculator();
+	return res;
+}
+
+bool Bot::_parseAge()
+{
+	if (_ageArg.empty())
+		return false;
+
+	std::string year, month, day, age;
+	age = _ageArg;
+	std::stringstream ss(_ageArg);
+
+	int flag = 0;
+	while (std::getline(ss, _ageArg, '-'))
+	{
+		flag++;
+		for (size_t i = 0; i < _ageArg.size(); ++i)
+			if (!isdigit(_ageArg[i]) && _ageArg[i] != '-') 
+				return false;
+	}
+	if (flag != 3) 
+		return false;
+
+	int found = age.find("-");
+	year = age.substr(0, found);
+	age = age.substr(found + 1);
+	found = age.find("-");
+	month = age.substr(0, found);
+	day = age.substr(found + 1);
+
+	if (std::atoi(year.c_str()) > 2024 || std::atoi(year.c_str()) < 1900)  
+		return false;
+	if (std::atoi(year.c_str()) == 2024 && std::atoi(month.c_str()) > 1) 
+		return false;
+	if (std::atoi(month.c_str()) > 12 || std::atoi(month.c_str()) < 1 || std::atoi(day.c_str()) > 31 || std::atoi(day.c_str()) < 1 ) 
+		return false;
+	if (std::atoi(month.c_str()) == 4 || std::atoi(month.c_str()) == 6 || std::atoi(month.c_str()) == 9 || std::atoi(month.c_str()) == 11)
+		if (std::atoi(day.c_str()) > 30) 
+			return false;
+	if ((std::atoi(year.c_str()) % 4 == 0 && std::atoi(year.c_str()) % 100 != 0) || std::atoi(year.c_str()) % 400 == 0)
+		if (std::atoi(month.c_str()) == 2 && std::atoi(day.c_str()) > 29) 
+			return false;
+	else if (std::atoi(month.c_str()) == 2 && std::atoi(day.c_str()) > 28) 
+		return false;
+	return true;
+}
+
+std::string Bot::_ageCalculator()
+{
+	int year, month, day;
+	year = std::atoi(_ageArg.substr(0, 4).c_str());
+	month = std::atoi(_ageArg.substr(5, 2).c_str());
+	day = std::atoi(_ageArg.substr(8, 2).c_str());
+
+	std::tm birthDate;
+	memset(&birthDate, 0, sizeof(birthDate));
+	birthDate.tm_year = year - 1900;
+	birthDate.tm_mon = month - 1;
+	birthDate.tm_mday = day;
+
+	std::time_t birthTime = mktime(&birthDate);
+	std::time_t currentTime;
+	std::time(&currentTime);
+
+	double seconds = difftime(currentTime, birthTime);
+	int years = static_cast<int>(seconds / (365.25 * 24 * 60 * 60));
+	int months = static_cast<int>((seconds - years * 365.25 * 24 * 60 * 60) / (30.44 * 24 * 60 * 60));
+	int days = static_cast<int>((seconds - years * 365.25 * 24 * 60 * 60 - months * 30.44 * 24 * 60 * 60) / (24 * 60 * 60));
+	
+	return MessageHandler::botGetAge(years, months, days);
 }

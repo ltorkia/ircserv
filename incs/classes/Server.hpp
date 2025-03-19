@@ -49,7 +49,6 @@ class Server {
 		void _setSignal();														// Paramétrage du signal
 		void _setLocalIp();														// Récupère l'adresse IP locale
 		void _setServerSocket();												// Paramétrage du socket serveur
-		int _getMaxFd();														// Récupère le descripteur maximum pour select()
 		
 		void _init();															// Initialise le serveur
 		void _checkActivity();													// Vérifie l'activité des clients
@@ -72,6 +71,7 @@ class Server {
 		// === SIGNAL ===
 		static volatile sig_atomic_t signalReceived;							// Indique si un signal a été reçu
 		static void signalHandler(int signal);									// Gestionnaire de signaux pour le serveur
+		sig_atomic_t isSignalReceived() const; 									// Vérifie si un signal a été reçu
 		
 		Server(const std::string &port, const std::string &password);
 		~Server();
@@ -79,21 +79,24 @@ class Server {
 		void launch();
 
 		// === SERVER INFOS ===
-		const std::string& getServerPassword() const;
+		int getServerSocketFd() const; 																// Récupère le descripteur de socket du serveur
+		fd_set getReadFds() const; 																	// Récupère l'ensemble des descripteurs surveillés
+		int getMaxFd();																				// Récupère le descripteur maximum pour select()
+		const std::string& getServerPassword() const; 												// Récupère le mot de passe du serveur
 
 		// === CLIENTS ===
-		std::map<int, Client*>& getClients();
-		int getTotalClientCount() const;
-		int getClientCount(bool authenticated);
-		int getClientByNickname(const std::string& nickname, Client* currClient);
-		void greetClient(Client* client);
-		void prepareClientToLeave(std::map<int, Client*>::iterator it, const std::string& reason);
+		std::map<int, Client*>& getClients(); 														// Récupère la liste des clients
+		int getTotalClientCount() const; 															// Récupère le nombre total de clients
+		int getClientCount(bool authenticated); 													// Récupère le nombre de clients authentifiés ou non
+		int getClientByNickname(const std::string& nickname, Client* currClient);					// Récupère le client par son pseudo
+		void greetClient(Client* client); 															// Accueille un client
+		void prepareClientToLeave(std::map<int, Client*>::iterator it, const std::string& reason);	// Prépare un client à quitter le serveur
 
 		// === CHANNELS ===
-		std::map<std::string, Channel*>& getChannels();
-		int getChannelCount() const;
-		void broadcastToClients(const std::string &message);
+		std::map<std::string, Channel*>& getChannels(); 											// Récupère la liste des canaux
+		int getChannelCount() const; 																// Récupère le nombre de canaux
+		void broadcastToClients(const std::string &message); 										// Envoie un message à tous les clients connectés
 
 		// === BONUS ===
-		std::map<std::string, File>& getFiles();
+		std::map<std::string, File>& getFiles(); 													// Récupère la liste des fichiers à envoyer
 };

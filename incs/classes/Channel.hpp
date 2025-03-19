@@ -19,7 +19,7 @@ class Channel {
 	private:
 		Channel();
 		Channel(const Channel& src);
-		Channel& operator=(Channel& src);
+		Channel& operator=(const Channel& src);
 
 		std::string _name;									// Nom du canal
 		std::string _password;

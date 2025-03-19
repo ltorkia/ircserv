@@ -44,6 +44,11 @@ void Server::signalHandler(int signal)
 	signalReceived = boolean::TRUE;
 }
 
+sig_atomic_t Server::isSignalReceived() const
+{
+	return signalReceived;
+}
+
 
 // === CONSTUCTORS / DESTRUCTORS ===
 
@@ -105,6 +110,53 @@ void Server::launch()
 /********** PUBLIC GETTERS AND METHODS FOR COMMANDHANDLER ACCESS **********/
 
 // === SERVER INFOS ===
+
+/**
+ * @brief Retrieves the file descriptor for the server socket.
+ * 
+ * This function returns the file descriptor associated with the server socket,
+ * which is used for network communication.
+ * 
+ * @return int The file descriptor of the server socket.
+ */
+int Server::getServerSocketFd() const
+{
+	return _serverSocketFd;
+}
+
+/**
+ * @brief Retrieves the set of file descriptors for reading.
+ * 
+ * This function returns a copy of the file descriptor set that is monitored
+ * for read events. It can be used to check which file descriptors are ready
+ * for reading.
+ * 
+ * @return fd_set The set of file descriptors for reading.
+ */
+fd_set Server::getReadFds() const
+{
+	return _readFds;
+}
+
+/**
+ * @brief Get the maximum file descriptor currently in use by the server.
+ *
+ * This function checks the highest file descriptor among the connected clients
+ * and updates the server's maximum file descriptor (_maxFd) if a higher value
+ * is found. It then returns the maximum file descriptor.
+ *
+ * @return int The maximum file descriptor currently in use by the server.
+ */
+int Server::getMaxFd()
+{
+	if (!_clients.empty())
+	{
+		int maxClientFd = _clients.rbegin()->first;
+		if (maxClientFd > _maxFd)
+			return maxClientFd;
+	}
+	return _serverSocketFd;
+}
 
 /**
  * @brief Returns the server's password.
@@ -443,27 +495,6 @@ void Server::_setServerSocket()
 }
 
 /**
- * @brief Get the maximum file descriptor currently in use by the server.
- *
- * This function checks the highest file descriptor among the connected clients
- * and updates the server's maximum file descriptor (_maxFd) if a higher value
- * is found. It then returns the maximum file descriptor.
- *
- * @return int The maximum file descriptor currently in use by the server.
- */
-int Server::_getMaxFd()
-{
-	if (!_clients.empty())
-	{
-		int maxClientFd = _clients.rbegin()->first;
-		if (maxClientFd > _maxFd)
-			return maxClientFd;
-	}
-	return _serverSocketFd;
-}
-
-
-/**
  * @brief Initializes the server by setting up signals, local IP, server socket, and creation time.
  * 
  * This function performs the following steps:
@@ -537,7 +568,7 @@ void Server::_start()
 		// -> Si pas de client, ce sera le descripteur du serveur
 		// -> Sinon, ce sera le descripteur du client avec le plus grand descripteur
 		// 	qui se trouve a la fin de la map car celle-ci est automatiquement triée par ordre croissant
-		_maxFd = _getMaxFd();
+		_maxFd = getMaxFd();
 
 		// Délai pour la fonction select: intervalle de 500 ms pour le retour de fonction
 		struct timeval timeout = {0, 500000};

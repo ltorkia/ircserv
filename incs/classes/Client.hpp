@@ -27,10 +27,11 @@
 class Channel;
 class Client {
 
-	private:
+	protected:
+		
 		Client();
 		Client(const Client& src);
-		Client& operator=(Client& src);
+		Client& operator=(const Client& src);
 
 		int _clientSocketFd;								// Descripteur de socket du client
 		bool _authenticated;								// Indique si le client est authentifié
@@ -64,8 +65,10 @@ class Client {
 		std::map<std::string, Channel*> _channelsJoined;	// Liste des canaux auxquels le client est connecté
 
 	public:
-		
+
 		Client(int fd);
+		// Client(const Client& src);
+		// Client& operator=(const Client& src);
 		~Client();
 
 		// === SETTERS INFOS CLIENT ===

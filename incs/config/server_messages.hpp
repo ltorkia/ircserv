@@ -21,6 +21,7 @@ namespace server_messages
 	const std::string ERR_BIND_SOCKET 				= "Failed to bind server socket. Address already in use";
 	const std::string ERR_LISTEN_SOCKET 			= "Failed to listen on server socket";
 	const std::string ERR_ACCEPT_CLIENT 			= "Failed to accept client";
+	const std::string ERR_OPEN_FILE 				= "Failed to open file";
 	
 
 	// === NOTICE MESSAGES FOR CLIENTS ===
@@ -55,5 +56,7 @@ namespace server_messages
 
 
 	// === BONUS BOT (AGE COMMAND) ===
-	const std::string INVALID_DATE_FORMAT 			= "Invalid date format(<age> <year-month-day>)";
+	const std::string ERR_READ_SERVER 				= "Bot: Connection lost or error occurred";
+	const std::string ERR_INVALID_CMD_FORMAT 		= "Invalid command format";
+	const std::string INVALID_DATE_FORMAT 			= "Invalid date format(!age <year-month-day>)";
 }

@@ -27,9 +27,6 @@ class CommandHandler {
 		void manage_command(std::string stringSent);
 
 	private :
-		CommandHandler();
-		CommandHandler(const CommandHandler& src);
-		CommandHandler& operator=(CommandHandler& src);
 
 		// === SERVER INSTANCE ===
 		Server& _server;

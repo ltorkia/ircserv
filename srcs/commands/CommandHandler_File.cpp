@@ -158,7 +158,7 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 			_client->sendMessage("DCC no file offered by " + request.args[0] + eol::IRC, NULL);
 			return ;
 		}
-		_clients[clientFd]->sendMessage(MessageHandler::MsgSendingFile(request.args[1], _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
+		_clients[clientFd]->sendMessage(MessageHandler::msgSendingFile(request.args[1], _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
 		std::fstream	ofs(request.args[1].c_str(), std::fstream::out);
 		std::fstream	ifs(file.Path.c_str(), std::fstream::in);
 		if (ofs.is_open())

@@ -98,7 +98,7 @@ void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelN
 	{
 		_modeSign = mode[IrcHelper::findCharBeforeIndex(mode, '-', '+', mode.find('l'))];
 		if (!_channelLimit(channel, _modeSign, modeArgs['l']))
-			_client->sendMessage(MessageHandler::ircInvalidModeParams(_client->getNickname(), channelName, "l", modeArgs['l'], "need only digital char"), NULL); //erreur si l arg est pas compose de digit
+			_client->sendMessage(MessageHandler::ircInvalidModeParams(_client->getNickname(), channelName, "l", modeArgs['l']), NULL); //erreur si l arg est pas compose de digit
 	}
 	for (int i = 1; mode[i]; i++)
 	{

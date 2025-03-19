@@ -227,6 +227,7 @@ namespace irc_replies
 
 	// 696 ERR_INVALIDMODEPARAM
 	const std::string ERR_INVALIDMODEPARAM 			= "696";
+	const std::string ERR_INVALIDMODEPARAM_MSG		= "int required only";
 
 	// 367 RPL_BANLIST
 	const std::string RPL_BANLIST 					= "367";

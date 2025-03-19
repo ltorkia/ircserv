@@ -12,7 +12,7 @@ Client::~Client() {}
 // --- PRIVATE
 Client::Client() {}
 Client::Client(const Client& src) {(void) src;}
-Client & Client::operator=(Client& src) {(void) src; return *this;}
+Client & Client::operator=(const Client& src) {(void) src; return *this;}
 
 
 // === SETTERS INFOS CLIENT ===

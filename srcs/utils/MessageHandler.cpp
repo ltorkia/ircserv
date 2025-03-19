@@ -713,11 +713,12 @@ std::string MessageHandler::ircCreationTime(const std::string& nickname, const s
 }
 
 // 696 ERR_INVALIDMODEPARAM : Indicates that there was a problem with a mode parameter. Replaces various implementation-specific mode-specific numerics.
-std::string MessageHandler::ircInvalidModeParams(const std::string &nickname, const std::string& channel, const std::string& mode_char, const std::string &param, const std::string &description)
+std::string MessageHandler::ircInvalidModeParams(const std::string &nickname, const std::string& channel, const std::string& mode_char, const std::string &param)
 {
+	std::string parameter = Utils::truncateStr(Utils::streamArg(param));
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_INVALIDMODEPARAM << " " << nickname << " " << channel << " "
-	<< mode_char << " " << param << " :" << IRC_COLOR_ERR << description << IRC_RESET;
+	<< mode_char << " " << parameter << " :" << IRC_COLOR_ERR << ERR_INVALIDMODEPARAM_MSG << IRC_RESET;
 	return stream.str();
 }
 
@@ -932,9 +933,16 @@ std::string MessageHandler::errorMsgSendFile(const std::string& filename)
 	return stream.str();
 }
 
-std::string MessageHandler::MsgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int& port)
+std::string MessageHandler::msgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int& port)
 {
 	std::ostringstream stream;
 	stream << DCC << " sending file " << filename << " for " << receiver << " [" << ip << " port " << port << "]";
+	return stream.str();
+}
+
+std::string MessageHandler::botGetAge(int years, int months, int days)
+{
+	std::ostringstream stream;
+	stream << "You are : " << years << " years, " << months << " months, " << days << " days old";
 	return stream.str();
 }

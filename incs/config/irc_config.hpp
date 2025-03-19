@@ -51,6 +51,16 @@ namespace name_type
 	};
 }
 
+// === BOT ===
+namespace bot
+{
+	const std::string NAME 					= "BOTTY";
+	const std::string QUOTES_PATH 			= "data/quotes.txt";
+	const std::string AGE_CMD 				= "!age";
+	const std::string JOKE_CMD				= "!joke";
+	const std::string TIME_CMD 				= "!time";
+}
+
 // === CHANNEL ERRORS ===
 namespace channel_error
 {
