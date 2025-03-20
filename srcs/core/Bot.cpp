@@ -36,7 +36,7 @@ Bot::~Bot() {}
  *
  * @throws std::runtime_error if an error occurs during the `select` call.
  */
-void Bot::_listenActivity()
+void Bot::listenActivity()
 {
 	while (true)
 	{
