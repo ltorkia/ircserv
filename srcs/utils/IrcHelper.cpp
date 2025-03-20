@@ -570,6 +570,20 @@ bool IrcHelper::isValidLimit(std::string &limit)
 // === BOT HELPER ===
 
 /**
+ * @brief Checks if the given message is a recognized bot command.
+ *
+ * This function checks if the provided message starts with one of the recognized
+ * bot commands: "!joke", "!age", or "!time".
+ *
+ * @param message The message to be checked.
+ * @return true if the message starts with a recognized bot command, false otherwise.
+ */
+bool IrcHelper::isBotCommandFound(const std::string& message)
+{
+	return message.find(bot::JOKE_CMD) == 0 || message.find(bot::AGE_CMD) == 0 || message.find(bot::TIME_CMD) == 0;
+}
+
+/**
  * @brief Get the current time as a string.
  * 
  * This function retrieves the current system time and returns it as a 

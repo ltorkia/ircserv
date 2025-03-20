@@ -7,6 +7,8 @@ using namespace commands;
 CommandHandler::CommandHandler(Server& server, std::map<int, Client*>::iterator it)
 	: _server(server), _it(it), _clientFd(_it->first), _client(_it->second), _clients(_server.getClients()), _channels(_server.getChannels())
 {
+	_bot = _server.getBot();
+
 	// === AUTHENTICATE COMMANDS : CommandHandler_Auth.cpp ===
 	_fctMap[PASS] 			= &CommandHandler::_isRightPassword;
 	_fctMap[NICK] 			= &CommandHandler::_setNicknameClient;
@@ -35,7 +37,7 @@ CommandHandler::CommandHandler(Server& server, std::map<int, Client*>::iterator 
 	_fctMap[AWAY] 			= &CommandHandler::_setAway;
 	_fctMap[QUIT] 			= &CommandHandler::_quitServer;
 
-	// === FILE COMMANDS (BONUS) : CommandHandler_File.cpp ===
+	// === FILE COMMANDS : CommandHandler_File.cpp ===
 	_fctMap[DCC] 			= &CommandHandler::_handleFile;
 }
 
@@ -50,16 +52,16 @@ CommandHandler::~CommandHandler() {}
  * the appropriate command to execute. It handles authentication checks, command validation, and
  * parameter validation before invoking the corresponding command function.
  *
- * @param stringSent The command string received from the client.
+ * @param input The command string received from the client.
  *
  * @throws std::invalid_argument if the command is unknown or if there are insufficient parameters.
  */
-void CommandHandler::manage_command(std::string stringSent)
+void CommandHandler::manageCommand(std::string input)
 {
-	if (stringSent.empty())
+	if (input.empty())
 		return;
 		
-	_vectorInput = Utils::getTokens(stringSent, splitter::SENTENCE);	
+	_vectorInput = Utils::getTokens(input, splitter::SENTENCE);	
 	_itInput = _vectorInput.begin();
 
 	std::string nickname = _client->isAuthenticated() ? _client->getNickname() : "*";
@@ -74,10 +76,16 @@ void CommandHandler::manage_command(std::string stringSent)
 		return ;
 	}
 
+	if (IrcHelper::isBotCommandFound(input))
+	{
+		_bot->sendMessage(MessageHandler::ircMsgToClient(_client->getNickname(), _bot->getNickname(), input), NULL);
+		return ;
+	}
+
 	std::string cmd = *_itInput;
 	std::map<std::string, void (CommandHandler::*)()>::iterator itFunction = _fctMap.find(cmd);;
 	if (itFunction == _fctMap.end())
-		throw std::invalid_argument(MessageHandler::ircUnknownCommand(nickname, stringSent));
+		throw std::invalid_argument(MessageHandler::ircUnknownCommand(nickname, input));
 	
 	_itInput++;
 

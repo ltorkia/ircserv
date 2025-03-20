@@ -8,6 +8,7 @@
 
 // === NAMESPACES ===
 #include "../config/irc_config.hpp"
+#include "../config/irc_replies.hpp"
 #include "../config/server_messages.hpp"
 #include "../config/commands.hpp"
 
@@ -50,8 +51,7 @@ class Bot : public Client {
 
 		// ================================================================================
 
-		// === INIT / LISTEN ===
-		void _initBot();
+		// === LISTEN ACTIVITY ===
 		void _listenActivity();
 
 		// === COMMAND HANDLER ===

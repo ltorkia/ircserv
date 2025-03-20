@@ -66,5 +66,6 @@ class IrcHelper {
 		static bool isValidLimit(std::string &limit);
 
 		// === BOT HELPER ===
+		static bool isBotCommandFound(const std::string& message);
 		static std::string getCurrentTime();
 };

@@ -54,7 +54,9 @@ namespace name_type
 // === BOT ===
 namespace bot
 {
-	const std::string NAME 					= "BOTTY";
+	const std::string NICK 					= "BOTTY";
+	const std::string USER 					= "bot";
+	const std::string REALNAME 				= "bot";
 	const std::string QUOTES_PATH 			= "data/quotes.txt";
 	const std::string AGE_CMD 				= "!age";
 	const std::string JOKE_CMD				= "!joke";

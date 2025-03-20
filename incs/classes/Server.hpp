@@ -14,6 +14,7 @@
 #include "IrcHelper.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "Bot.hpp"
 #include "CommandHandler.hpp"
 #include "CommandHandler_File.hpp"
 
@@ -45,11 +46,15 @@ class Server {
 		// === FILES TO SEND ===
 		std::map<std::string, File>	_files; 									// Liste des fichiers à envoyer
 
+		// === BOT INSTANCE ===
+		Bot* _bot;																// Instance du bot
+
 		// === INIT / CLEAN ===
 		void _setSignal();														// Paramétrage du signal
 		void _setLocalIp();														// Récupère l'adresse IP locale
 		void _setServerSocket();												// Paramétrage du socket serveur
-		
+		void _initBot();														// Initialise le bot
+
 		void _init();															// Initialise le serveur
 		void _checkActivity();													// Vérifie l'activité des clients
 		void _start();															// Démarre le serveur
@@ -83,6 +88,7 @@ class Server {
 		fd_set getReadFds() const; 																	// Récupère l'ensemble des descripteurs surveillés
 		int getMaxFd();																				// Récupère le descripteur maximum pour select()
 		const std::string& getServerPassword() const; 												// Récupère le mot de passe du serveur
+		Bot* getBot(); 																				// Récupère l'instance du bot
 
 		// === CLIENTS ===
 		std::map<int, Client*>& getClients(); 														// Récupère la liste des clients

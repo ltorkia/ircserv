@@ -1,6 +1,7 @@
 #include "../../incs/classes/Bot.hpp"
 
 // === NAMESPACES ===
+using namespace irc_replies;
 using namespace server_messages;
 
 // =========================================================================================
@@ -22,63 +23,7 @@ Bot::~Bot() {}
 
 // --- PRIVATE
 
-// === INIT AND LISTEN ===
-
-void Bot::_initBot()
-{
-	// std::string welcome;
-	// ssize_t recivedBytes;
-	// std::string nickname, command;
-
-	// _Loggedin = false;
-	// char buffer[1024];
-	// std::vector<std::string> buff;
-	// std::string botmask = nick + "!" + '~' + user + "@" + adr;
-	// welcome = MessageHandler::ircWelcomeMessage(user, botmask);
-	// while(true)
-	// {
-	// 	bzero(buffer, sizeof(buffer));
-	// 	recivedBytes = recv(sock, buffer, (sizeof(buffer) - 1), 0);
-	// 	if(recivedBytes <= 0)
-	// 	{
-	// 		perror("Bot :");
-	// 		return ;
-	// 	}
-	// 	if (buffer[0])
-	// 		buff.push_back(std::string(buffer));
-	// 	while(!buff.empty() && !_Loggedin)
-	// 	{
-	// 		if (buff.back().find(welcome, 0) == std::string::npos)
-	// 			buff.pop_back();
-	// 		else
-	// 		{
-	// 			std::cout << "\nBOT Is Connected!\n" << std::endl;
-	// 			_Loggedin = true;
-	// 		}
-	// 	}
-	// 	if (!_Loggedin)
-	// 	{
-	// 		std::cout << "Error while connecting." << std::endl;
-	// 		return ;
-	// 	}
-	// 	else if (buff.back().find(MessageHandler::ircPing()) != std::string::npos)
-	// 	{
-	// 		std::stringstream ss;
-	// 		ss << MessageHandler::ircPong();
-	// 		sendMessage(ss.str(), sock);
-	// 	}
-	// 	else if(buff.back().find("PRIVMSG") != std::string::npos && _Loggedin)
-	// 	{
-	// 		if (commandHandler(buff, nickname, command, sock) == 1)
-	// 			continue ;
-	// 	}
-	// 	else if (buff.back().find("NOTICE") != std::string::npos && _Loggedin && buff.back().find("PRIVMSG") == std::string::npos)
-	// 	{
-	// 		if (getInviteHandler(buff, nickname, command, sock) == 1)
-	// 			continue;
-	// 	}
-	// }
-}
+// === LISTEN ACTIVITY ===
 
 void Bot::_listenActivity()
 {
@@ -139,11 +84,41 @@ void Bot::_readInput()
 
 void Bot::_parseInput(std::string& input)
 {
-	std::vector<std::string> args = Utils::getTokens(input, splitter::SENTENCE);
+	std::string errorMessage;
+
+	std::vector<std::string> args = Utils::getTokens(input, splitter::WORD);
+	if (args.size() != 4)
+		errorMessage = ERR_NEEDMOREPARAMS_MSG;
+
+	// On skip le nickname bot et on recupère la commande (doit etre PRIVMSG)
+	std::vector<std::string>::iterator itArg = args.begin();
+	++itArg;
+	std::string command = *itArg;
+
+	// On recupère le nickname du client
+	++itArg;
+	std::string clientNick = *itArg;
+	_clientFd = _server.getClientByNickname(clientNick, this);
+	if (IrcHelper::clientExists(_clientFd) == false)
+		return;
+	_client = _clients[_clientFd];
+
+	// Verification de la commande apres avoir identifié le client
+	if (command != commands::PRIVMSG)
+		_client->sendMessage(MessageHandler::ircUnknownCommand(clientNick, input), this);
+
+	// On recupère l'input du client
+	++itArg;
+	std::string message = Utils::stockVector(itArg, args);
+	std::vector<std::string> args = Utils::getTokens(message, splitter::SENTENCE);
 	if (args.size() < 1)
-		throw std::invalid_argument(ERR_INVALID_CMD_FORMAT);
+		_client->sendMessage(MessageHandler::ircUnknownCommand(clientNick, input), this);
+	
+	// On recupère la commande bot
 	std::vector<std::string>::iterator itArg = args.begin();
 	_command = *itArg;
+
+	// On recupère les arguments de la commande bot s'il y en a
 	++itArg;
 	if (itArg != args.end())
 		_ageArg = *itArg;

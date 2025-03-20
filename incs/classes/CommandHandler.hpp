@@ -13,9 +13,13 @@
 #include "Utils.hpp"
 #include "IrcHelper.hpp"
 #include "Server.hpp"
+#include "Client.hpp"
+#include "Channel.hpp"
+#include "Bot.hpp"
 
 // =========================================================================================
 
+class Bot;
 class Server;
 class CommandHandler {
 
@@ -24,7 +28,7 @@ class CommandHandler {
 		~CommandHandler();
 
 		// === COMMAND MANAGER : MAIN METHOD ===
-		void manage_command(std::string stringSent);
+		void manageCommand(std::string input);
 
 	private :
 
@@ -36,9 +40,10 @@ class CommandHandler {
 		int _clientFd;
 		Client* _client;
 
-		// === REFERENCE TO ALL CLIENTS + ALL CHANNELS ===
+		// === REFERENCE TO ALL CLIENTS + ALL CHANNELS + bot ===
 		std::map<int, Client*>& _clients;
 		std::map<std::string, Channel*>& _channels;
+		Bot* _bot;	
 
 		// === MAP : COMMANDS -> HANDLERS ===
 		std::map<std::string, void (CommandHandler::*)()> _fctMap;
@@ -94,7 +99,7 @@ class CommandHandler {
 		void _setAway();
 		void _quitServer();
 
-		// === FILE COMMANDS (BONUS) : CommandHandler_File.cpp ===
+		// === FILE COMMANDS : CommandHandler_File.cpp ===
 		void _handleFile();
 		void _sendFile(std::vector<std::string> entry);
 		void _getFile(std::vector<std::string> entry);

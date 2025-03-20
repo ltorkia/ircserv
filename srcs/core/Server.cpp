@@ -170,6 +170,16 @@ const std::string& Server::getServerPassword() const
 	return _password;
 }
 
+/**
+ * @brief Retrieves the bot instance associated with the server.
+ * 
+ * @return Bot* Pointer to the bot instance.
+ */
+Bot* Server::getBot()
+{
+	return _bot;
+}
+
 
 // === CLIENTS ===
 
@@ -495,20 +505,61 @@ void Server::_setServerSocket()
 }
 
 /**
+ * @brief Initializes a bot connection.
+ *
+ * This function accepts a new connection for a bot, sets the bot's socket to non-blocking mode,
+ * and adds the bot's file descriptor to the set of read file descriptors.
+ *
+ * @details
+ * - Accepts a new connection on the server socket.
+ * - Sets the new bot socket to non-blocking mode.
+ * - Adds the bot socket to the read file descriptor set.
+ * - Creates a new Bot instance with the bot's file descriptor.
+ *
+ * @note If accepting the connection or setting the socket to non-blocking mode fails,
+ *       appropriate error messages are printed and the bot connection is terminated.
+ */
+void Server::_initBot()
+{
+	struct sockaddr_in botAddr;
+	socklen_t botAddrLen = sizeof(botAddr);
+
+	// Accepter une connexion et obtenir un nouveau descripteur de socket pour ce bot
+	int botFd = accept(_serverSocketFd, (struct sockaddr*)&botAddr, &botAddrLen);
+	if (botFd < 0)
+	{
+		perror("Failed to accept new bot");
+		return;
+	}
+
+	// Rendre le nouveau socket non-bloquant
+	if (fcntl(botFd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		perror("Failed to set bot socket to non-blocking");
+		_disconnectClient(botFd, CONNECTION_FAILED);
+		return;
+	}
+	FD_SET(botFd, &_readFds);
+	_bot = new Bot(botFd, bot::NICK, bot::USER, bot::REALNAME, *this);
+}
+
+/**
  * @brief Initializes the server by setting up signals, local IP, server socket, and creation time.
  * 
  * This function performs the following steps:
  * 1. Sets up signal handling by calling _setSignal().
  * 2. Retrieves and sets the local IP address by calling _setLocalIp().
  * 3. Creates and configures the server socket by calling _setServerSocket().
- * 4. Records the server creation time using MessageHandler::msgTimeServerCreation().
- * 5. Displays a welcome message with the local IP, port, and password using MessageHandler::displayWelcome().
+ * 4. Initializes the bot connection by calling _initBot().
+ * 5. Records the server creation time using MessageHandler::msgTimeServerCreation().
+ * 6. Displays a welcome message with the local IP, port, and password using MessageHandler::displayWelcome().
  */
 void Server::_init()
 {
 	_setSignal();
 	_setLocalIp();
 	_setServerSocket();
+	_initBot();
 
 	_timeCreationStr = MessageHandler::msgTimeServerCreation();
 	MessageHandler::displayWelcome(_localIp, _port, _password);
@@ -632,6 +683,9 @@ void Server::_clean()
 		_deleteClient(_clients.begin());
 	}
 
+	// Supprimer le bot
+	delete _bot;
+
 	// Fermer le socket du serveur
 	if (close(_serverSocketFd) == -1)
 	{
@@ -736,7 +790,7 @@ void Server::_processInput(std::map<int, Client*>::iterator it, std::string mess
 
 	try {
 		CommandHandler handler(*this, it);
-		handler.manage_command(message);
+		handler.manageCommand(message);
 	} catch (const std::exception &e) {
 		client->sendMessage(e.what(), NULL);
 	}
