@@ -42,7 +42,7 @@ class Bot : public Client {
 		int _clientFd;
 
 		// === CURRENT CHANNEL ===
-		Channel* _channel;
+		// Channel* _channel;
 
 		// === CLIENT INPUT ===
 		std::string _input;

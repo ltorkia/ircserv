@@ -93,7 +93,7 @@ void Bot::_readInput()
 	// Suppression \r\n
 	std::string message(buffer);
 	size_t pos = message.find('\n');
-	std::string message = message.substr(0, pos);
+	message = message.substr(0, pos);
 	if (!message.empty() && message[message.size() - 1] == '\r')
 		message.erase(message.size() - 1);
 
@@ -123,7 +123,10 @@ bool Bot::_parseInput(std::string& input)
 
 	std::vector<std::string> args = Utils::getTokens(input, splitter::WORD);
 	if (args.size() != 4)
+	{
 		_client->sendMessage(MessageHandler::ircNeedMoreParams(_nickname, input), this);
+		return false;
+	}
 
 	// On recupère le nickname de l'envoyeur
 	std::vector<std::string>::iterator itArg = args.begin();
@@ -137,7 +140,10 @@ bool Bot::_parseInput(std::string& input)
 	// 	_client->sendMessage(MessageHandler::ircUnknownCommand(_nickname, input), this);
 	std::string command = *itArg;
 	if (command != commands::PRIVMSG)
+	{
 		_client->sendMessage(MessageHandler::ircUnknownCommand(_nickname, input), this);
+		return false;
+	}
 
 	// On skip le nick du bot
 	++itArg;
@@ -145,18 +151,23 @@ bool Bot::_parseInput(std::string& input)
 	// On recupère l'input du client
 	++itArg;
 	std::string message = Utils::stockVector(itArg, args);
-	std::vector<std::string> args = Utils::getTokens(message, splitter::SENTENCE);
-	if (args.size() < 1)
+	std::vector<std::string> argsInput = Utils::getTokens(message, splitter::SENTENCE);
+	if (argsInput.size() < 1)
+	{
 		_client->sendMessage(MessageHandler::ircUnknownCommand(_nickname, input), this);
+		return false;
+	}
 	
 	// On recupère la commande bot
-	std::vector<std::string>::iterator itArg = args.begin();
-	_command = *itArg;
+	std::vector<std::string>::iterator itArgInput = argsInput.begin();
+	_command = *itArgInput;
 
 	// On recupère les arguments de la commande bot s'il y en a
-	++itArg;
-	if (itArg != args.end())
-		_ageArg = *itArg;
+	++itArgInput;
+	if (itArgInput != argsInput.end())
+		_ageArg = *itArgInput;
+
+	return true;
 }
 
 /**
@@ -318,10 +329,12 @@ bool Bot::_parseAge()
 		if (std::atoi(day.c_str()) > 30) 
 			return false;
 	if ((std::atoi(year.c_str()) % 4 == 0 && std::atoi(year.c_str()) % 100 != 0) || std::atoi(year.c_str()) % 400 == 0)
+	{
 		if (std::atoi(month.c_str()) == 2 && std::atoi(day.c_str()) > 29) 
 			return false;
+	}
 	else if (std::atoi(month.c_str()) == 2 && std::atoi(day.c_str()) > 28) 
-		return false;
+			return false;
 	return true;
 }
 
