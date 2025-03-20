@@ -13,7 +13,7 @@ Channel::~Channel() {}
 // --- PRIVATE
 Channel::Channel() {}
 Channel::Channel(const Channel& src) {(void) src;}
-Channel & Channel::operator=(Channel& src) {(void) src; return *this;}
+Channel & Channel::operator=(const Channel& src) {(void) src; return *this;}
 
 
 // === SETTERS ===

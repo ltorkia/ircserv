@@ -364,7 +364,7 @@ std::map<std::string, File>& Server::getFiles()
 
 Server::Server() {}
 Server::Server(const Server& src) {(void) src;}
-Server & Server::operator=(Server& src) {(void) src; return *this;}
+Server & Server::operator=(const Server& src) {(void) src; return *this;}
 
 
 // === INIT / CLEAN ===

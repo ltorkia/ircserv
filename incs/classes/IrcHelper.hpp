@@ -30,7 +30,7 @@ class IrcHelper {
 	private:
 		IrcHelper();
 		IrcHelper(const IrcHelper& src);
-		IrcHelper& operator=(IrcHelper& src);
+		IrcHelper& operator=(const IrcHelper& src);
 		~IrcHelper();
 
 	public:

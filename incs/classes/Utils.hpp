@@ -15,7 +15,7 @@ class Utils {
 	private:
 		Utils();
 		Utils(const Utils& src);
-		Utils& operator=(Utils& src);
+		Utils& operator=(const Utils& src);
 		~Utils();
 
 	public:

@@ -25,7 +25,7 @@ class Server {
 	private:
 		Server();
 		Server(const Server& src);
-		Server& operator=(Server& src);
+		Server& operator=(const Server& src);
 
 		// === SERVER INFOS ===
 		int _port;																// Port du serveur

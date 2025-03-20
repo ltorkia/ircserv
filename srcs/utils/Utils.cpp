@@ -7,7 +7,7 @@ using namespace commands;
 
 Utils::Utils() {}
 Utils::Utils(const Utils& src) {(void) src;}
-Utils & Utils::operator=(Utils& src) {(void) src; return *this;}
+Utils & Utils::operator=(const Utils& src) {(void) src; return *this;}
 Utils::~Utils() {}
 
 

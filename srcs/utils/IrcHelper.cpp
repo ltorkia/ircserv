@@ -15,7 +15,7 @@ using namespace colors;
 
 IrcHelper::IrcHelper() {}
 IrcHelper::IrcHelper(const IrcHelper& src) {(void) src;}
-IrcHelper & IrcHelper::operator=(IrcHelper& src) {(void) src; return *this;}
+IrcHelper & IrcHelper::operator=(const IrcHelper& src) {(void) src; return *this;}
 IrcHelper::~IrcHelper() {}
 
 

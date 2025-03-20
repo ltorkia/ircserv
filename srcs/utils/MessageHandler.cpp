@@ -11,7 +11,7 @@ using namespace colors;
 
 MessageHandler::MessageHandler() {}
 MessageHandler::MessageHandler(const MessageHandler& src) {(void) src;}
-MessageHandler& MessageHandler::operator=(MessageHandler& src) {(void) src; return *this;}
+MessageHandler& MessageHandler::operator=(const MessageHandler& src) {(void) src; return *this;}
 MessageHandler::~MessageHandler() {}
 
 

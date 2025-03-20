@@ -21,7 +21,7 @@ class MessageHandler {
 	private:
 		MessageHandler();
 		MessageHandler(const MessageHandler& src);
-		MessageHandler & operator=(MessageHandler& src);
+		MessageHandler & operator=(const MessageHandler& src);
 		~MessageHandler();
 
 	public:
