@@ -505,19 +505,14 @@ void Server::_setServerSocket()
 }
 
 /**
- * @brief Initializes a bot connection.
+ * @brief Initializes a bot connection on the server.
  *
  * This function accepts a new connection for a bot, sets the bot's socket to non-blocking mode,
- * and adds the bot's file descriptor to the set of read file descriptors.
+ * and adds the bot's file descriptor to the set of read file descriptors. It then creates a new
+ * Bot instance and starts listening for activity from the bot.
  *
- * @details
- * - Accepts a new connection on the server socket.
- * - Sets the new bot socket to non-blocking mode.
- * - Adds the bot socket to the read file descriptor set.
- * - Creates a new Bot instance with the bot's file descriptor.
- *
- * @note If accepting the connection or setting the socket to non-blocking mode fails,
- *       appropriate error messages are printed and the bot connection is terminated.
+ * @note If accepting the connection or setting the socket to non-blocking mode fails, an error
+ * message is printed and the bot connection is terminated.
  */
 void Server::_initBot()
 {
@@ -541,6 +536,7 @@ void Server::_initBot()
 	}
 	FD_SET(botFd, &_readFds);
 	_bot = new Bot(botFd, bot::NICK, bot::USER, bot::REALNAME, *this);
+	_bot->listenActivity();
 }
 
 /**

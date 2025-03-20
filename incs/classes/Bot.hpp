@@ -26,6 +26,9 @@ class Bot : public Client {
 	
 		Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real, Server& server);
 		~Bot();
+
+		// === LISTEN ACTIVITY ===
+		void listenActivity();
 	
 	private:
 
@@ -51,12 +54,9 @@ class Bot : public Client {
 
 		// ================================================================================
 
-		// === LISTEN ACTIVITY ===
-		void _listenActivity();
-
 		// === COMMAND HANDLER ===
 		void _readInput();
-		void _parseInput(std::string& input);
+		bool _parseInput(std::string& input);
 		std::string _handleCommand(std::string& input);
 
 		// === JOKE COMMAND ===
