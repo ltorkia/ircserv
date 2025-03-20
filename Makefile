@@ -9,7 +9,7 @@ CORE_DIR			=	core
 CMD_DIR				=	commands
 UTILS_DIR			=	utils
 
-CORE_FILES  		=	Server.cpp		Client.cpp		Channel.cpp
+CORE_FILES  		=	Server.cpp		Client.cpp		Channel.cpp		Bot.cpp
 
 CMD_FILES			=	CommandHandler.cpp				CommandHandler_Auth.cpp \
 						CommandHandler_Channel.cpp 		CommandHandler_File.cpp \
