@@ -9,6 +9,7 @@ namespace server
 	const std::string LOCALHOST 			= "127.0.0.1";
 	const std::string VERSION				= "1.1";
 	const std::string UNKNOWN_IP 			= "unknown IP";
+	const std::string ENV_PATH 				= "incs/config/.env";
 
 	const size_t BUFFER_SIZE 				= 510;
 

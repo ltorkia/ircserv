@@ -1,24 +1,33 @@
-NAME				= 	ircserv
-
-#-----> MANDATORY
+NAME_SERVER	= ircserv
+NAME_BOT	= ircbot
 
 SRCS_DIR			=	srcs
 OBJS_DIR			= 	build
+OBJS_DIR_BOT		= 	build_bot
 
 CORE_DIR			=	core
 CMD_DIR				=	commands
+BOT_DIR				=	bot
 UTILS_DIR			=	utils
 
-CORE_FILES  		=	Server.cpp		Client.cpp		Channel.cpp		Bot.cpp
+CORE_FILES  		=	Server.cpp		Client.cpp		Channel.cpp
 
 CMD_FILES			=	CommandHandler.cpp				CommandHandler_Auth.cpp \
 						CommandHandler_Channel.cpp 		CommandHandler_File.cpp \
 						CommandHandler_Log.cpp 			CommandHandler_Message.cpp \
 						CommandHandler_Mode.cpp
 
+BOT_FILES  			=	Bot.cpp			main.cpp
+
 UTILS_FILES			=	MessageHandler.cpp		IrcHelper.cpp		Utils.cpp
 
-MAIN_FILES			=	main.cpp \
+MAIN_SERVER_FILES	=	main.cpp \
+						$(addprefix $(CORE_DIR)/, $(CORE_FILES)) \
+						$(addprefix $(CMD_DIR)/, $(CMD_FILES)) \
+						$(addprefix $(UTILS_DIR)/, $(UTILS_FILES)) \
+						$(addprefix $(BOT_DIR)/, Bot.cpp)
+
+MAIN_BOT_FILES		=	$(addprefix $(BOT_DIR)/, $(BOT_FILES)) \
 						$(addprefix $(CORE_DIR)/, $(CORE_FILES)) \
 						$(addprefix $(CMD_DIR)/, $(CMD_FILES)) \
 						$(addprefix $(UTILS_DIR)/, $(UTILS_FILES))
@@ -27,9 +36,18 @@ MAIN_FILES			=	main.cpp \
 #############         COMPILATION            ############
 #########################################################
 
-SRCS				= 	${addprefix $(SRCS_DIR)/,$(MAIN_FILES)}
+#-----> SERVEUR IRC
+
+SRCS				= 	${addprefix $(SRCS_DIR)/,$(MAIN_SERVER_FILES)}
 OBJS				= 	${SRCS:%.cpp=${OBJS_DIR}/%.o}
 DEPS				= 	${OBJS:.o=.d}
+
+#-----> BOT
+
+SRCS_BOT			= 	${addprefix $(SRCS_DIR)/,$(MAIN_BOT_FILES)}
+OBJS_BOT			= 	${SRCS_BOT:%.cpp=${OBJS_DIR_BOT}/%.o}
+DEPS_BOT			= 	${OBJS_BOT:.o=.d}
+
 INC_DIRS			= 	-I./incs/classes/ -I./incs/config/
 
 CXX					= 	c++
@@ -52,43 +70,45 @@ RESET				= \033[0m
 #############             RULES               ###########
 #########################################################
 
-#-----> MANDATORY
+#-----> SERVEUR IRC
 
 ${OBJS_DIR}/%.o: %.cpp
 	@mkdir -p ${dir $@}
 	@echo "\n${GREEN}--> Compiling $<${RESET}"
 	${CXX} -MMD -c ${CXXFLAGS} $< -o $@
 
-all: ${NAME}
+all: ${NAME_SERVER}
+	@$(MAKE) bot
 
-${NAME}: ${OBJS}
+${NAME_SERVER}: ${OBJS}
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}####                    LINKING                    ####${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
-	@echo "${GREEN}--> ${NAME}${RESET}\n"
-	${CXX} ${OBJS} -o ${NAME}
+	@echo "${GREEN}--> ${NAME_SERVER}${RESET}\n"
+	${CXX} ${OBJS} -o ${NAME_SERVER}
 
-#-----> BONUS
+#-----> BOT
 
-$(OBJS_DIRB)/%.o: %.cpp
+# Règle pour compiler les fichiers du bot
+$(OBJS_DIR_BOT)/%.o: %.cpp
 	@mkdir -p ${dir $@}
-	@echo "\n${GREEN}--> Compiling Bonus $<${RESET}"
+	@echo "\n${GREEN}--> Compiling ircbot $<${RESET}"
 	${CXX} -MMD -c ${CXXFLAGS} $< -o $@
 
-bonus: ${NAME_BONUS}
+bot: ${NAME_BOT}
 
-${NAME_BONUS}: ${OBJSB}
+${NAME_BOT}: ${OBJS_BOT}
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}####                    LINKING                    ####${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
-	@echo "${GREEN}--> ${NAME_BONUS}${RESET}\n"
-	${CXX} ${OBJSB} -o ${NAME_BONUS}
+	@echo "${GREEN}--> ${NAME_BOT}${RESET}\n"
+	${CXX} ${OBJS_BOT} -o ${NAME_BOT}
 
 #-----> CLEANING / RECOMPILATION
 
@@ -100,7 +120,7 @@ clean:
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	${RM} ${OBJS_DIR}
-	${RM} ${OBJS_DIRB}
+	${RM} ${OBJS_DIR_BOT}
 
 fclean:
 	@echo "\n"
@@ -110,9 +130,9 @@ fclean:
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	${RM} ${OBJS_DIR}
-	${RM} ${NAME}
-	${RM} ${OBJS_DIRB}
-	${RM} ${NAME_BONUS}
+	${RM} ${NAME_SERVER}
+	${RM} ${OBJS_DIR_BOT}
+	${RM} ${NAME_BOT}
 
 re: fclean
 	@$(MAKE) all
@@ -126,4 +146,4 @@ debug: fclean
 
 -include ${DEPS}
 
-.PHONY: all clean fclean re debug
+.PHONY: all clean fclean re debug bot

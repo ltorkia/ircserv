@@ -779,7 +779,7 @@ std::string MessageHandler::msgServerException(const std::exception &e)
 
 // === DISPLAY ===
 
-void MessageHandler::displayWelcome(const std::string &clientIp, int port, const std::string &password)
+void MessageHandler::displayWelcome(const std::string &serverIp, int port, const std::string &password)
 {
 	std::cout << std::endl << CYAN << "==================================================" << RESET << std::endl << std::endl;
 	std::cout << GREEN << "            ██╗" << RED << "     ██████╗ " << BLUE << "   ██████╗ " << RESET << std::endl;
@@ -792,7 +792,7 @@ void MessageHandler::displayWelcome(const std::string &clientIp, int port, const
 	std::cout << CYAN << "==================================================" << RESET << std::endl << std::endl;
 	std::cout << BLUE << "         IRC server successfully launched !" << RESET << std::endl;
 	std::cout << PURPLE << "         Waiting for connections... " << RESET << std::endl << std::endl;
-	std::cout << RED << "         🖥️  - IP Server: " << WHITE << clientIp << RESET << std::endl;
+	std::cout << RED << "         🖥️  - IP Server: " << WHITE << serverIp << RESET << std::endl;
 	std::cout << RED << "         🔌 - Port:      " << WHITE << port << RESET << std::endl;
 	std::cout << RED << "         🔑 - Password:  " << WHITE << password << RESET << std::endl;
 	std::cout << std::endl << CYAN << "==================================================" << RESET << std::endl << std::endl;

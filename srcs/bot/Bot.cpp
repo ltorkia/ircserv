@@ -10,36 +10,36 @@ using namespace server_messages;
 Bot::Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real, Server& server)
 	:  Client(botFd), _server(server), _clients(_server.getClients()), _channels(_server.getChannels())
 {
-	_authenticated = true;
-	_clientSocketFd = botFd;
-	_nickname = nick;
-	_username = user;
-	_realName = real;
-	_hostname = nick;
-	_clientIp = _hostname;
+	// === BOT INFOS ===
+	_botNick = nick;
+	_botUser = user;
+	_botReal = real;
 }
 Bot::~Bot() {}
-
 
 // === LISTEN ACTIVITY ===
 
 /**
- * @brief Listens for activity on the server socket and processes input.
+ * @brief Listens for activity on the server socket and processes incoming messages.
  *
- * This function runs an infinite loop that continuously checks for activity
- * on the server socket. It uses the `select` system call to monitor the socket
- * for readability with a timeout of 500 milliseconds. If a signal is received
- * from the server, the loop breaks and the function exits. If an error occurs
- * during the `select` call (other than an interrupt), a runtime exception is thrown.
- * When the server socket is ready for reading, the function calls `_readInput`
- * to process the incoming data.
+ * This function runs an infinite loop that continuously checks for activity on the server socket.
+ * It performs the following steps:
+ * 1. If the bot is not authenticated, it attempts to authenticate.
+ * 2. Checks if a termination signal has been received from the server and breaks the loop if so.
+ * 3. Sets up the file descriptor set and timeout for the select call.
+ * 4. Uses the select system call to wait for activity on the server socket.
+ * 5. If an error occurs during select (other than an interrupt), it throws a runtime error.
+ * 6. If there is activity on the server socket, it reads the input from the server.
  *
- * @throws std::runtime_error if an error occurs during the `select` call.
+ * @throws std::runtime_error If an error occurs during the select system call.
  */
 void Bot::listenActivity()
 {
 	while (true)
 	{
+		if (!_authenticated)
+			_authenticate();
+
 		if (_server.isSignalReceived())
 			break;
 
@@ -61,6 +61,40 @@ void Bot::listenActivity()
 
 
 // --- PRIVATE
+
+// === AUTHENTICATE ==
+
+/**
+ * @brief Authenticates the bot with the IRC server.
+ *
+ * This function performs the authentication process for the bot by sending
+ * the necessary IRC commands to the server. It sends the server password,
+ * bot nickname, and bot username in sequence, with a delay between each
+ * command to ensure proper processing by the server.
+ *
+ * The function checks if the bot is already authenticated before proceeding
+ * with the authentication steps. If the bot is not authenticated, it sends
+ * the following commands:
+ * - PASS: Sends the server password.
+ * - NICK: Sends the bot's nickname.
+ * - USER: Sends the bot's username and real name.
+ *
+ * The function also prints messages to the console to indicate the progress
+ * of the authentication process.
+ */
+void Bot::_authenticate()
+{
+	// connection to irc server
+	sendMessage("PASS " + _server.getServerPassword() + "\r\n", NULL);
+	std::cout << "\nSending password, waiting for authentication..." << std::endl; 
+	sleep(1);
+	sendMessage("NICK " + _botNick + "\r\n", NULL);
+	std::cout << "\nSending nickname, waiting for second authentication..." << std::endl; 
+	sleep(1);
+	sendMessage("USER " + _botUser + " 0 * :" + _botReal + "\r\n", NULL);
+	std::cout << "\nSending username, getting bored..." << std::endl; 
+	sleep(1);
+}
 
 // === COMMAND HANDLER ===
 
@@ -103,7 +137,7 @@ void Bot::_readInput()
 	if (_parseInput(message) == false)
 		return;
 	std::string response = _handleCommand(message);
-	sendMessage(response, this);
+	_client->sendMessage(MessageHandler::ircMsgToClient(_nickname, _clientNickname, response), NULL);
 }
 
 /**
@@ -130,8 +164,8 @@ bool Bot::_parseInput(std::string& input)
 
 	// On recupère le nickname de l'envoyeur
 	std::vector<std::string>::iterator itArg = args.begin();
-	std::string clientNick = *itArg;
-	_clientFd = _server.getClientByNickname(clientNick, this);
+	_clientNickname = *itArg;
+	_clientFd = _server.getClientByNickname(_clientNickname, this);
 	_client = _clients[_clientFd];
 
 	// On recupère la commande (doit etre PRIVMSG)

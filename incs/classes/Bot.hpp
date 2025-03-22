@@ -32,6 +32,11 @@ class Bot : public Client {
 	
 	private:
 
+		// === BOT INFOS ===
+		std::string _botNick;
+		std::string _botUser;
+		std::string _botReal;
+
 		// === SERVER / CLIENTS / CHANNELS ===
 		Server& _server;
 		std::map<int, Client*>& _clients;
@@ -40,6 +45,7 @@ class Bot : public Client {
 		// === CURRENT CLIENT ===
 		Client* _client;
 		int _clientFd;
+		std::string _clientNickname;
 
 		// === CURRENT CHANNEL ===
 		// Channel* _channel;
@@ -53,6 +59,9 @@ class Bot : public Client {
 		std::vector<std::string> _quotes;
 
 		// ================================================================================
+
+		// === AUTHENTICATION ===
+		void _authenticate();
 
 		// === COMMAND HANDLER ===
 		void _readInput();
@@ -68,4 +77,4 @@ class Bot : public Client {
         std::string _getAge();
 		bool _parseAge();
 		std::string _ageCalculator();
-};	
+};

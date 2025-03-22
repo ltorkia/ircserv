@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>						// gestion chaînes de caractères -> std::cout, std::cerr, std::string
+#include <fstream>						// gestion fichiers -> std::ifstream, std::ofstream
 #include <sstream>						// gestion flux -> std::ostringstream
 #include <ctime> 						// gestion temps -> std::time_t, std::tm
 #include <map>							// container map
@@ -37,6 +38,8 @@ class IrcHelper {
 
 		// === SERVER CONNECT HELPER ===
 		static int validatePort(const std::string& port);
+		static void writeEnvFile(const std::string& serverIp, int port);
+		static std::string getEnvValue(const std::string& key);
 
 		// === AUTHENTICATION HELPER ===
 		static int getCommand(const Client& client);

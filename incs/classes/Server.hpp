@@ -53,7 +53,6 @@ class Server {
 		void _setSignal();														// Paramétrage du signal
 		void _setLocalIp();														// Récupère l'adresse IP locale
 		void _setServerSocket();												// Paramétrage du socket serveur
-		void _initBot();														// Initialise le bot
 
 		void _init();															// Initialise le serveur
 		void _checkActivity();													// Vérifie l'activité des clients
@@ -85,6 +84,8 @@ class Server {
 
 		// === SERVER INFOS ===
 		int getServerSocketFd() const; 																// Récupère le descripteur de socket du serveur
+		const std::string& getLocalIP() const; 														// Récupère l'adresse IP locale
+		int getPort() const; 																		// Récupère le port du serveur;
 		fd_set getReadFds() const; 																	// Récupère l'ensemble des descripteurs surveillés
 		int getMaxFd();																				// Récupère le descripteur maximum pour select()
 		const std::string& getServerPassword() const; 												// Récupère le mot de passe du serveur

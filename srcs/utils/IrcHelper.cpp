@@ -47,6 +47,61 @@ int IrcHelper::validatePort(const std::string& port)
 	return static_cast<int>(portNumber);
 }
 
+/**
+ * @brief Writes the server IP and port to the environment configuration file.
+ *
+ * This function creates or truncates the environment configuration file and writes
+ * the provided server IP address and port number to it. If the file cannot be created
+ * or opened, an error message is printed to the standard error output.
+ *
+ * @param serverIp The IP address of the server to be written to the environment file.
+ * @param port The port number to be written to the environment file.
+ */
+void IrcHelper::writeEnvFile(const std::string& serverIp, int port)
+{
+	std::ofstream file(server::ENV_PATH.c_str(), std::ios::trunc); // Ouvre en mode écriture et écrase le contenu existant
+	if (!file)
+	{
+		std::cerr << "Erreur : Impossible de créer config/.env" << std::endl;
+		return;
+	}
+    file << "SERVER_IP=" << serverIp << '\n';
+    file << "PORT=" << port << '\n';
+    file.close();
+}
+
+/**
+ * @brief Retrieves the value of a specified environment variable from a configuration file.
+ *
+ * This function opens the configuration file specified by `server::ENV_PATH` and searches for a line
+ * that contains the given key. If the key is found, the function extracts and returns the value
+ * associated with the key. If the file cannot be opened or the key is not found, an empty string is returned.
+ *
+ * @param key The environment variable key to search for in the configuration file.
+ * @return The value associated with the specified key, or an empty string if the key is not found or the file cannot be opened.
+ */
+std::string IrcHelper::getEnvValue(const std::string& key)
+{
+	std::ifstream file(server::ENV_PATH.c_str());
+	if (!file)
+	{
+		std::cerr << "Erreur : Impossible d'ouvrir config/.env" << std::endl;
+		return "";
+	}
+
+	std::string line;
+	while (std::getline(file, line))
+	{
+		if (line.find(key) != std::string::npos)
+		{
+			file.close();
+			return line.substr(line.find('=') + 1);
+		}
+	}
+	file.close();
+	return "";
+}
+
 // === AUTHENTICATION HELPER ===
 
 /**

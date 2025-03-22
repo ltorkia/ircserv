@@ -125,6 +125,29 @@ int Server::getServerSocketFd() const
 }
 
 /**
+ * @brief Retrieves the local IP address of the server.
+ * 
+ * This function returns a constant reference to the local IP address
+ * stored in the server instance.
+ * 
+ * @return const std::string& A constant reference to the local IP address.
+ */
+const std::string& Server::getLocalIP() const
+{
+	return _localIp;
+}
+
+/**
+ * @brief Retrieves the port number the server is using.
+ * 
+ * @return int The port number.
+ */
+int Server::getPort() const
+{
+	return _port;
+}
+
+/**
  * @brief Retrieves the set of file descriptors for reading.
  * 
  * This function returns a copy of the file descriptor set that is monitored
@@ -505,59 +528,25 @@ void Server::_setServerSocket()
 }
 
 /**
- * @brief Initializes a bot connection on the server.
- *
- * This function accepts a new connection for a bot, sets the bot's socket to non-blocking mode,
- * and adds the bot's file descriptor to the set of read file descriptors. It then creates a new
- * Bot instance and starts listening for activity from the bot.
- *
- * @note If accepting the connection or setting the socket to non-blocking mode fails, an error
- * message is printed and the bot connection is terminated.
- */
-void Server::_initBot()
-{
-	struct sockaddr_in botAddr;
-	socklen_t botAddrLen = sizeof(botAddr);
-
-	// Accepter une connexion et obtenir un nouveau descripteur de socket pour ce bot
-	int botFd = accept(_serverSocketFd, (struct sockaddr*)&botAddr, &botAddrLen);
-	if (botFd < 0)
-	{
-		perror("Failed to accept new bot");
-		return;
-	}
-
-	// Rendre le nouveau socket non-bloquant
-	if (fcntl(botFd, F_SETFL, O_NONBLOCK) < 0)
-	{
-		perror("Failed to set bot socket to non-blocking");
-		_disconnectClient(botFd, CONNECTION_FAILED);
-		return;
-	}
-	FD_SET(botFd, &_readFds);
-	_bot = new Bot(botFd, bot::NICK, bot::USER, bot::REALNAME, *this);
-	_bot->listenActivity();
-}
-
-/**
- * @brief Initializes the server by setting up signals, local IP, server socket, and creation time.
+ * @brief Initializes the server by setting up signals, local IP, server socket,
+ *        writing environment file, and displaying welcome message.
  * 
  * This function performs the following steps:
- * 1. Sets up signal handling by calling _setSignal().
- * 2. Retrieves and sets the local IP address by calling _setLocalIp().
- * 3. Creates and configures the server socket by calling _setServerSocket().
- * 4. Initializes the bot connection by calling _initBot().
- * 5. Records the server creation time using MessageHandler::msgTimeServerCreation().
- * 6. Displays a welcome message with the local IP, port, and password using MessageHandler::displayWelcome().
+ * - Sets up signal handling.
+ * - Determines and sets the local IP address.
+ * - Configures and sets up the server socket.
+ * - Generates the server creation time string.
+ * - Writes the environment file with the local IP and port.
+ * - Displays a welcome message with the local IP, port, and password.
  */
 void Server::_init()
 {
 	_setSignal();
 	_setLocalIp();
 	_setServerSocket();
-	_initBot();
 
 	_timeCreationStr = MessageHandler::msgTimeServerCreation();
+	IrcHelper::writeEnvFile(_localIp, _port);
 	MessageHandler::displayWelcome(_localIp, _port, _password);
 }
 
@@ -601,7 +590,10 @@ void Server::_checkActivity()
 void Server::_start()
 {
 	// Boucle infinie pour écouter les connexions des clients tant que le serveur n'est pas interrompu
-	while (1) {
+	while (1)
+	{
+		// if (!_bot)
+		// 	_initBot();
 
 		if (signalReceived)
 			break;
@@ -678,9 +670,6 @@ void Server::_clean()
 		_disconnectClient(clientFd, SHUTDOWN_REASON);
 		_deleteClient(_clients.begin());
 	}
-
-	// Supprimer le bot
-	delete _bot;
 
 	// Fermer le socket du serveur
 	if (close(_serverSocketFd) == -1)
@@ -836,7 +825,24 @@ void Server::_acceptNewClient()
 	}
 
 	// Ajouter ce nouveau client à la liste des clients connectés
-	_clients[newClientFd] = new Client(newClientFd);
+	// _clients[newClientFd] = new Client(newClientFd);
+
+	// Lire un message immédiatement (si le bot envoie un message dès la connexion)
+	char buffer[32] = {0};
+	int bytesRead = recv(newClientFd, buffer, sizeof(buffer) - 1, MSG_PEEK); // Lire sans supprimer du buffer
+
+	if (bytesRead > 0 && strcmp(buffer, "HELLO_BOT\r\n") == 0)
+	{
+		std::cout << "🤖 Bot détecté ! Création d'une instance Bot." << std::endl;
+		_bot = new Bot(newClientFd, bot::NICK, bot::USER, bot::REALNAME, *this);
+		_clients[newClientFd] = _bot;
+		_bot->listenActivity();
+	}
+	else
+	{
+		std::cout << "👤 Nouveau client détecté." << std::endl;
+		_clients[newClientFd] = new Client(newClientFd);
+	}
 
 	// Si l'adresse et le port du client ne sont pas récupérables (ex: proxy, VPN...)
 	// on assigne des valeurs par défaut pour éviter une déconnexion
@@ -864,12 +870,15 @@ void Server::_acceptNewClient()
 	// Ajouter le descripteur du client à l'ensemble des descripteurs surveillés pour l'écriture et la lecture
 	FD_SET(newClientFd, &_readFds);
 
-	// Prompt pour saisir les infos d'authentification
-	std::string authenticationPrompt = IrcHelper::commandToSend(*_clients[newClientFd]);
-	_clients[newClientFd]->sendMessage(MessageHandler::ircCommandPrompt(authenticationPrompt, "", false), NULL);
-
-	// Log de connexion du client
-	std::cout << MessageHandler::msgClientConnected(_clients[newClientFd]->getClientIp(), _clients[newClientFd]->getClientPort(), newClientFd, "") << std::endl;
+	if (bytesRead <= 0)
+	{
+		// Prompt pour saisir les infos d'authentification
+		std::string authenticationPrompt = IrcHelper::commandToSend(*_clients[newClientFd]);
+		_clients[newClientFd]->sendMessage(MessageHandler::ircCommandPrompt(authenticationPrompt, "", false), NULL);
+	
+		// Log de connexion du client
+		std::cout << MessageHandler::msgClientConnected(_clients[newClientFd]->getClientIp(), _clients[newClientFd]->getClientPort(), newClientFd, "") << std::endl;
+	}
 }
 
 /**

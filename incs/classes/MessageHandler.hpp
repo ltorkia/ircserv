@@ -141,7 +141,7 @@ class MessageHandler {
 		static std::string msgServerException(const std::exception &e);
 
 		// === DISPLAY ===
-		static void displayWelcome(const std::string &clientIp, int port, const std::string &password);
+		static void displayWelcome(const std::string &serverIp, int port, const std::string &password);
 		static std::string msgTimeServerCreation();
 
 		// === SETTINGS ===
