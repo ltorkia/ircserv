@@ -106,6 +106,20 @@ void Server::launch()
 	}
 }
 
+/**
+ * @brief Cleanly exits the server.
+ *
+ * This function prints a message indicating that the server is exiting,
+ * performs necessary cleanup operations by calling the _clean() method,
+ * and then terminates the program with an exit status of 0.
+ */
+void Server::cleanExit()
+{
+	std::cout << "Exiting server..." << std::endl;
+	_clean();
+	exit(0);
+}
+
 
 /********** PUBLIC GETTERS AND METHODS FOR COMMANDHANDLER ACCESS **********/
 
@@ -834,22 +848,22 @@ void Server::_acceptNewClient()
 	if (bytesRead > 0 && strcmp(buffer, "HELLO_BOT\r\n") == 0)
 	{
 		std::cout << "🤖 Bot détecté ! Création d'une instance Bot." << std::endl;
-		_bot = new Bot(newClientFd, bot::NICK, bot::USER, bot::REALNAME, *this);
-		_clients[newClientFd] = _bot;
-		_bot->listenActivity();
+		_initBot(newClientFd);
 	}
 	else
 	{
 		std::cout << "👤 Nouveau client détecté." << std::endl;
-		_clients[newClientFd] = new Client(newClientFd);
+		_addClient(newClientFd);
 	}
+
+	Client* client = _clients[newClientFd];
 
 	// Si l'adresse et le port du client ne sont pas récupérables (ex: proxy, VPN...)
 	// on assigne des valeurs par défaut pour éviter une déconnexion
 	if (getpeername(newClientFd, (struct sockaddr*)&clientAddr, &clientAddrLen) == -1)
 	{
-		_clients[newClientFd]->setClientIp(server::UNKNOWN_IP);
-		_clients[newClientFd]->setClientPort(0);
+		client->setClientIp(server::UNKNOWN_IP);
+		client->setClientPort(0);
 	}
 	else
 	{
@@ -858,13 +872,13 @@ void Server::_acceptNewClient()
 	
 		// Convertit l'adresse binaire en chaîne lisible
 		if (getnameinfo((struct sockaddr*)&clientAddr, clientAddrLen, ipAddr, sizeof(ipAddr), NULL, 0, NI_NUMERICHOST) != 0)
-			_clients[newClientFd]->setClientIp(server::UNKNOWN_IP);
+			client->setClientIp(server::UNKNOWN_IP);
 		else
-			_clients[newClientFd]->setClientIp(ipAddr);
+			client->setClientIp(ipAddr);
 	
 		// Stocke le port source du client (0 si non identifiable)
 		int clientPort = ntohs(((struct sockaddr_in*)&clientAddr)->sin_port);
-		_clients[newClientFd]->setClientPort(clientPort);
+		client->setClientPort(clientPort);
 	}
 
 	// Ajouter le descripteur du client à l'ensemble des descripteurs surveillés pour l'écriture et la lecture
@@ -873,12 +887,44 @@ void Server::_acceptNewClient()
 	if (bytesRead <= 0)
 	{
 		// Prompt pour saisir les infos d'authentification
-		std::string authenticationPrompt = IrcHelper::commandToSend(*_clients[newClientFd]);
-		_clients[newClientFd]->sendMessage(MessageHandler::ircCommandPrompt(authenticationPrompt, "", false), NULL);
+		std::string authenticationPrompt = IrcHelper::commandToSend(*client);
+		client->sendMessage(MessageHandler::ircCommandPrompt(authenticationPrompt, "", false), NULL);
 	
 		// Log de connexion du client
-		std::cout << MessageHandler::msgClientConnected(_clients[newClientFd]->getClientIp(), _clients[newClientFd]->getClientPort(), newClientFd, "") << std::endl;
+		std::cout << MessageHandler::msgClientConnected(client->getClientIp(), client->getClientPort(), newClientFd, "") << std::endl;
 	}
+
+	if (_bot)
+		_bot->listenActivity();
+}
+
+/**
+ * @brief Adds a new client to the server.
+ *
+ * This function creates a new Client object using the provided client file descriptor
+ * and adds it to the server's client map.
+ *
+ * @param clientFd The file descriptor of the client to be added.
+ */
+void Server::_addClient(int clientFd)
+{
+	_clients[clientFd] = new Client(clientFd);
+}
+
+/**
+ * @brief Initializes the bot and adds it to the server's client list.
+ * 
+ * This function creates a new Bot instance with the given file descriptor,
+ * sets its nickname, username, and real name, and adds it to the server's
+ * list of clients. It also starts listening for activity from the bot.
+ * 
+ * @param botFd The file descriptor associated with the bot.
+ */
+void Server::_initBot(int botFd)
+{
+	_bot = new Bot(botFd, bot::NICK, bot::USER, bot::REALNAME, *this);
+	_clients[botFd] = _bot;
+	_bot->listenActivity();
 }
 
 /**

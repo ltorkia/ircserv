@@ -66,6 +66,8 @@ class Server {
 		
 		// === UPDATE CLIENTS ===
 		void _acceptNewClient();												// Accepte une nouvelle connexion client
+		void _addClient(int clientFd); 											// Ajoute un client à la liste
+		void _initBot(int botFd); 												// Ajoute un bot au serveur
 		void _disconnectClient(int fd, const std::string& reason); 				// Déconnecte un client du serveur
 		void _deleteClient(std::map<int, Client*>::iterator it);				// Supprime un client de la liste
 		void _lateClientDeletion();												// Supprime les clients de la liste en différé
@@ -81,6 +83,7 @@ class Server {
 		~Server();
 
 		void launch();
+		void cleanExit(); 																			// Fermeture propre du serveur
 
 		// === SERVER INFOS ===
 		int getServerSocketFd() const; 																// Récupère le descripteur de socket du serveur

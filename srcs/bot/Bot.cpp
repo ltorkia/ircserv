@@ -84,6 +84,9 @@ void Bot::listenActivity()
  */
 void Bot::_authenticate()
 {
+	std::cout << "\nAuthenticating bot with the server..." << std::endl;
+	std::cout << "bot fd: " << _clientSocketFd << std::endl;
+
 	// connection to irc server
 	sendMessage("PASS " + _server.getServerPassword() + "\r\n", NULL);
 	std::cout << "\nSending password, waiting for authentication..." << std::endl; 
@@ -94,6 +97,12 @@ void Bot::_authenticate()
 	sendMessage("USER " + _botUser + " 0 * :" + _botReal + "\r\n", NULL);
 	std::cout << "\nSending username, getting bored..." << std::endl; 
 	sleep(1);
+
+	if (!isAuthenticated())
+	{
+		std::cerr << "Authentication failed" << std::endl;
+		_server.cleanExit();
+	}
 }
 
 // === COMMAND HANDLER ===

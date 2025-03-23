@@ -24,15 +24,15 @@ int main(void)
 	int botSocketFd = socket(AF_INET, SOCK_STREAM, 0);
 	if (botSocketFd < 0)
 	{
-		perror(ERR_SOCKET_CREATION.c_str());
-		return 1;
+		std::cerr << ERR_SOCKET_CREATION << std::endl;
+        return 1;
 	}
 
 	std::string serverIp = IrcHelper::getEnvValue("SERVER_IP");
 	int port = atoi(IrcHelper::getEnvValue("PORT").c_str());
 	if (serverIp.empty() || port == 0)
 	{
-		perror(ERR_ENV_VALUE.c_str());
+		std::cerr << ERR_ENV_VALUE << std::endl;
 		return 1;
 	}
 
@@ -42,7 +42,7 @@ int main(void)
 
 	if (connect(botSocketFd, (struct sockaddr*)&botAddr, sizeof(botAddr)) < 0)
 	{
-		perror(ERR_SOCKET_CREATION.c_str());
+		std::cerr << "Échec connect" << std::endl;
 		return 1;
 	}
 
@@ -52,7 +52,7 @@ int main(void)
 	const char *helloBotMsg = "HELLO_BOT\r\n";
 	if (send(botSocketFd, helloBotMsg, strlen(helloBotMsg), 0) < 0)
 	{
-		perror("Échec de l'envoi du message d'identification");
+		std::cerr << "Échec de l'envoi du message d'identification" << std::endl;
 		close(botSocketFd);
 		return 1;
 	}
