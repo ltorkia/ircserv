@@ -10,6 +10,7 @@ namespace server_messages
 
 	// === EXCEPTIONS FOR ERROR SETTINGS ===
 	const std::string ERR_INVALID_ARGUMENTS 		= "./" + server::NAME + " <port> <password>";				// argc
+	const std::string ERR_NO_NETWORK 				= "No network interface available";
 	const std::string ERR_INVALID_PORT_NUMBER 		= "Invalid port number. Port must be between 1 and 65535"; 	// arg[1]
 	const std::string ERR_INVALID_PASSWORD 			= "Incorrect password format";								// arg[2]
 	const std::string ERR_SET_SIGNAL 				= "Failed to configure SIGINT signal";
@@ -56,8 +57,14 @@ namespace server_messages
 	const std::string CONNECTION_TIMEOUT 			= "Connection timeout";
 
 
-	// === BONUS BOT (AGE COMMAND) ===
+	// === BOT ===
+	const std::string BOT_CONNECTED 				= "Bot connected to server";
+	const std::string BOT_DISCONNECTED 				= "Bot disconnected from server";
+	const std::string MSG_BOT_QUIT 					= "Bot: Quitting...";
+	const std::string MSG_BOT_ERROR 				= "Bot: Error occurred";
+	const std::string ERR_ECHEC_CONNECTION 			= "Connection failed";
 	const std::string ERR_READ_SERVER 				= "Bot: Connection lost or error occurred";
+	const std::string ERR_WRITE_SERVER				= "Bot: Failed to send message";
 	const std::string ERR_INVALID_CMD_FORMAT 		= "Invalid command format";
-	const std::string INVALID_DATE_FORMAT 			= "Invalid date format(!age <year-month-day>)";
+	const std::string INVALID_DATE_FORMAT 			= "Invalid date format. Usage: !age <YYYY-MM-DD>";
 }

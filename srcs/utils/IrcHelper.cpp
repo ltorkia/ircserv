@@ -1,6 +1,17 @@
 #include "../../incs/classes/IrcHelper.hpp"
 
+// === OTHER CLASSES ===
+#include "../../incs/classes/Client.hpp"
+#include "../../incs/classes/Channel.hpp"
+#include "../../incs/classes/Utils.hpp"
+#include "../../incs/classes/MessageHandler.hpp"
+
 // === NAMESPACES ===
+#include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/server_messages.hpp"
+#include "../../incs/config/commands.hpp"
+#include "../../incs/config/colors.hpp"
+
 using namespace server_messages;
 using namespace name_type;
 using namespace auth_cmd;
@@ -56,18 +67,20 @@ int IrcHelper::validatePort(const std::string& port)
  *
  * @param serverIp The IP address of the server to be written to the environment file.
  * @param port The port number to be written to the environment file.
+ * @param password The server password to be written to the environment file.
  */
-void IrcHelper::writeEnvFile(const std::string& serverIp, int port)
+void IrcHelper::writeEnvFile(const std::string& serverIp, int port, const std::string& password)
 {
-	std::ofstream file(server::ENV_PATH.c_str(), std::ios::trunc); // Ouvre en mode écriture et écrase le contenu existant
+	std::ofstream file(env::PATH.c_str(), std::ios::trunc); // Ouvre en mode écriture et écrase le contenu existant
 	if (!file)
 	{
-		std::cerr << "Erreur : Impossible de créer config/.env" << std::endl;
+		std::cerr << "Erreur : Impossible de créer incs/config/.env" << std::endl;
 		return;
 	}
-    file << "SERVER_IP=" << serverIp << '\n';
-    file << "PORT=" << port << '\n';
-    file.close();
+	file << env::SERVER_IP_KEY << "=" << serverIp << '\n';
+	file << env::SERVER_PORT_KEY << "=" << port << '\n';
+	file << env::PASS_KEY << "=" << password << '\n';
+	file.close();
 }
 
 /**
@@ -82,7 +95,7 @@ void IrcHelper::writeEnvFile(const std::string& serverIp, int port)
  */
 std::string IrcHelper::getEnvValue(const std::string& key)
 {
-	std::ifstream file(server::ENV_PATH.c_str());
+	std::ifstream file(env::PATH.c_str());
 	if (!file)
 	{
 		std::cerr << "Erreur : Impossible d'ouvrir config/.env" << std::endl;
@@ -325,6 +338,32 @@ std::string IrcHelper::formatUsername(const std::string& username)
 
 
 // === MESSAGES HELPER ===
+
+/**
+ * @brief Extracts and cleans a message from the buffer.
+ *
+ * This function extracts a message from the provided buffer up to the specified position (excluding the newline character).
+ * If the extracted message ends with a carriage return character ('\r'), it is removed.
+ * The processed part of the buffer is then erased.
+ *
+ * @param bufferMessage The buffer containing the message to be extracted and cleaned.
+ * @param pos The position up to which the message should be extracted.
+ * @return A cleaned message string.
+ */
+std::string IrcHelper::extractAndCleanMessage(std::string& bufferMessage, size_t pos)
+{
+	// On extrait le message jusqu'au \n (non inclus)
+	std::string message = bufferMessage.substr(0, pos);
+
+	// On enlève le \r s'il y en a un (cas irssi)
+	if (!message.empty() && message[message.size() - 1] == '\r')
+		message.erase(message.size() - 1);
+
+	// On supprime la commande traitée du buffer
+	bufferMessage.erase(0, pos + 1);
+
+	return message;
+}
 
 /**
  * @brief Sanitizes an IRC message by removing the leading character if necessary.
@@ -625,17 +664,58 @@ bool IrcHelper::isValidLimit(std::string &limit)
 // === BOT HELPER ===
 
 /**
- * @brief Checks if the given message is a recognized bot command.
+ * @brief Finds the starting position of a bot command in the given message.
  *
- * This function checks if the provided message starts with one of the recognized
- * bot commands: "!joke", "!age", or "!time".
+ * This function searches for predefined bot commands (JOKE_CMD, AGE_CMD, TIME_CMD)
+ * within the provided message string. If any of these commands are found, the
+ * function returns the starting position of the first occurrence. If none of the
+ * commands are found, it returns std::string::npos.
  *
- * @param message The message to be checked.
- * @return true if the message starts with a recognized bot command, false otherwise.
+ * @param message The message string to search for bot commands.
+ * @return The starting position of the first found bot command, or std::string::npos if none are found.
  */
-bool IrcHelper::isBotCommandFound(const std::string& message)
+size_t IrcHelper::getBotCommandStartPos(const std::string& message)
 {
-	return message.find(bot::JOKE_CMD) == 0 || message.find(bot::AGE_CMD) == 0 || message.find(bot::TIME_CMD) == 0;
+	const std::string commands[] = {bot::JOKE_CMD, bot::AGE_CMD, bot::TIME_CMD};
+
+	for (size_t i = 0; i < 3; ++i)
+	{
+		size_t pos = message.find(commands[i]);
+		if (pos != std::string::npos)
+			return pos;
+	}
+	return std::string::npos;
+}
+
+/**
+ * @brief Checks if the given command is an invalid bot command.
+ *
+ * This function compares the provided command against a set of predefined
+ * valid bot commands (JOKE_CMD, AGE_CMD, TIME_CMD). If the command does not
+ * match any of these, it is considered invalid.
+ *
+ * @param command The command string to be checked.
+ * @return true if the command is invalid, false if it is a valid bot command.
+ */
+bool IrcHelper::isInvalidBotCommand(const std::string& command)
+{
+	return command != bot::JOKE_CMD && command != bot::AGE_CMD && command != bot::TIME_CMD;
+}
+
+/**
+ * @brief Retrieves the current local time.
+ *
+ * This function fills the provided std::tm structure with the current local time.
+ *
+ * @param[out] outTime A reference to a std::tm structure that will be filled with the current local time.
+ */
+void IrcHelper::getCurrentTime(std::tm &outTime)
+{
+	std::time_t now = std::time(0);
+	std::memset(&outTime, 0, sizeof(outTime));
+	std::tm *localTime = std::localtime(&now);
+	if (localTime)
+		outTime = *localTime;
 }
 
 /**
@@ -647,7 +727,7 @@ bool IrcHelper::isBotCommandFound(const std::string& message)
  * 
  * @return std::string The current time as a string.
  */
-std::string IrcHelper::getCurrentTime()
+std::string IrcHelper::getTimeString()
 {
 	time_t now = time(0);
 	return ctime(&now);

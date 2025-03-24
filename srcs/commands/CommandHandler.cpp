@@ -1,14 +1,20 @@
 #include "../../incs/classes/CommandHandler.hpp"
 
+// === OTHER CLASSES ===
+#include "../../incs/classes/Utils.hpp"
+#include "../../incs/classes/IrcHelper.hpp"
+#include "../../incs/classes/MessageHandler.hpp"
+
 // === NAMESPACES ===
+#include "../../incs/config/commands.hpp"
+#include "../../incs/config/server_messages.hpp"
+
 using namespace commands;
 
 // =========================================================================================
 CommandHandler::CommandHandler(Server& server, std::map<int, Client*>::iterator it)
 	: _server(server), _it(it), _clientFd(_it->first), _client(_it->second), _clients(_server.getClients()), _channels(_server.getChannels())
 {
-	_bot = _server.getBot();
-
 	// === AUTHENTICATE COMMANDS : CommandHandler_Auth.cpp ===
 	_fctMap[PASS] 			= &CommandHandler::_isRightPassword;
 	_fctMap[NICK] 			= &CommandHandler::_setNicknameClient;
@@ -76,13 +82,8 @@ void CommandHandler::manageCommand(std::string input)
 		return ;
 	}
 
-	if (IrcHelper::isBotCommandFound(input))
-	{
-		_bot->sendMessage(MessageHandler::ircMsgToClient(_client->getNickname(), _bot->getNickname(), input), NULL);
-		return ;
-	}
-
 	std::string cmd = *_itInput;
+	
 	std::map<std::string, void (CommandHandler::*)()>::iterator itFunction = _fctMap.find(cmd);;
 	if (itFunction == _fctMap.end())
 		throw std::invalid_argument(MessageHandler::ircUnknownCommand(nickname, input));

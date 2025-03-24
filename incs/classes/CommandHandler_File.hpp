@@ -6,11 +6,9 @@
 #include <fstream> 						// gestion fichiers -> std::ifstream, std::ofstream
 #include <filesystem> 					// gestion fichiers -> std::filesystem
 
-// === CLASSES ===
-#include "Server.hpp"
-
 // =========================================================================================
 
+class Server;
 class File
 {
 	public:

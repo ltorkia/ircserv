@@ -5,26 +5,22 @@
 #include <fstream>				// gestion fichiers -> std::ifstream, std::ofstream
 #include <vector>				// container vector
 #include <map>					// container map
+#include <cstring>				// memset()
+#include <arpa/inet.h>			// inet_addr()
+#include <unistd.h>				// close()
+#include <csignal>				// gestion signaux -> SIGINT, SIGTSTP
 
-// === NAMESPACES ===
-#include "../config/irc_config.hpp"
-#include "../config/irc_replies.hpp"
-#include "../config/server_messages.hpp"
-#include "../config/commands.hpp"
-
-// === CLASSES ===
-#include "IrcHelper.hpp"
-#include "MessageHandler.hpp"
-#include "Server.hpp"
-#include "Client.hpp"
-
-class Server;
-class Client;
-class Bot : public Client {
-
+class Bot
+{
 	public:
+
+		// === SIGNAL ===
+		static volatile sig_atomic_t signalReceived;							// Indique si un signal a été reçu
+		static void signalHandler(int signal);									// Gestionnaire de signaux
+		sig_atomic_t isSignalReceived() const; 									// Vérifie si un signal a été reçu	
 	
-		Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real, Server& server);
+		// === CONSTUCTORS / DESTRUCTORS ===
+		Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real);
 		~Bot();
 
 		// === LISTEN ACTIVITY ===
@@ -33,40 +29,41 @@ class Bot : public Client {
 	private:
 
 		// === BOT INFOS ===
+		bool _hasSentAuthInfos;
+		bool _isAuthenticated;
+		int _botFd;
 		std::string _botNick;
 		std::string _botUser;
 		std::string _botReal;
+		std::string _botMask;
 
-		// === SERVER / CLIENTS / CHANNELS ===
-		Server& _server;
-		std::map<int, Client*>& _clients;
-		std::map<std::string, Channel*>& _channels;
-
-		// === CURRENT CLIENT ===
-		Client* _client;
-		int _clientFd;
+		// === CURRENT CLIENT AND CHANNEL ===
+		std::string _target;
 		std::string _clientNickname;
-
-		// === CURRENT CHANNEL ===
-		// Channel* _channel;
+		std::string _channelName;
 
 		// === CLIENT INPUT ===
 		std::string _input;
 		std::string _command;
+		size_t _commandPos;
 		std::string _ageArg;
+
+		// === BUFFER ===
+		std::string _buffer;
 		
 		// === QUOTES FOR JOKES ===
 		std::vector<std::string> _quotes;
 
 		// ================================================================================
 
-		// === AUTHENTICATION ===
-		void _authenticate();
-
 		// === COMMAND HANDLER ===
 		void _readInput();
-		bool _parseInput(std::string& input);
-		std::string _handleCommand(std::string& input);
+		void _authenticate();
+		std::vector<std::string>::iterator _getItCommand(std::vector<std::string>& args);
+		bool _parsingFailed(std::string& input);
+		bool _processSpecialMessages(const std::string& input);
+		bool _noBotCommandFound(const std::string& input);
+		std::string _handleCommand();
 
 		// === JOKE COMMAND ===
 		std::string _getJoke();
@@ -77,4 +74,7 @@ class Bot : public Client {
         std::string _getAge();
 		bool _parseAge();
 		std::string _ageCalculator();
+
+		// === SEND MESSAGE ===
+		void _sendMessage(const std::string &message) const;
 };

@@ -1,5 +1,15 @@
 #include "../../incs/classes/Client.hpp"
 
+// === OTHER CLASSES ===
+#include "../../incs/classes/Server.hpp"
+#include "../../incs/classes/Channel.hpp"
+#include "../../incs/classes/Utils.hpp"
+#include "../../incs/classes/IrcHelper.hpp"
+#include "../../incs/classes/MessageHandler.hpp"
+
+// === NAMESPACES ===
+#include "../../incs/config/irc_config.hpp"
+
 // =========================================================================================
 // === CONSTUCTORS / DESTRUCTORS ===
 
@@ -206,8 +216,8 @@ bool Client::pingSent() const
 void Client::sendMessage(const std::string &message, Client* sender) const
 {
 	// On formate le message en IRC (ajout du \r\n, si trop long tronqué à 512 caractères)
-	std::string formatedMessage = MessageHandler::ircFormat(message);
-	if (send(_clientSocketFd, formatedMessage.c_str(), formatedMessage.length(), MSG_NOSIGNAL) == -1)
+	std::string formattedMessage = MessageHandler::ircFormat(message);
+	if (send(_clientSocketFd, formattedMessage.c_str(), formattedMessage.length(), MSG_NOSIGNAL) == -1)
 	{
 		perror("send() failed");
 		return;

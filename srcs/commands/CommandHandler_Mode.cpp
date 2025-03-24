@@ -1,7 +1,14 @@
 #include "../../incs/classes/CommandHandler.hpp"
-#include "../../incs/classes/Channel.hpp"
+
+// === OTHER CLASSES ===
+#include "../../incs/classes/Utils.hpp"
+#include "../../incs/classes/IrcHelper.hpp"
+#include "../../incs/classes/MessageHandler.hpp"
 
 // === NAMESPACES ===
+#include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/commands.hpp"
+
 using namespace commands;
 using namespace channel_error;
 using namespace error_display;

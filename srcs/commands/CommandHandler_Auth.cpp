@@ -1,6 +1,16 @@
 #include "../../incs/classes/CommandHandler.hpp"
 
+// === OTHER CLASSES ===
+#include "../../incs/classes/Utils.hpp"
+#include "../../incs/classes/IrcHelper.hpp"
+#include "../../incs/classes/MessageHandler.hpp"
+
 // === NAMESPACES ===
+#include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/commands.hpp"
+#include "../../incs/config/server_messages.hpp"
+#include "../../incs/config/colors.hpp"
+
 using namespace commands;
 using namespace name_type;
 using namespace auth_cmd;

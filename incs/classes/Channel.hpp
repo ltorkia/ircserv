@@ -4,18 +4,11 @@
 #include <sstream>				// gestion flux -> std::ostringstream
 #include <set>					// container set
 
-// === NAMESPACES ===
-#include "../config/irc_config.hpp"
-
-// === CLASSES ===
-#include "MessageHandler.hpp"
-#include "Client.hpp"
-
 // =========================================================================================
 
 class Client;
-class Channel {
-
+class Channel
+{
 	private:
 		Channel();
 		Channel(const Channel& src);

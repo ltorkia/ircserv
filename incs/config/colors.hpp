@@ -2,8 +2,8 @@
 
 #include <string>
 
-namespace colors {
-
+namespace colors
+{
 	/*********** IRSSI COLOR CODES ***********/
 
 	const std::string IRC_RESET 			= "\x0F";

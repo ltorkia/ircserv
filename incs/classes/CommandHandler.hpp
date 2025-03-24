@@ -3,26 +3,15 @@
 // === SERVER LIBRARIES ===
 #include "../config/server_libs.hpp"
 
-// === NAMESPACES ===
-#include "../config/irc_config.hpp"
-#include "../config/commands.hpp"
-#include "../config/server_messages.hpp"
-#include "../config/colors.hpp"
-
-// === CLASSES ===
-#include "Utils.hpp"
-#include "IrcHelper.hpp"
-#include "Server.hpp"
-#include "Client.hpp"
-#include "Channel.hpp"
-#include "Bot.hpp"
+// === HIGH CLASS DEPENDENCY ===
+#include "../classes/Server.hpp"
+#include "../classes/Client.hpp"
+#include "../classes/Channel.hpp"
 
 // =========================================================================================
 
-class Bot;
-class Server;
-class CommandHandler {
-
+class CommandHandler
+{
 	public : 
 		CommandHandler(Server& server, std::map<int, Client*>::iterator it);
 		~CommandHandler();
@@ -40,10 +29,9 @@ class CommandHandler {
 		int _clientFd;
 		Client* _client;
 
-		// === REFERENCE TO ALL CLIENTS + ALL CHANNELS + bot ===
+		// === REFERENCE TO ALL CLIENTS + ALL CHANNELS ===
 		std::map<int, Client*>& _clients;
 		std::map<std::string, Channel*>& _channels;
-		Bot* _bot;	
 
 		// === MAP : COMMANDS -> HANDLERS ===
 		std::map<std::string, void (CommandHandler::*)()> _fctMap;

@@ -9,12 +9,20 @@ namespace server
 	const std::string LOCALHOST 			= "127.0.0.1";
 	const std::string VERSION				= "1.1";
 	const std::string UNKNOWN_IP 			= "unknown IP";
-	const std::string ENV_PATH 				= "incs/config/.env";
 
 	const size_t BUFFER_SIZE 				= 510;
 
 	const int PING_INTERVAL 				= 240;
 	const int PONG_TIMEOUT 					= 300;
+}
+
+// === ENV INFOS ===
+namespace env
+{
+	const std::string PATH 					= "incs/config/.env";
+	const std::string SERVER_IP_KEY 		= "SERVER_IP";
+	const std::string SERVER_PORT_KEY 		= "SERVER_PORT";
+	const std::string PASS_KEY 				= "PASSWORD";
 }
 
 // === SPLITTER MODE ===

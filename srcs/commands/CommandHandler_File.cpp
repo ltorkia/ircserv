@@ -1,6 +1,14 @@
 #include "../../incs/classes/CommandHandler.hpp"
 #include "../../incs/classes/CommandHandler_File.hpp"
 
+// === OTHER CLASSES ===
+#include "../../incs/classes/Utils.hpp"
+#include "../../incs/classes/IrcHelper.hpp"
+#include "../../incs/classes/MessageHandler.hpp"
+
+// === NAMESPACES ===
+#include "../../incs/config/server_messages.hpp"
+
 //---------------------------------------------------FILE METHODS---------------------------------------------------//
 
 File::File() {}

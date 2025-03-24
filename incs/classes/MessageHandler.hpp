@@ -5,19 +5,11 @@
 #include <ctime> 			// gestion temps -> std::time_t, std::tm
 #include <vector>			// container vector
 
-// === NAMESPACES ===
-#include "../config/irc_config.hpp"
-#include "../config/irc_replies.hpp"
-#include "../config/commands.hpp"
-#include "../config/colors.hpp"
-
-// === CLASSES ===
-#include "Utils.hpp"
-
 // =========================================================================================
 
-class MessageHandler {
-
+class Utils;
+class MessageHandler
+{
 	private:
 		MessageHandler();
 		MessageHandler(const MessageHandler& src);
@@ -163,11 +155,12 @@ class MessageHandler {
 		static std::string msgNoClientInChannel(const std::string& channelName);
 		static std::string msgChannelDestroyed(const std::string& channelName);
 
-
-		/**************************** BONUS ****************************/
-		
+		// === FILES ===
 		static std::string msgSendFile(const std::string& filename, const std::string &client, const std::string &adr, const int &port);
 		static std::string errorMsgSendFile(const std::string& filename);
 		static std::string msgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int &port);
+		
+		// === BOT ===
 		static std::string botGetAge(int years, int months, int days);
+		static std::string ircMsgBotToClient(const std::string& receiverName, const std::string& message);
 };

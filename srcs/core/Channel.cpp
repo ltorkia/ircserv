@@ -1,5 +1,12 @@
 #include "../../incs/classes/Channel.hpp"
 
+// === OTHER CLASSES ===
+#include "../../incs/classes/Client.hpp"
+#include "../../incs/classes/MessageHandler.hpp"
+
+// === NAMESPACES ===
+#include "../../incs/config/irc_config.hpp"
+
 // =========================================================================================
 /**************************************** PUBLIC ****************************************/
 

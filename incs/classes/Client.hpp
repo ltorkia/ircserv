@@ -13,21 +13,13 @@
 #include <vector>				// container vector
 #include <set>					// container set
 
-// === NAMESPACES ===
-#include "../config/irc_config.hpp"
-
-// === CLASSES ===
-#include "Utils.hpp"
-#include "IrcHelper.hpp"
-#include "MessageHandler.hpp"
-#include "Channel.hpp"
-
 // =========================================================================================
 
+class Server;
 class Channel;
-class Client {
-
-	protected:
+class Client
+{
+	private:
 		
 		Client();
 		Client(const Client& src);
@@ -67,8 +59,6 @@ class Client {
 	public:
 
 		Client(int fd);
-		// Client(const Client& src);
-		// Client& operator=(const Client& src);
 		~Client();
 
 		// === SETTERS INFOS CLIENT ===

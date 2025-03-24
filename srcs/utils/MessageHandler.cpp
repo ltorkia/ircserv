@@ -1,7 +1,15 @@
-// === CLASSES ===
 #include "../../incs/classes/MessageHandler.hpp"
 
+// === OTHER CLASSES ===
+#include "../../incs/classes/Utils.hpp"
+#include "../../incs/classes/IrcHelper.hpp"
+
 // === NAMESPACES ===
+#include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/irc_replies.hpp"
+#include "../../incs/config/commands.hpp"
+#include "../../incs/config/colors.hpp"
+
 using namespace irc_replies;
 using namespace commands;
 using namespace colors;
@@ -808,16 +816,17 @@ void MessageHandler::displayWelcome(const std::string &serverIp, int port, const
  */
 std::string MessageHandler::msgTimeServerCreation()
 {
-	std::time_t now = std::time(NULL);		// Récupère le temps actuel
-	std::tm *ltm = std::localtime(&now);	// Convertit en heure locale
+	std::tm now;
+	IrcHelper::getCurrentTime(now);
 
 	std::ostringstream stream;
-	stream << (ltm->tm_year + 1900) << "-"	// Année
-		<< (ltm->tm_mon + 1) << "-"     	// Mois (de 0 à 11, donc +1)
-		<< ltm->tm_mday << " at "			// Jour
-		<< ltm->tm_hour << ":"				// Heure
-		<< ltm->tm_min << ":"				// Minute
-		<< ltm->tm_sec;						// Seconde
+	stream 
+		<< (now.tm_year + 1900) << "-"		// Année
+		<< (now.tm_mon + 1) << "-"     		// Mois (de 0 à 11, donc +1)
+		<< now.tm_mday << " at "			// Jour
+		<< now.tm_hour << ":"				// Heure
+		<< now.tm_min << ":"				// Minute
+		<< now.tm_sec;						// Seconde
 
 	return stream.str();
 }
@@ -842,9 +851,9 @@ std::string MessageHandler::msgClientConnected(const std::string& clientIp, int 
 	if (!nickname.empty())
 	{
 		nickDisplay = DEFAULT + nickname + " ";
-		text = nickDisplay + COLOR_SUCCESS + "registered";
+		text = "👤 " + nickDisplay + COLOR_SUCCESS + "registered";
 	} else
-		text = COLOR_INFO + "New unregistered client";
+		text = "➕ " + COLOR_INFO + "New unregistered client";
 
 	std::ostringstream stream;
 	stream << text << " => " << COLOR_DISPLAY << "[" << clientIp << "][port " << port << "][socket " << socket << "]" << RESET;
@@ -859,9 +868,9 @@ std::string MessageHandler::msgClientDisconnected(const std::string& clientIp, i
 	if (!nickname.empty())
 	{
 		nickDisplay = DEFAULT + nickname + " ";
-		text = nickDisplay + COLOR_ERR + "left";
+		text = "👋 " + nickDisplay + COLOR_ERR + "left";
 	} else
-		text = COLOR_INFO + "Unregistered client left";
+		text = "➖ " + COLOR_INFO + "Unregistered client left";
 
 	std::ostringstream stream;
 	stream << text << " => " << COLOR_DISPLAY << "[" << clientIp << "][port " << port << "][socket " << socket << "]" << RESET;
@@ -873,56 +882,55 @@ std::string MessageHandler::msgClientDisconnected(const std::string& clientIp, i
 
 std::string MessageHandler::msgClientCreatedChannel(const std::string& nickname, const std::string& channelName, const std::string& password)
 {
-	if (!password.empty())
-		return msgBuilder(COLOR_SUCCESS, DEFAULT + nickname + COLOR_SUCCESS + " created channel " + DEFAULT + channelName + COLOR_SUCCESS + " with password set", "");
-	return msgBuilder(COLOR_SUCCESS, DEFAULT + nickname + COLOR_SUCCESS + " created channel " + DEFAULT + channelName, "");
+	std::string notifPass = !password.empty() ? COLOR_SUCCESS + " with password set" : "";
+	return msgBuilder("🚀 " + COLOR_SUCCESS, DEFAULT + nickname + COLOR_SUCCESS + " created channel " + DEFAULT + channelName + notifPass, "");
 }
 std::string MessageHandler::msgIsInvitedToChannel(const std::string& nickname, const std::string& inviterNick, const std::string& channelName)
 {
-	return msgBuilder(COLOR_INFO, DEFAULT + inviterNick + COLOR_INFO + " invited " + DEFAULT + nickname + COLOR_INFO + " to join channel " + DEFAULT + channelName, "");
+	return msgBuilder("📩 " + COLOR_INFO, DEFAULT + inviterNick + COLOR_INFO + " invited " + DEFAULT + nickname + COLOR_INFO + " to join channel " + DEFAULT + channelName, "");
 }
 std::string MessageHandler::msgClientJoinedChannel(const std::string& nickname, const std::string& channelName)
 {
-	return msgBuilder(COLOR_SUCCESS, DEFAULT + nickname + COLOR_SUCCESS + " joined channel " + DEFAULT + channelName, "");
+	return msgBuilder("➡️  " + COLOR_SUCCESS, DEFAULT + nickname + COLOR_SUCCESS + " joined channel " + DEFAULT + channelName, "");
 }
 std::string MessageHandler::msgClientSetTopic(const std::string& nickname, const std::string& channelName, const std::string& topic)
 {
-	std::string defTopic = topic.empty() ? "NO TOPIC" : topic;
-	return msgBuilder(COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " set topic on channel " + DEFAULT + channelName + COLOR_INFO + " to " + DEFAULT + defTopic, "");
+	std::string notifTopic = topic.empty() ? "NO TOPIC" : topic;
+	return msgBuilder("📢 " + COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " set topic on channel " + DEFAULT + channelName + COLOR_INFO + " to " + DEFAULT + notifTopic, "");
 }
 std::string MessageHandler::msgClientOperatorAdded(const std::string& nickname, const std::string& channelName)
 {
-	return msgBuilder(COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " is now operator of channel " + DEFAULT + channelName, "");
+	return msgBuilder("🛡️  " + COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " is now operator of channel " + DEFAULT + channelName, "");
 }
 std::string MessageHandler::msgClientOperatorRemoved(const std::string& nickname, const std::string& channelName)
 {
-	return msgBuilder(COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " doesn't operate on channel " + DEFAULT + channelName + COLOR_INFO + " anymore", "");
+	return msgBuilder("⚠️ " + COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " doesn't operate on channel " + DEFAULT + channelName + COLOR_INFO + " anymore", "");
 }
 std::string MessageHandler::msgClientLeftChannel(const std::string& nickname, const std::string& channelName, const std::string& reason)
 {
-	return msgBuilder(COLOR_ERR, DEFAULT + nickname + COLOR_ERR + " left channel " + DEFAULT + channelName + PURPLE + " (" + reason + ")", "");
+	return msgBuilder("⬅️  " + COLOR_ERR, DEFAULT + nickname + COLOR_ERR + " left channel " + DEFAULT + channelName + PURPLE + " (" + reason + ")", "");
 }
 std::string MessageHandler::msgClientKickedFromChannel(const std::string& nickname, const std::string& kickerNick, const std::string& channelName, const std::string& reason)
 {
-	return msgBuilder(COLOR_INFO, DEFAULT + kickerNick + COLOR_INFO + " kicked " + DEFAULT + nickname + COLOR_INFO + " from channel " + DEFAULT + channelName + PURPLE + " (" + reason + ")", "");
+	return msgBuilder("⛔ " + COLOR_INFO, DEFAULT + kickerNick + COLOR_INFO + " kicked " + DEFAULT + nickname + COLOR_INFO + " from channel " + DEFAULT + channelName + PURPLE + " (" + reason + ")", "");
 }
 std::string MessageHandler::msgNoClientInChannel(const std::string& channelName)
 {
-	return msgBuilder(COLOR_INFO, "No client left in channel " + DEFAULT + channelName, "");
+	return msgBuilder("🏜️  " + COLOR_INFO, "No client left in channel " + DEFAULT + channelName, "");
 }
 std::string MessageHandler::msgChannelDestroyed(const std::string& channelName)
 {
-	return msgBuilder(COLOR_ERR, "Channel " + DEFAULT + channelName + COLOR_ERR + " destroyed.", "");
+	return msgBuilder("💥 " + COLOR_ERR, "Channel " + DEFAULT + channelName + COLOR_ERR + " destroyed.", "");
 }
 
 
-// === BONUS ===
+// === FILES ===
 
  //+ _client->getNickname() + "souhaite vous envoyer ce fichier : " + filename + ". Pour l'accepter, merci d'utiliser la commande GET. Sinon, merci d'ignorer ce message."
 std::string MessageHandler::msgSendFile(const std::string& filename, const std::string &client, const std::string &adr, const int &port)
 {
 	std::ostringstream stream;
-	stream << DCC << " SEND FROM " << client << " [" << adr << " " << port << "]: " << filename;
+	stream << "📤 " << DCC << " SEND FROM " << client << " [" << adr << " " << port << "]: " << filename;
 	return stream.str();
 }
 
@@ -940,9 +948,20 @@ std::string MessageHandler::msgSendingFile(const std::string& filename, const st
 	return stream.str();
 }
 
+
+// === BOT ===
+
 std::string MessageHandler::botGetAge(int years, int months, int days)
 {
 	std::ostringstream stream;
-	stream << "You are : " << years << " years, " << months << " months, " << days << " days old";
+	stream << "⏳ " << "You are : " << years << " years, " << months << " months, " << days << " days old";
+	return stream.str();
+}
+
+// Message privé bot to client
+std::string MessageHandler::ircMsgBotToClient(const std::string& receiverName, const std::string& message)
+{
+	std::ostringstream stream;	
+	stream << PRIVMSG << " " << receiverName << " :" << message;
 	return stream.str();
 }

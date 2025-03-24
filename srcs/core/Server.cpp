@@ -1,6 +1,19 @@
 #include "../../incs/classes/Server.hpp"
 
+// === OTHER CLASSES ===
+#include "../../incs/classes/Client.hpp"
+#include "../../incs/classes/Channel.hpp"
+#include "../../incs/classes/CommandHandler.hpp"
+#include "../../incs/classes/CommandHandler_File.hpp"
+#include "../../incs/classes/Utils.hpp"
+#include "../../incs/classes/IrcHelper.hpp"
+#include "../../incs/classes/MessageHandler.hpp"
+
 // === NAMESPACES ===
+#include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/colors.hpp"
+#include "../../incs/config/server_messages.hpp"
+
 using namespace server_messages;
 using namespace colors;
 
@@ -205,16 +218,6 @@ int Server::getMaxFd()
 const std::string& Server::getServerPassword() const
 {
 	return _password;
-}
-
-/**
- * @brief Retrieves the bot instance associated with the server.
- * 
- * @return Bot* Pointer to the bot instance.
- */
-Bot* Server::getBot()
-{
-	return _bot;
 }
 
 
@@ -429,19 +432,13 @@ void Server::_setSignal()
 }
 
 /**
- * @brief Sets the local IP address of the server.
- *
- * This function retrieves the list of network interfaces available on the system
- * and iterates through them to find the first non-local IPv4 address. If no such
- * address is found, it defaults to using the localhost address.
- *
- * The function uses the `getifaddrs` system call to obtain the network interfaces
- * and checks each interface for an assigned IPv4 address. It ignores the localhost
- * address (127.0.0.1) and stores the first valid non-local IP address found.
- *
- * If the `getifaddrs` call fails, the function defaults to using the localhost address.
- *
- * Memory allocated by `getifaddrs` is freed before the function returns.
+ * @brief Configures the local IP address for the server to allow clients to connect from other machines.
+ * 
+ * This function retrieves the list of available network interfaces and sets the server's local IP address
+ * to the first valid IPv4 address found, excluding the loopback address (127.0.0.1). If no valid address
+ * is found, it defaults to the loopback address. If no network interfaces are available, it throws a runtime error.
+ * 
+ * @throws std::runtime_error If no valid network interface is found.
  */
 void Server::_setLocalIp() // Configure l'adresse réseau pour permettre aux clients de se connecter depuis d'autres machines
 {
@@ -478,6 +475,9 @@ void Server::_setLocalIp() // Configure l'adresse réseau pour permettre aux cli
 
 	// Libère la mémoire allouée pour la liste des interfaces réseau
 	freeifaddrs(networkInterfaces);
+
+	if (_localIp.empty())
+		throw std::runtime_error(ERR_NO_NETWORK);
 }
 
 /**
@@ -560,7 +560,7 @@ void Server::_init()
 	_setServerSocket();
 
 	_timeCreationStr = MessageHandler::msgTimeServerCreation();
-	IrcHelper::writeEnvFile(_localIp, _port);
+	IrcHelper::writeEnvFile(_localIp, _port, _password);
 	MessageHandler::displayWelcome(_localIp, _port, _password);
 }
 
@@ -746,14 +746,9 @@ void Server::_handleMessage(std::map<int, Client*>::iterator it)
 	while (((pos = bufferMessage.find('\n')) != std::string::npos))
 	{
 		// On extrait le message jusqu'au \n (non inclus)
-		std::string message = bufferMessage.substr(0, pos);
-
-		// On enlève le \r s'il y en a un (cas irssi)
-		if (!message.empty() && message[message.size() - 1] == '\r')
-			message.erase(message.size() - 1);
-
-		// On supprime la commande traitée du buffer
-		bufferMessage.erase(0, pos + 1);
+		// + on enlève le \r s'il y en a un (cas irssi)
+		// + on supprime la commande traitée du buffer
+		std::string message = IrcHelper::extractAndCleanMessage(bufferMessage, pos);
 
 		// Debug : affiche le message reçu
 		// std::cout << "---> " << message << std::endl;
@@ -837,24 +832,7 @@ void Server::_acceptNewClient()
 		_disconnectClient(newClientFd, CONNECTION_FAILED);
 		return;
 	}
-
-	// Ajouter ce nouveau client à la liste des clients connectés
-	// _clients[newClientFd] = new Client(newClientFd);
-
-	// Lire un message immédiatement (si le bot envoie un message dès la connexion)
-	char buffer[32] = {0};
-	int bytesRead = recv(newClientFd, buffer, sizeof(buffer) - 1, MSG_PEEK); // Lire sans supprimer du buffer
-
-	if (bytesRead > 0 && strcmp(buffer, "HELLO_BOT\r\n") == 0)
-	{
-		std::cout << "🤖 Bot détecté ! Création d'une instance Bot." << std::endl;
-		_initBot(newClientFd);
-	}
-	else
-	{
-		std::cout << "👤 Nouveau client détecté." << std::endl;
-		_addClient(newClientFd);
-	}
+	_addClient(newClientFd);
 
 	Client* client = _clients[newClientFd];
 
@@ -884,18 +862,12 @@ void Server::_acceptNewClient()
 	// Ajouter le descripteur du client à l'ensemble des descripteurs surveillés pour l'écriture et la lecture
 	FD_SET(newClientFd, &_readFds);
 
-	if (bytesRead <= 0)
-	{
-		// Prompt pour saisir les infos d'authentification
-		std::string authenticationPrompt = IrcHelper::commandToSend(*client);
-		client->sendMessage(MessageHandler::ircCommandPrompt(authenticationPrompt, "", false), NULL);
-	
-		// Log de connexion du client
-		std::cout << MessageHandler::msgClientConnected(client->getClientIp(), client->getClientPort(), newClientFd, "") << std::endl;
-	}
+	// Prompt pour saisir les infos d'authentification
+	std::string authenticationPrompt = IrcHelper::commandToSend(*client);
+	client->sendMessage(MessageHandler::ircCommandPrompt(authenticationPrompt, "", false), NULL);
 
-	if (_bot)
-		_bot->listenActivity();
+	// Log de connexion du client
+	std::cout << MessageHandler::msgClientConnected(client->getClientIp(), client->getClientPort(), newClientFd, "") << std::endl;
 }
 
 /**
@@ -909,22 +881,6 @@ void Server::_acceptNewClient()
 void Server::_addClient(int clientFd)
 {
 	_clients[clientFd] = new Client(clientFd);
-}
-
-/**
- * @brief Initializes the bot and adds it to the server's client list.
- * 
- * This function creates a new Bot instance with the given file descriptor,
- * sets its nickname, username, and real name, and adds it to the server's
- * list of clients. It also starts listening for activity from the bot.
- * 
- * @param botFd The file descriptor associated with the bot.
- */
-void Server::_initBot(int botFd)
-{
-	_bot = new Bot(botFd, bot::NICK, bot::USER, bot::REALNAME, *this);
-	_clients[botFd] = _bot;
-	_bot->listenActivity();
 }
 
 /**

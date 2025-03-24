@@ -1,4 +1,9 @@
 #include "../incs/classes/Server.hpp"
+
+// === NAMESPACES ===
+#include "../../incs/config/server_messages.hpp"
+#include "../../incs/config/colors.hpp"
+
 using namespace server_messages;
 using namespace colors;
 

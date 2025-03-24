@@ -3,25 +3,13 @@
 // === SERVER LIBRARIES ===
 #include "../config/server_libs.hpp"
 
-// === NAMESPACES ===
-#include "../config/irc_config.hpp"
-#include "../config/colors.hpp"
-#include "../config/server_messages.hpp"
-
-// === CLASSES ===
-#include "MessageHandler.hpp"
-#include "Utils.hpp"
-#include "IrcHelper.hpp"
-#include "Client.hpp"
-#include "Channel.hpp"
-#include "Bot.hpp"
-#include "CommandHandler.hpp"
-#include "CommandHandler_File.hpp"
-
 // =========================================================================================
 
-class Server {
-
+class Client;
+class Channel;
+class File;
+class Server
+{
 	private:
 		Server();
 		Server(const Server& src);
@@ -46,9 +34,6 @@ class Server {
 		// === FILES TO SEND ===
 		std::map<std::string, File>	_files; 									// Liste des fichiers à envoyer
 
-		// === BOT INSTANCE ===
-		Bot* _bot;																// Instance du bot
-
 		// === INIT / CLEAN ===
 		void _setSignal();														// Paramétrage du signal
 		void _setLocalIp();														// Récupère l'adresse IP locale
@@ -67,7 +52,6 @@ class Server {
 		// === UPDATE CLIENTS ===
 		void _acceptNewClient();												// Accepte une nouvelle connexion client
 		void _addClient(int clientFd); 											// Ajoute un client à la liste
-		void _initBot(int botFd); 												// Ajoute un bot au serveur
 		void _disconnectClient(int fd, const std::string& reason); 				// Déconnecte un client du serveur
 		void _deleteClient(std::map<int, Client*>::iterator it);				// Supprime un client de la liste
 		void _lateClientDeletion();												// Supprime les clients de la liste en différé
@@ -92,7 +76,6 @@ class Server {
 		fd_set getReadFds() const; 																	// Récupère l'ensemble des descripteurs surveillés
 		int getMaxFd();																				// Récupère le descripteur maximum pour select()
 		const std::string& getServerPassword() const; 												// Récupère le mot de passe du serveur
-		Bot* getBot(); 																				// Récupère l'instance du bot
 
 		// === CLIENTS ===
 		std::map<int, Client*>& getClients(); 														// Récupère la liste des clients
@@ -107,6 +90,6 @@ class Server {
 		int getChannelCount() const; 																// Récupère le nombre de canaux
 		void broadcastToClients(const std::string &message); 										// Envoie un message à tous les clients connectés
 
-		// === BONUS ===
+		// === FILE MANAGER ===
 		std::map<std::string, File>& getFiles(); 													// Récupère la liste des fichiers à envoyer
 };

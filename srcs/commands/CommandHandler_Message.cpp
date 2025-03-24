@@ -1,6 +1,14 @@
 #include "../../incs/classes/CommandHandler.hpp"
 
+// === OTHER CLASSES ===
+#include "../../incs/classes/Utils.hpp"
+#include "../../incs/classes/IrcHelper.hpp"
+#include "../../incs/classes/MessageHandler.hpp"
+
 // === NAMESPACES ===
+#include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/commands.hpp"
+
 using namespace commands;
 using namespace channel_error;
 using namespace error_display;
@@ -29,7 +37,7 @@ void CommandHandler::_sendPrivateMessage()
 
 	std::vector<std::string>::iterator itMessage = ++args.begin();
 	std::string	message = itMessage != args.end() ? *itMessage : "";
-	
+
 	if (IrcHelper::isRightChannel(*_client, *itTarget, _channels, HIDE_ERROR) != INVALID_FORMAT)
 		_sendToChannel(targets, message);
 	else
@@ -57,7 +65,7 @@ void CommandHandler::_sendToChannel(std::vector<std::string>& targets, std::stri
 		if (message.empty() || (message[0] == ':' && message.size() == 1) || Utils::isOnlySpace(message) == true)
 			throw std::invalid_argument(MessageHandler::ircNoTextToSend(nickname));
 
-		std::string formatedMessage = IrcHelper::sanitizeIrcMessage(message, PRIVMSG, nickname);
+		std::string formattedMessage = IrcHelper::sanitizeIrcMessage(message, PRIVMSG, nickname);
 		std::string targetName = *itTarget;
 
 		if (IrcHelper::channelExists(targetName, _channels) == false)
@@ -66,7 +74,7 @@ void CommandHandler::_sendToChannel(std::vector<std::string>& targets, std::stri
 			continue;
 		}
 		Channel* channel = _channels[targetName];
-		channel->sendToAll(MessageHandler::ircMsgToChannel(nickname, targetName, formatedMessage), _client, false);
+		channel->sendToAll(MessageHandler::ircMsgToChannel(nickname, targetName, formattedMessage), _client, false);
 	}
 }
 
@@ -98,7 +106,7 @@ void CommandHandler::_sendToClient(std::vector<std::string>& targets, std::strin
 				throw std::invalid_argument(MessageHandler::ircNoTextToSend(nickname));
 		}
 
-		std::string formatedMessage = IrcHelper::sanitizeIrcMessage(message, PRIVMSG, nickname);
+		std::string formattedMessage = IrcHelper::sanitizeIrcMessage(message, PRIVMSG, nickname);
 		int clientFd = _server.getClientByNickname(targetName, NULL);
 		if (IrcHelper::clientExists(clientFd) == false)
 		{
@@ -110,7 +118,7 @@ void CommandHandler::_sendToClient(std::vector<std::string>& targets, std::strin
 		if (targetClient == _client)
 			continue;
 
-		targetClient->sendMessage(MessageHandler::ircMsgToClient(nickname, targetName, formatedMessage), _client);			
+		targetClient->sendMessage(MessageHandler::ircMsgToClient(nickname, targetName, formattedMessage), _client);			
 		
 		// Si le client visé est absent, l'envoyeur reçoit sa notification d'absence
 		if (targetClient->isAway())

@@ -4,14 +4,10 @@
 #include <sstream>						// gestion flux -> std::ostringstream
 #include <vector>						// container vector
 
-// === NAMESPACES ===
-#include "../config/irc_config.hpp"
-#include "../config/commands.hpp"
-
 // =========================================================================================
 
-class Utils {
-
+class Utils
+{
 	private:
 		Utils();
 		Utils(const Utils& src);

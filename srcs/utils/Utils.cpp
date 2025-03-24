@@ -1,4 +1,9 @@
 #include "../../incs/classes/Utils.hpp"
+
+// === NAMESPACES ===
+#include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/commands.hpp"
+
 using namespace commands;
 
 // =========================================================================================

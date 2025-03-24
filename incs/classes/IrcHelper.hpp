@@ -10,24 +10,12 @@
 #include <climits> 						// std::numeric_limits
 #include <cerrno>						// codes erreur -> errno
 
-// === NAMESPACES ===
-#include "../config/irc_config.hpp"
-#include "../config/server_messages.hpp"
-#include "../config/commands.hpp"
-#include "../config/colors.hpp"
-
-// === CLASSES ===
-#include "Utils.hpp"
-#include "MessageHandler.hpp"
-#include "Client.hpp"
-#include "Channel.hpp"
-
 // =========================================================================================
 
 class Client;
 class Channel;
-class IrcHelper {
-
+class IrcHelper
+{
 	private:
 		IrcHelper();
 		IrcHelper(const IrcHelper& src);
@@ -38,7 +26,7 @@ class IrcHelper {
 
 		// === SERVER CONNECT HELPER ===
 		static int validatePort(const std::string& port);
-		static void writeEnvFile(const std::string& serverIp, int port);
+		static void writeEnvFile(const std::string& serverIp, int port, const std::string& password);
 		static std::string getEnvValue(const std::string& key);
 
 		// === AUTHENTICATION HELPER ===
@@ -50,6 +38,7 @@ class IrcHelper {
 		static std::string formatUsername(const std::string& username);
 
 		// === MESSAGES HELPER ===
+		static std::string extractAndCleanMessage(std::string& bufferMessage, size_t pos);
 		static std::string sanitizeIrcMessage(std::string msg, const std::string& cmd, const std::string& nickname);
 
 		// === CHANNEL HELPER ===
@@ -69,6 +58,8 @@ class IrcHelper {
 		static bool isValidLimit(std::string &limit);
 
 		// === BOT HELPER ===
-		static bool isBotCommandFound(const std::string& message);
-		static std::string getCurrentTime();
+		static size_t getBotCommandStartPos(const std::string& message);
+		static bool isInvalidBotCommand(const std::string& command);
+		static void getCurrentTime(std::tm &outTime);
+		static std::string getTimeString();
 };
