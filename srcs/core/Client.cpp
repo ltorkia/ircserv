@@ -366,7 +366,6 @@ void Client::addToChannel(Channel* channel, const std::string& password, const s
 			sendMessage(MessageHandler::ircChannelFull(this->getNickname(), channel->getName()), NULL);
 			return ;
 		}
-		channel->setNbUser(channel->getNbUser() + 1);
 		channel->addClient(this);
 		_channelsJoined[channelName] = channel;
 

@@ -20,8 +20,9 @@ class Channel
 
 		std::set<const Client*> _connected, _operators, _invited;	// Liste des clients connectés, des opérateurs et des invités	
 		
-		bool _invites, _rightsTopic, _limits, nbUser;				// Variables de configuration du canal
-
+		bool _invites, _rightsTopic;								// Modes invite +i et topic +t
+		int _limits;												// Mode +l limite de clients sur le canal
+	
 	public:
 		Channel(const std::string &name, const std::string& password);
 		~Channel();
@@ -36,7 +37,6 @@ class Channel
 		void setInvites(const bool info);
 		void setRightsTopic(const bool info);
 		void setLimits(const int info);
-		void setNbUser(const int info);
 		
 		// === GETTERS ===
 		const std::string& getName() const;					// Récupère le nom du canal
@@ -46,14 +46,15 @@ class Channel
 		time_t getTopicTimestamp() const;					// Récupère la date de la dernière modification du sujet
 		time_t getCreationTime() const;						// Récupère le creation time du canal
 		std::string getMode() const; 						// Récupère les modes du canal
-		std::string getNicknames() const;					// Récupère la liste des pseudos des clients connectés au canal
+
+		int getConnectedCount() const;
 		std::set<const Client*> getClientsList() const;		// Récupère la liste des clients du canal
 		std::set<const Client*> getOperatorsList() const;	// Récupère la liste des operators du canal
 		std::set<const Client*> getInvitedList() const;		// Récupère la liste des clients invités sur le canal
+		std::string getNicknames() const;					// Récupère la liste des pseudos des clients connectés au canal
 		int getChannelClientByNickname(const std::string &nickname, const Client* currClient); // Récupère le client du canal par son pseudo
 
 		bool getInvites() const;
-		int getNbUser() const;
 		bool getRightsTopic() const;
 		int getLimits() const;
 		

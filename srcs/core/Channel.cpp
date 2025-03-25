@@ -14,7 +14,7 @@
 
 // --- PUBLIC
 Channel::Channel(const std::string &name, const std::string& password) : _name(name), _password(password),
-	_topic(""), _channelTimestamp(time(0)), _invites(false), _rightsTopic(false), _limits(-1), _nbUser(0) {}
+	_topic(""), _channelTimestamp(time(0)), _invites(false), _rightsTopic(false), _limits(-1) {}
 Channel::~Channel() {}
 
 // --- PRIVATE
@@ -79,10 +79,6 @@ void Channel::setLimits(const int info)
 {
 	_limits = info;
 }
-void Channel::setNbUser(const int info)
-{
-	_nbUser = info;
-}
 
 
 // === GETTERS ===
@@ -107,38 +103,10 @@ time_t Channel::getTopicTimestamp() const
 {
 	return _topicTimestamp;
 }
-
-/**
- * @brief Retrieves a space-separated string of nicknames of all clients connected to the channel.
- *
- * This function iterates through the set of connected clients and constructs a string
- * containing their nicknames. If a client is an operator, their nickname is prefixed with "@".
- *
- * @return A std::string containing the nicknames of all connected clients, separated by spaces.
- */
-std::string Channel::getNicknames() const
-{
-	std::string nicknames;
-	std::set<const Client*>::iterator it = _connected.begin();
-	std::set<const Client*>::iterator end = _connected.end();
-
-	std::string prefix;
-
-	while (it != end)
-	{
-		prefix = isOperator(*it) ? "@" : "";
-		nicknames += (prefix + (*it)->getNickname());
-		++it;
-		if (it != end)
-			nicknames += " ";
-	}
-	return nicknames;
-}
 time_t Channel::getCreationTime() const
 {
 	return _channelTimestamp;
 }
-
 /**
  * @brief Retrieves the mode settings of the channel as a string.
  *
@@ -177,6 +145,10 @@ std::string Channel::getMode() const
 	return display;
 }
 
+int Channel::getConnectedCount() const
+{
+	return _connected.size();
+}
 std::set<const Client*> Channel::getClientsList() const
 {
 	return _connected;
@@ -188,6 +160,32 @@ std::set<const Client*> Channel::getOperatorsList() const
 std::set<const Client*> Channel::getInvitedList() const
 {
 	return _invited;
+}
+/**
+ * @brief Retrieves a space-separated string of nicknames of all clients connected to the channel.
+ *
+ * This function iterates through the set of connected clients and constructs a string
+ * containing their nicknames. If a client is an operator, their nickname is prefixed with "@".
+ *
+ * @return A std::string containing the nicknames of all connected clients, separated by spaces.
+ */
+std::string Channel::getNicknames() const
+{
+	std::string nicknames;
+	std::set<const Client*>::iterator it = _connected.begin();
+	std::set<const Client*>::iterator end = _connected.end();
+
+	std::string prefix;
+
+	while (it != end)
+	{
+		prefix = isOperator(*it) ? "@" : "";
+		nicknames += (prefix + (*it)->getNickname());
+		++it;
+		if (it != end)
+			nicknames += " ";
+	}
+	return nicknames;
 }
 /**
  * @brief Retrieves the file descriptor of a client in the channel by their nickname.
@@ -224,10 +222,6 @@ int Channel::getLimits() const
 {
 	return _limits;
 }
-int Channel::getNbUser() const
-{
-	return _nbUser;
-}
 
 
 bool Channel::hasClients() const
@@ -252,7 +246,7 @@ bool Channel::hasTopic() const
 }
 bool Channel::isFull() const
 {
-	return _nbUser + 1 > _limits && _limits != -1;
+	return getConnectedCount() + 1 > _limits && _limits != -1;
 }
 
 bool Channel::isConnected(const Client* client) const
@@ -374,7 +368,6 @@ void Channel::removeClient(Client* client, const Client* kicker, const std::stri
 
 		// On supprime le client des clients connectes au canal
 		_connected.erase(client);
-		_nbUser--;
 
 		// On l'enleve des operateurs s'il est operateur
 		removeOperator(client);

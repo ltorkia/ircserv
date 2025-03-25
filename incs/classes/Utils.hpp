@@ -21,6 +21,7 @@ class Utils
 		static bool isEmptyOrInvalid(const std::vector<std::string>::iterator& it, const std::vector<std::string>& vec);
 		static bool isOnlySpace(const std::string &str);
 		static bool isPrintableSentence(const std::string &str);
+		static bool isNonPrintableChar(char c);
 		static bool isOnlyAlphaNum(const std::string &str);
 		static bool isAllDigit(const std::string &str);
 		static void printVector(const std::vector<std::string>& vec);

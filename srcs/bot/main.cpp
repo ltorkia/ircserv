@@ -71,13 +71,13 @@ int main(void)
 		if (connect(botFd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0)
 			throw std::runtime_error(ERR_ECHEC_CONNECTION);
 
-		std::cout << "🤖 Bot connecté au serveur !" << std::endl;
+		std::cout << std::endl << BOT_CONNECTED << std::endl << std::endl;
 
 		bot.run();
 	}
 	catch (const std::exception &e)
 	{
-		std::cerr << RED << "Error: " << RESET << e.what() << std::endl << std::endl;
+		std::cerr << RED << "❌ Error: " << RESET << e.what() << std::endl << std::endl;
 		return 1;
 	}
 	return 0;

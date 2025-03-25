@@ -954,7 +954,7 @@ std::string MessageHandler::msgSendingFile(const std::string& filename, const st
 std::string MessageHandler::botGetAge(int years, int months, int days)
 {
 	std::ostringstream stream;
-	stream << "⏳ " << "You are " << years << " years, " << months << " months, " << days << " days old";
+	stream << "⏳ " << "You are " << years << " years, " << months << " months, and " << days << " days old !";
 	return stream.str();
 }
 

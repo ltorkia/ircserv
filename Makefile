@@ -17,9 +17,9 @@ CMD_FILES			=	CommandHandler.cpp				CommandHandler_Auth.cpp \
 						CommandHandler_Log.cpp 			CommandHandler_Message.cpp \
 						CommandHandler_Mode.cpp
 
-BOT_FILES  			=	main.cpp				Bot.cpp						Bot_MessageProcessor.cpp \
-						Bot_Authenticate.cpp	Bot_CommandHandler.cpp		Bot_PrivmsgParser.cpp \
-						Bot_PrivmsgHandler.cpp
+BOT_FILES  			=	main.cpp				Bot.cpp							Bot_MessageStream.cpp \
+						Bot_Authenticate.cpp	Bot_CommandHandlerServer.cpp	Bot_CommandHandlerUser \
+						Bot_ParsingHelper.cpp
 
 UTILS_FILES			=	MessageHandler.cpp		IrcHelper.cpp		Utils.cpp
 

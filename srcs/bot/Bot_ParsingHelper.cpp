@@ -3,50 +3,18 @@
 // === OTHER CLASSES ===
 #include "../../incs/classes/Utils.hpp"
 #include "../../incs/classes/IrcHelper.hpp"
+#include "../../incs/classes/MessageHandler.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
 #include "../../incs/config/commands.hpp"
+#include "../../incs/config/server_messages.hpp"
+
+using namespace server_messages;
 
 // =========================================================================================
 
-// === PRIVMSG PARSER ===
-
-/**
- * @brief Parses a PRIVMSG command from the input string.
- *
- * This function processes the input string to extract and validate the components
- * of an IRC PRIVMSG command. It performs the following steps:
- * 1. Tokenizes the input string into arguments.
- * 2. Validates the number of arguments.
- * 3. Extracts and validates the sender's nickname.
- * 4. Validates the PRIVMSG command structure.
- * 5. Extracts the target of the message.
- * 6. Extracts the message content.
- * 7. Parses and executes the bot command from the message content.
- *
- * @param input The input string containing the PRIVMSG command.
- * @return true if the PRIVMSG command is successfully parsed and valid, false otherwise.
- */
-bool Bot::_parsePrivmsg(std::string& input)
-{
-	std::vector<std::string> args = Utils::getTokens(input, splitter::WORD);
-	if (args.size() < 4)
-		return false;
-
-	Utils::printVector(args);
-
-	if (!_extractSenderNick(args.front())
-		|| !_isValidPrivmsg(args)
-		|| !_extractTarget(args))
-		return false;
-
-	std::string message = _extractMessage(args);
-	if (message.empty())
-		return false;
-
-	return _parseBotCommand(message);
-}
+// === PARSING HELPER ===
 
 /**
  * @brief Extracts the sender's nickname from the given string.
@@ -69,17 +37,17 @@ bool Bot::_extractSenderNick(std::string& nickname)
 }
 
 /**
- * @brief Checks if the given arguments represent a valid PRIVMSG command.
- *
- * This function verifies whether the second element in the provided vector
- * of arguments matches the PRIVMSG command.
- *
+ * @brief Checks if the given command matches the expected command.
+ * 
+ * This function compares the second element of the args vector with the provided command string.
+ * 
  * @param args A vector of strings containing the command arguments.
- * @return true if the second argument is the PRIVMSG command, false otherwise.
+ * @param command The command string to be validated against.
+ * @return true if the second element of args matches the command string, false otherwise.
  */
-bool Bot::_isValidPrivmsg(const std::vector<std::string>& args)
+bool Bot::_isValidCommand(const std::vector<std::string>& args, const std::string& command)
 {
-	return args[1] == commands::PRIVMSG;
+	return args[1] == command;
 }
 
 /**
@@ -125,6 +93,23 @@ std::string Bot::_extractMessage(std::vector<std::string>& args)
 }
 
 /**
+ * @brief Checks if a bot command is found in the input string.
+ *
+ * This function searches for the start position of a bot command within the given input string.
+ * If a bot command is found, it updates the _commandPos member variable with the position of the command.
+ *
+ * @param input The input string to search for a bot command.
+ * @return true if a bot command is found, false otherwise.
+ */
+bool Bot::_botCommandFound(const std::string& input)
+{
+	_commandPos = IrcHelper::getBotCommandStartPos(input);
+	if (_commandPos == std::string::npos)
+		return false;
+	return true;
+}
+
+/**
  * @brief Parses a bot command from the given message.
  *
  * This function extracts the bot command from the provided message string.
@@ -135,19 +120,27 @@ std::string Bot::_extractMessage(std::vector<std::string>& args)
  */
 bool Bot::_parseBotCommand(std::string& message)
 {
-	_commandPos = IrcHelper::getBotCommandStartPos(message);
-	if (_commandPos == std::string::npos || (_commandPos > 0 && !isspace(message[_commandPos - 1])))
+	// On vérifie que le message contient une commande bot, si oui _commandPos est actualisé dans _botCommandFound,
+	// Si non ou invalide, et que la cible (client ou channel) envoie un message au bot pour la première fois (_targetGotWelcomePrompt),
+	// on envoie un message à la cible listant les fonctionnalités du bot (_announceFeaturesOnce()).
+	if (!_botCommandFound(message) || (_commandPos > 0 && !isspace(message[_commandPos - 1])))
+	{
+		_announceFeaturesOnce();
 		return false;
+	}
 
+	// On extrait la commande et ses potentiels arguments du message
 	message = message.substr(_commandPos);
 	std::vector<std::string> argsInput = Utils::getTokens(message, splitter::SENTENCE);
 	if (argsInput.empty())
 		return false;
 
+	// On vérifie que la commande stockée est valide
 	_command = argsInput.front();
 	if (IrcHelper::isInvalidBotCommand(_command))
 		return false;
 
+	// Si la commande est AGE, un argument est attendu, on stocke le reste de la string
 	if (_command == bot::AGE_CMD && argsInput.size() > 1)
 		_ageArg = argsInput[1];
 

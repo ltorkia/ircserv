@@ -3,12 +3,15 @@
 #include <iostream>				// gestion chaînes de caractères -> std::cout, std::cerr, std::string
 #include <sstream>				// gestion flux -> std::ostringstream
 #include <fstream>				// gestion fichiers -> std::ifstream, std::ofstream
+#include <algorithm>			// std::remove_if()
 #include <vector>				// container vector
 #include <map>					// container map
 #include <cstring>				// memset()
 #include <arpa/inet.h>			// inet_addr()
 #include <unistd.h>				// close()
 #include <csignal>				// gestion signaux -> SIGINT, SIGTSTP
+
+// =========================================================================================
 
 class Bot
 {
@@ -24,11 +27,12 @@ class Bot
 
 		// === LISTEN ACTIVITY : Bot.cpp ===
 		void run();
+		
 	
 	private:
 
 		// === BOT INFOS ===
-		bool _hasSentAuthInfos, _isAuthenticated;
+		bool _hasSentAuthInfos, _isAuthenticated, _targetGotWelcomePrompt;
 		int _botFd;
 		std::string _botNick, _botUser, _botReal, _botMask;
 
@@ -46,42 +50,44 @@ class Bot
 		int _year, _month, _day;
 		int _currentYear, _currentMonth, _currentDay;
 		
-		// === QUOTES FOR JOKES ===
+		// === QUOTES FOR FACTS ===
 		std::vector<std::string> _quotes;
 
 		// ================================================================================
 
-		// === READ / SEND MESSAGES : Bot_MessageProcessor.cpp ===
+		// === READ / SEND MESSAGES : Bot_MessageStream.cpp ===
 		void _handleMessage();
 		int _readFromServer();
 		void _sendMessage(const std::string &message) const;
+		void _announceFeaturesOnce();
 
 		// === AUTHENTICATE : Bot_Authenticate.cpp ===
 		void _authenticate(const std::string& message);
 		void _sendAuthInfos();
-		
-		// === COMMAND HANDLER : Bot_CommandHandler.cpp ===
-		void _manageCommand(std::string& message);
-		bool _handleSpecialCommands(const std::string& input);
-		bool _handleInvite(const std::string& input);
-		bool _noBotCommandFound(const std::string& input);
 
-		// === PRIVMSG PARSER : Bot_PrivmsgParser.cpp ===
-		bool _parsePrivmsg(std::string& input);
+		// === PARSING HELPER : Bot_ParsingHelper.cpp ===
 		bool _extractSenderNick(std::string& nickname);
-		bool _isValidPrivmsg(const std::vector<std::string>& args);
+		bool _isValidCommand(const std::vector<std::string>& args, const std::string& command);
 		bool _extractTarget(const std::vector<std::string>& args);
 		std::string _extractMessage(std::vector<std::string>& args);
+		bool _botCommandFound(const std::string& input);
 		bool _parseBotCommand(std::string& message);
+		
+		// === COMMAND HANDLER SERVER : Bot_CommandHandlerServer.cpp ===
+		void _manageServerCommand(std::string& message);
+		bool _handlePing(const std::string& input);
+		bool _handleInvite(const std::string& input);
+		bool _handleJoin(const std::string& input);
+		bool _parsePrivmsg(std::string& input);
 
-		// === PRIVMSG HANDLER : Bot_PrivmsgHandler.cpp ===
-		std::string _handlePrivmsgCommand();
+		// === COMMAND HANDLER USER : Bot_CommandHandlerUser.cpp ===
+		std::string _handleBotCommand();
 
-		// === --- JOKE COMMAND : Bot_PrivmsgHandler.cpp ===
-		std::string _getRandomJoke();
+		// ---> FUNFACT COMMAND
+		std::string _getRandomFunfact();
 		std::vector<std::string> _getQuotes(std::string filename);
 
-		// === --- AGE COMMAND : Bot_PrivmsgHandler.cpp ===
+		// ---> AGE COMMAND
         std::string _getAge();
 		bool _parseBirthdate();
 		bool _extractDate(const std::string& dateStr);

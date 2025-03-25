@@ -14,24 +14,24 @@ using namespace server_messages;
 
 // =========================================================================================
 
-// === PRIVMSG HANDLER ===
+// === COMMAND HANDLER USER ===
 
 /**
  * @brief Handles the input command and returns the appropriate response.
  *
  * This function processes the input command and returns a response based on the command type.
  * It supports the following commands:
- * - bot::JOKE_CMD: Returns a joke.
- * - bot::AGE_CMD: Returns the bot's age.
+ * - bot::FUNFACT_CMD: Returns a cultural funfact.
+ * - bot::AGE_CMD: Returns the client's age.
  * - bot::TIME_CMD: Returns the current time.
  * If the command is unknown, it returns an unknown command message.
  *
  * @return A string containing the response to the input command.
  */
-std::string Bot::_handlePrivmsgCommand()
+std::string Bot::_handleBotCommand()
 {
-	if (_command == bot::JOKE_CMD)
-		return _getRandomJoke();
+	if (_command == bot::FUNFACT_CMD)
+		return _getRandomFunfact();
 	if (_command == bot::AGE_CMD)
 		return _getAge();
 	if (_command == bot::TIME_CMD)
@@ -40,18 +40,18 @@ std::string Bot::_handlePrivmsgCommand()
 }
 
 
-// === JOKE COMMAND ===
+// === FACT COMMAND ===
 
 /**
- * @brief Retrieves a random joke from a list of quotes.
+ * @brief Retrieves a random funfact from a list of quotes.
  *
  * This function loads a list of quotes from a predefined file path,
  * seeds the random number generator with the current time, and returns
  * a randomly selected quote from the list.
  *
- * @return A randomly selected joke as a std::string.
+ * @return A randomly selected funfact as a std::string.
  */
-std::string Bot::_getRandomJoke()
+std::string Bot::_getRandomFunfact()
 {
 	_quotes = _getQuotes(bot::QUOTES_PATH);
 	std::srand(static_cast<unsigned int>(std::time(NULL)));
@@ -119,6 +119,7 @@ std::string Bot::_getAge()
 bool Bot::_parseBirthdate()
 {
 	// Vérifier que la chaîne à traiter respecte le format "YYYY-MM-DD"
+	// Si la string continue après, vérifier qu'il y a bien un espace après la date
 	if (_ageArg.empty() || _ageArg.size() < 10 || _ageArg[4] != '-'
 	|| _ageArg[7] != '-' || (_ageArg.size() > 10 && !isspace(_ageArg[10])))
 		return false;
@@ -152,22 +153,22 @@ bool Bot::_parseBirthdate()
  */
 bool Bot::_extractDate(const std::string& dateStr)
 {
-    if (dateStr.size() != 10)
-        return false;
+	if (dateStr.size() != 10)
+		return false;
 
 	// Extraire année, mois, jour
-    std::string yearStr = dateStr.substr(0, 4);
-    std::string monthStr = dateStr.substr(5, 2);
-    std::string dayStr = dateStr.substr(8, 2);
+	std::string yearStr = dateStr.substr(0, 4);
+	std::string monthStr = dateStr.substr(5, 2);
+	std::string dayStr = dateStr.substr(8, 2);
 
-    if (!Utils::isNumber(yearStr) || !Utils::isNumber(monthStr) || !Utils::isNumber(dayStr))
-        return false;
+	if (!Utils::isNumber(yearStr) || !Utils::isNumber(monthStr) || !Utils::isNumber(dayStr))
+		return false;
 
 	// Convertir en entiers
 	_year = std::atoi(yearStr.c_str());
 	_month = std::atoi(monthStr.c_str());
 	_day = std::atoi(dayStr.c_str());
-    return true;
+	return true;
 }
 
 /**
@@ -196,18 +197,17 @@ bool Bot::_isValidDate()
 		|| (_year == _currentYear && _month == _currentMonth && _day > _currentDay))
 		return false;
 
-    static const int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-    bool isLeapYear = (_year % 4 == 0 && _year % 100 != 0) || (_year % 400 == 0);
+	bool isLeapYear = (_year % 4 == 0 && _year % 100 != 0) || (_year % 400 == 0);
 
 	// Vérifier février (année bissextile)
-    if (_month == 2)
-        return _day <= (isLeapYear ? 29 : 28);
+	if (_month == 2)
+		return _day <= (isLeapYear ? 29 : 28);
 
 	// Vérifier les mois à 30 jours
-    if (_month == 4 || _month == 6 || _month == 9 || _month == 11)
-        return _day <= 30;
+	if (_month == 4 || _month == 6 || _month == 9 || _month == 11)
+		return _day <= 30;
 
-    return true;
+	return true;
 }
 
 /**

@@ -56,8 +56,8 @@ void Bot::_handleMessage()
 			continue;
 		}
 
-		// Traitement des commandes et messages privés
-		_manageCommand(message);
+		// Traitement des commandes server (PING, INVITE, JOIN, PRIVMSG...)
+		_manageServerCommand(message);
 	}
 }
 
@@ -106,8 +106,24 @@ void Bot::_sendMessage(const std::string &message) const
 	// On formate le message en IRC (ajout du \r\n, si trop long tronqué à 512 caractères)
 	std::string formattedMessage = MessageHandler::ircFormat(message);
 
-	std::cout << "<--- bot sent: " << formattedMessage << std::endl;
+	// std::cout << "<--- bot sent: " << formattedMessage << std::endl;
 
 	if (send(_botFd, formattedMessage.c_str(), formattedMessage.length(), MSG_NOSIGNAL) == -1)
 		perror("send() failed");
+}
+
+/**
+ * @brief Announces the bot's features to the target channel once.
+ *
+ * This function sends a welcome message to the target channel listing the bot's features.
+ * It ensures that the welcome message is sent only once by checking the _targetGotWelcomePrompt flag.
+ * If the flag is false, it sends the message and sets the flag to true.
+ */
+void Bot::_announceFeaturesOnce()
+{
+	if (!_targetGotWelcomePrompt)
+	{
+		_sendMessage(MessageHandler::botCmdPrivmsg(_target, MSG_WELCOME_PROMPT));
+		_targetGotWelcomePrompt = true;
+	}
 }

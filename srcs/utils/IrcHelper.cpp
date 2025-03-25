@@ -666,7 +666,7 @@ bool IrcHelper::isValidLimit(std::string &limit)
 /**
  * @brief Finds the starting position of a bot command in the given message.
  *
- * This function searches for predefined bot commands (JOKE_CMD, AGE_CMD, TIME_CMD)
+ * This function searches for predefined bot commands (FUNFACT_CMD, AGE_CMD, TIME_CMD)
  * within the provided message string. If any of these commands are found, the
  * function returns the starting position of the first occurrence. If none of the
  * commands are found, it returns std::string::npos.
@@ -676,7 +676,7 @@ bool IrcHelper::isValidLimit(std::string &limit)
  */
 size_t IrcHelper::getBotCommandStartPos(const std::string& message)
 {
-	const std::string commands[] = {bot::JOKE_CMD, bot::AGE_CMD, bot::TIME_CMD};
+	const std::string commands[] = {bot::FUNFACT_CMD, bot::AGE_CMD, bot::TIME_CMD};
 
 	for (size_t i = 0; i < 3; ++i)
 	{
@@ -691,7 +691,7 @@ size_t IrcHelper::getBotCommandStartPos(const std::string& message)
  * @brief Checks if the given command is an invalid bot command.
  *
  * This function compares the provided command against a set of predefined
- * valid bot commands (JOKE_CMD, AGE_CMD, TIME_CMD). If the command does not
+ * valid bot commands (FUNFACT_CMD, AGE_CMD, TIME_CMD). If the command does not
  * match any of these, it is considered invalid.
  *
  * @param command The command string to be checked.
@@ -699,7 +699,7 @@ size_t IrcHelper::getBotCommandStartPos(const std::string& message)
  */
 bool IrcHelper::isInvalidBotCommand(const std::string& command)
 {
-	return command != bot::JOKE_CMD && command != bot::AGE_CMD && command != bot::TIME_CMD;
+	return command != bot::FUNFACT_CMD && command != bot::AGE_CMD && command != bot::TIME_CMD;
 }
 
 /**

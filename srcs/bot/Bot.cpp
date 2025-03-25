@@ -11,8 +11,8 @@
 
 // --- PUBLIC
 Bot::Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real)
-	: _hasSentAuthInfos(false), _isAuthenticated(false), _botFd(botFd), _botNick(nick), _botUser(user), _botReal(real),
-	_botMask(_botNick + "!" + '~' + _botUser + "@" + IrcHelper::getEnvValue(env::SERVER_IP_KEY)) {}
+	: _hasSentAuthInfos(false), _isAuthenticated(false), _targetGotWelcomePrompt(false), _botFd(botFd),
+	_botNick(nick), _botUser(user), _botReal(real), _botMask(_botNick + "!" + '~' + _botUser + "@" + IrcHelper::getEnvValue(env::SERVER_IP_KEY)) {}
 Bot::~Bot() {close(_botFd);}
 
 

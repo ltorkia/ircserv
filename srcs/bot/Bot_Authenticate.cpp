@@ -7,6 +7,9 @@
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
 #include "../../incs/config/commands.hpp"
+#include "../../incs/config/server_messages.hpp"
+
+using namespace server_messages;
 
 // =========================================================================================
 
@@ -26,8 +29,8 @@ void Bot::_authenticate(const std::string& message)
 	std::string welcomeMsg = MessageHandler::ircWelcomeMessage(_botNick, _botMask);
 	if (message == welcomeMsg)
 	{
-		std::cout << "Welcome message received, bot is authenticated." << std::endl;
 		_isAuthenticated = true;
+		std::cout << BOT_AUTHENTICATED << std::endl << std::endl;
 	}
 	if (_hasSentAuthInfos == false)
 		_sendAuthInfos();
@@ -53,26 +56,20 @@ void Bot::_authenticate(const std::string& message)
  */
 void Bot::_sendAuthInfos()
 {
-	std::cout << "\nAuthenticating bot with the server..." << std::endl;
-
 	std::string pass = IrcHelper::getEnvValue(env::PASS_KEY);
 	if (pass.empty())
-	{
-		std::cerr << "Erreur : mot de passe IRC non trouvé dans les variables d'environnement." << std::endl;
-		exit(1);
-	}
+		throw std::invalid_argument(ERR_ENV_VALUE);
 
-	// connection to irc server
 	_sendMessage(commands::PASS + " " + pass);
-	std::cout << "\nSending password, waiting for authentication..." << std::endl; 
+	std::cout << MSG_SENDING_PASSWORD << std::endl << std::endl; 
 	sleep(1);
 
 	_sendMessage(commands::NICK + " " + _botNick);
-	std::cout << "\nSending nickname, waiting for second authentication..." << std::endl; 
+	std::cout << MSG_SENDING_NICKNAME << std::endl << std::endl; 
 	sleep(1);
 
 	_sendMessage(commands::USER + " " + _botUser + " 0 * :" + _botReal);
-	std::cout << "\nSending username, getting bored..." << std::endl; 
+	std::cout << MSG_SENDING_USERNAME << std::endl << std::endl; 
 	sleep(1);
 
 	_hasSentAuthInfos = true;

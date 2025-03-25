@@ -103,6 +103,20 @@ bool Utils::isPrintableSentence(const std::string &str)
 }
 
 /**
+ * @brief Checks if a character is a non-printable character.
+ * 
+ * This function determines whether the given character is a non-printable
+ * character by using the standard library function `isprint`.
+ * 
+ * @param c The character to be checked.
+ * @return true if the character is non-printable, false otherwise.
+ */
+bool Utils::isNonPrintableChar(char c)
+{
+	return !isprint(c);
+}
+
+/**
  * @brief Checks if the given string contains only alphabetic characters.
  *
  * This function iterates through each character in the input string and checks
@@ -300,4 +314,5 @@ bool Utils::isNumber(const std::string& str)
 {
 	for (size_t i = 0; i < str.size(); ++i)
 		if (!std::isdigit(str[i])) return false;
+	return true;
 }

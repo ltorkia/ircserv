@@ -606,9 +606,6 @@ void Server::_start()
 	// Boucle infinie pour écouter les connexions des clients tant que le serveur n'est pas interrompu
 	while (1)
 	{
-		// if (!_bot)
-		// 	_initBot();
-
 		if (signalReceived)
 			break;
 
