@@ -286,3 +286,18 @@ std::string Utils::truncateStr(const std::string& str)
 {
 	return str.size() > 42 ? str.substr(0, 39) + "..." : str;
 }
+
+/**
+ * @brief Checks if the given string represents a number.
+ * 
+ * This function iterates through each character in the string and checks if it is a digit.
+ * If any character is not a digit, the function returns false.
+ * 
+ * @param str The string to be checked.
+ * @return true if the string represents a number, false otherwise.
+ */
+bool Utils::isNumber(const std::string& str)
+{
+	for (size_t i = 0; i < str.size(); ++i)
+		if (!std::isdigit(str[i])) return false;
+}

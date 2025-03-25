@@ -1,6 +1,7 @@
 #include "../../incs/classes/Bot.hpp"
 
 // === OTHER CLASSES ===
+#include "../../incs/classes/Utils.hpp"
 #include "../../incs/classes/IrcHelper.hpp"
 #include "../../incs/classes/MessageHandler.hpp"
 
@@ -106,27 +107,20 @@ std::string Bot::_getAge()
 }
 
 /**
- * @brief Parses and validates the age argument in the format "YYYY-MM-DD".
+ * @brief Parses and validates the birthdate string stored in _ageArg.
  *
- * This function checks if the age argument (_ageArg) is a valid date string
- * in the format "YYYY-MM-DD". It performs the following validations:
- * - The string must be exactly 10 characters long and follow the "YYYY-MM-DD" format.
- * - The year, month, and day components must be numeric.
- * - The year must be between 1900 and the current year.
- * - The month must be between 1 and 12.
- * - The day must be valid for the given month (considering leap years for February).
- * - The date must not be in the future.
+ * This function checks if the birthdate string (_ageArg) is in the format "YYYY-MM-DD".
+ * If the string is empty, too short, or does not follow the expected format, the function returns false.
+ * It then extracts the first 10 characters of the string and retrieves the current date.
+ * The function proceeds to extract the year, month, and day from the birthdate string and validates these values.
  *
- * @return true if the age argument is valid, false otherwise.
+ * @return true if the birthdate string is valid and correctly parsed, false otherwise.
  */
 bool Bot::_parseBirthdate()
 {
-	if (_ageArg.empty())
-		return false;
-
 	// Vérifier que la chaîne à traiter respecte le format "YYYY-MM-DD"
-	if (_ageArg.size() < 10 || _ageArg[4] != '-' || _ageArg[7] != '-'
-		|| (_ageArg.size() > 10 && !isspace(_ageArg[10])))
+	if (_ageArg.empty() || _ageArg.size() < 10 || _ageArg[4] != '-'
+	|| _ageArg[7] != '-' || (_ageArg.size() > 10 && !isspace(_ageArg[10])))
 		return false;
 
 	// Ne conserver que les 10 premiers caractères
@@ -136,86 +130,101 @@ bool Bot::_parseBirthdate()
 	std::tm now;
 	IrcHelper::getCurrentTime(now);
 
-	int currentYear = now.tm_year + 1900;
-	int currentMonth = now.tm_mon + 1;
+	_currentYear = now.tm_year + 1900;
+	_currentMonth = now.tm_mon + 1;
+	_currentDay = now.tm_mday;
 
-	// Extraire année, mois, jour
-	std::istringstream stream(_ageArg);
-	std::string yearStr, monthStr, dayStr;
-
-	std::getline(stream, yearStr, '-');
-	std::getline(stream, monthStr, '-');
-	std::getline(stream, dayStr);
-
-	// Vérifier que tous les caractères sont numériques
-	for (size_t i = 0; i < yearStr.size(); ++i)
-		if (!std::isdigit(yearStr[i])) return false;
-	for (size_t i = 0; i < monthStr.size(); ++i)
-		if (!std::isdigit(monthStr[i])) return false;
-	for (size_t i = 0; i < dayStr.size(); ++i)
-		if (!std::isdigit(dayStr[i])) return false;
-
-	// Convertir en entiers
-	int year = std::atoi(yearStr.c_str());
-	int month = std::atoi(monthStr.c_str());
-	int day = std::atoi(dayStr.c_str());
-
-	// Vérification de l'année
-	if (year < 1900 || year > currentYear)
-		return false;
-
-	// Vérification du mois
-	if (month < 1 || month > 12)
-		return false;
-
-	// Vérification du jour
-	if (day < 1 || day > 31)
-		return false;
-
-	// Vérifier les mois à 30 jours
-	if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30)
-		return false;
-
-	// Vérifier février (année bissextile)
-	bool isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-	if (month == 2)
-	{
-		if (isLeapYear && day > 29)
-			return false;
-		else if (!isLeapYear && day > 28)
-			return false;
-	}
-
-	// Vérification que la date n'est pas dans le futur
-	if (year == currentYear && month > currentMonth)
+	// Extraire année, mois, jour, et vérifications des valeurs
+	if (!_extractDate(_ageArg) || !_isValidDate())
 		return false;
 
 	return true;
 }
 
 /**
- * @brief Calculates the age based on the provided birth date.
+ * @brief Extracts the date from a given string and stores it in the Bot object.
  *
- * This function calculates the age in years, months, and days from the birth date
- * provided in the _ageArg member variable. The birth date should be in the format "YYYY-MM-DD".
+ * This function takes a date string in the format "YYYY-MM-DD" and extracts the year, month,
+ * and day from it. It then converts these values to integers and stores them in the Bot object.
  *
- * @return A string representing the age in a specific format, as returned by MessageHandler::botGetAge.
+ * @param dateStr The date string in the format "YYYY-MM-DD".
+ * @return true if the date was successfully extracted and stored, false otherwise.
+ */
+bool Bot::_extractDate(const std::string& dateStr)
+{
+    if (dateStr.size() != 10)
+        return false;
+
+	// Extraire année, mois, jour
+    std::string yearStr = dateStr.substr(0, 4);
+    std::string monthStr = dateStr.substr(5, 2);
+    std::string dayStr = dateStr.substr(8, 2);
+
+    if (!Utils::isNumber(yearStr) || !Utils::isNumber(monthStr) || !Utils::isNumber(dayStr))
+        return false;
+
+	// Convertir en entiers
+	_year = std::atoi(yearStr.c_str());
+	_month = std::atoi(monthStr.c_str());
+	_day = std::atoi(dayStr.c_str());
+    return true;
+}
+
+/**
+ * @brief Checks if the date stored in the Bot object is valid.
+ *
+ * This function performs several checks to ensure the date is valid:
+ * - The year must be between 1900 and the current year.
+ * - The month must be between 1 and 12.
+ * - The day must be between 1 and 31.
+ * - The date must not be in the future.
+ * - February is checked for leap years.
+ * - Months with 30 days are validated.
+ *
+ * @return true if the date is valid, false otherwise.
+ */
+bool Bot::_isValidDate()
+{
+	// Vérification de l'année, du moi et du jour
+	if (_year < 1900 || _year > _currentYear
+		|| _month < 1 || _month > 12
+		|| _day < 1 || _day > 31)
+		return false;
+
+	// Vérification que la date n'est pas dans le futur
+	if ((_year == _currentYear && _month > _currentMonth)
+		|| (_year == _currentYear && _month == _currentMonth && _day > _currentDay))
+		return false;
+
+    static const int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    bool isLeapYear = (_year % 4 == 0 && _year % 100 != 0) || (_year % 400 == 0);
+
+	// Vérifier février (année bissextile)
+    if (_month == 2)
+        return _day <= (isLeapYear ? 29 : 28);
+
+	// Vérifier les mois à 30 jours
+    if (_month == 4 || _month == 6 || _month == 9 || _month == 11)
+        return _day <= 30;
+
+    return true;
+}
+
+/**
+ * @brief Calculates the age in years, months, and days based on the current date and the birth date.
+ *
+ * This function computes the age by subtracting the birth date from the current date.
+ * It adjusts the calculation if the birthday has not occurred yet in the current year.
+ * It also handles the case where the number of days is negative by borrowing days from the previous month.
+ *
+ * @return A string representing the age in the format provided by MessageHandler::botGetAge.
  */
 std::string Bot::_ageCalculator()
 {
-	int year, month, day;
-	year = std::atoi(_ageArg.substr(0, 4).c_str());
-	month = std::atoi(_ageArg.substr(5, 2).c_str());
-	day = std::atoi(_ageArg.substr(8, 2).c_str());
-
-	// Obtenir la date actuelle
-	std::tm now;
-	IrcHelper::getCurrentTime(now);
-
-	// Calcul de l'âge en années
-	int years = now.tm_year + 1900 - year;
-	int months = now.tm_mon + 1 - month;
-	int days = now.tm_mday - day;
+	// Calcul de l'âge en années, mois, jours
+	int years = _currentYear - _year;
+	int months = _currentMonth - _month;
+	int days = _currentDay - _day;
 
 	// Ajustement si l'anniversaire n'est pas encore passé cette année
 	if (months < 0 || (months == 0 && days < 0))
@@ -227,8 +236,8 @@ std::string Bot::_ageCalculator()
 	{
 		// Trouver le nombre de jours dans le mois précédent
 		static const int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-		int prevMonth = (month == 1) ? 12 : month - 1;
-		int prevYear = (month == 1) ? year - 1 : year;
+		int prevMonth = (_month == 1) ? 12 : _month - 1;
+		int prevYear = (_month == 1) ? _year - 1 : _year;
 
 		// Vérifier année bissextile pour février
 		int daysInPrevMonth = daysInMonth[prevMonth - 1];

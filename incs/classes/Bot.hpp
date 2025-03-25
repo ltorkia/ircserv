@@ -15,8 +15,8 @@ class Bot
 	public:
 
 		// === SIGNAL : Bot.cpp ===
-		static volatile sig_atomic_t signalReceived;							// Indique si un signal a été reçu
-		static void signalHandler(int signal);									// Gestionnaire de signaux
+		static volatile sig_atomic_t signalReceived;
+		static void signalHandler(int signal);
 
 		// === CONSTUCTORS / DESTRUCTORS : Bot.cpp ===
 		Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real);
@@ -28,27 +28,23 @@ class Bot
 	private:
 
 		// === BOT INFOS ===
-		bool _hasSentAuthInfos;
-		bool _isAuthenticated;
+		bool _hasSentAuthInfos, _isAuthenticated;
 		int _botFd;
-		std::string _botNick;
-		std::string _botUser;
-		std::string _botReal;
-		std::string _botMask;
-
-		// === CURRENT CLIENT AND CHANNEL ===
-		std::string _target;
-		std::string _clientNickname;
-		std::string _channelName;
-
-		// === CLIENT INPUT ===
-		std::string _input;
-		std::string _command;
-		size_t _commandPos;
-		std::string _ageArg;
+		std::string _botNick, _botUser, _botReal, _botMask;
 
 		// === BUFFER ===
 		std::string _buffer;
+
+		// === CURRENT CLIENT AND CHANNEL ===
+		std::string _target, _clientNickname, _channelName;
+
+		// === CLIENT INPUT ===
+		std::string _input, _command, _ageArg;
+		size_t _commandPos;
+
+		// === ARG BIRTHDATE AND CURRENT DATE ===
+		int _year, _month, _day;
+		int _currentYear, _currentMonth, _currentDay;
 		
 		// === QUOTES FOR JOKES ===
 		std::vector<std::string> _quotes;
@@ -67,8 +63,8 @@ class Bot
 		// === COMMAND HANDLER : Bot_CommandHandler.cpp ===
 		void _manageCommand(std::string& message);
 		bool _handleSpecialCommands(const std::string& input);
-		bool _noBotCommandFound(const std::string& input);
 		bool _handleInvite(const std::string& input);
+		bool _noBotCommandFound(const std::string& input);
 
 		// === PRIVMSG PARSER : Bot_PrivmsgParser.cpp ===
 		bool _parsePrivmsg(std::string& input);
@@ -88,5 +84,7 @@ class Bot
 		// === --- AGE COMMAND : Bot_PrivmsgHandler.cpp ===
         std::string _getAge();
 		bool _parseBirthdate();
+		bool _extractDate(const std::string& dateStr);
+		bool _isValidDate();
 		std::string _ageCalculator();
 };

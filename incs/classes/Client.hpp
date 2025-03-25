@@ -25,36 +25,19 @@ class Client
 		Client(const Client& src);
 		Client& operator=(const Client& src);
 
-		int _clientSocketFd;								// Descripteur de socket du client
-		bool _authenticated;								// Indique si le client est authentifié
-		bool _rightPassServ;								// Indique si le client a le bon password du serveur
+		int _clientSocketFd, _port;														// Descripteur de socket du client + port
+		bool _isIrssi, _isIdentified, _authenticated, _rightPassServ;					// Indique si le client est via irssi, si les NICK et USER sont fournis à la connexion, s'il est authentifié, et s'il a le bon mot de passe serveur
 		
-		time_t _signonTime;									// Timestamp de connexion
-		time_t _lastActivity;								// Dernier moment actif du client
-
-		bool _isIrssi;										// Indique si le client est un Irssi
-		bool _isIdentified;									// Indique si irssi fournit les nick et user automatiquement
-
-		std::vector<std::string> _identNicknameCmd;			// Commande d'identification nickname d'Irssi
-		std::vector<std::string> _identUsernameCmd;			// Commande d'identification username d'Irssi
-
-		std::string _bufferMessage;							// Buffer de message
-
-		std::string _nickname;								// Pseudo du client
-		std::string _username;								// Nom d'utilisateur
-        std::string _realName;								// Nom réel
-		std::string _hostname;								// Nom d'hôte
-		std::string _clientIp;								// Adresse IP client
-		std::string _usermask;								// Usermask du client pour RPL
-		int _port;											// Port client
+		std::vector<std::string> _identNicknameCmd, _identUsernameCmd;					// Commande d'identification nickname et username d'Irssi
+		std::string _nickname, _username, _realName, _hostname, _clientIp, _usermask;	// Pseudo + nom d'utilisateur + nom réel + nom d'hôte + adresse IP + usermask pour RPL
 		
-		bool _isAway;										// Indique si le client est indiqué absent
-		std::string _awayMessage;							// Message d'absence
+		std::string _bufferMessage;														// Buffer de message
+		std::string _awayMessage;														// Message d'absence
+		
+		time_t _signonTime, _lastActivity;												// Timestamp de connexion et dernier moment actif du client
+		bool _isAway, _errorMsgTooLongSent, _pingSent;									// Indique si le client est marqué absent, si une erreur est envoyée car message trop long, et si le serveur attend un PONG
 
-		bool _errorMsgTooLongSent;							// Message d'erreur envoyé si le message est trop long
-		bool _pingSent;										// Indique si le serveur attend un PONG du client
-
-		std::map<std::string, Channel*> _channelsJoined;	// Liste des canaux auxquels le client est connecté
+		std::map<std::string, Channel*> _channelsJoined;								// Liste des canaux auxquels le client est connecté
 
 	public:
 

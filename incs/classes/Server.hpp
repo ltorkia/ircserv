@@ -15,15 +15,9 @@ class Server
 		Server(const Server& src);
 		Server& operator=(const Server& src);
 
-		// === SERVER INFOS ===
-		int _port;																// Port du serveur
-		std::string _password;													// Mot de passe du serveur
-		std::string _localIp;													// Adresse IP locale
-		std::string _timeCreationStr;											// Date et heure de création du serveur
-
-		// === SOCKETS ===
-		int _serverSocketFd;													// Descripteur du socket du serveur
-		int _maxFd;																// Descripteur maximum pour select()
+		// === SERVER INFOS + SOCKETS ===
+		std::string _password, _localIp, _timeCreationStr;						// Mot de passe serveur + adresse IP locale + date et heure de création du serveur
+		int _serverSocketFd, _port, _maxFd;										// Descripteur du socket du serveur + port + descripteur maximum pour select()
 		fd_set _readFds;														// Ensemble des descripteurs surveillés
 		
 		// === CONTAINERS -> CLIENTS + CHANNELS ===

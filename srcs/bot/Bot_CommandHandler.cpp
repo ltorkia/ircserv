@@ -60,24 +60,6 @@ bool Bot::_handleSpecialCommands(const std::string& input)
 }
 
 /**
- * @brief Checks if a bot command is found in the input string.
- *
- * This function determines the position of a bot command within the input string
- * using the IrcHelper::getBotCommandStartPos function. If a bot command is found,
- * it returns false. Otherwise, it returns true.
- *
- * @param input The input string to be checked for a bot command.
- * @return true if no bot command is found, false otherwise.
- */
-bool Bot::_noBotCommandFound(const std::string& input)
-{
-	size_t commandPos = IrcHelper::getBotCommandStartPos(input);
-	if (commandPos != std::string::npos)
-		return false;
-	return true;
-}
-
-/**
  * @brief Handles an invite message and joins the specified channel.
  *
  * This function processes an invite message, verifies its format, extracts the
@@ -109,5 +91,23 @@ bool Bot::_handleInvite(const std::string& input)
 	std::cout << "Channel : " << channelName << std::endl;
 	_sendMessage(MessageHandler::botCmdJoinChannel(channelName));
 
+	return true;
+}
+
+/**
+ * @brief Checks if a bot command is found in the input string.
+ *
+ * This function determines the position of a bot command within the input string
+ * using the IrcHelper::getBotCommandStartPos function. If a bot command is found,
+ * it returns false. Otherwise, it returns true.
+ *
+ * @param input The input string to be checked for a bot command.
+ * @return true if no bot command is found, false otherwise.
+ */
+bool Bot::_noBotCommandFound(const std::string& input)
+{
+	size_t commandPos = IrcHelper::getBotCommandStartPos(input);
+	if (commandPos != std::string::npos)
+		return false;
 	return true;
 }

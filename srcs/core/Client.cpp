@@ -15,8 +15,8 @@
 
 // --- PUBLIC
 Client::Client(int fd)
-	: _clientSocketFd(fd), _authenticated(false), _rightPassServ(false), _signonTime(time(NULL)), _lastActivity(time(NULL)),
-	_isIrssi(false), _isIdentified(false), _isAway(false), _errorMsgTooLongSent(false), _pingSent(false) {}
+	: _clientSocketFd(fd), _isIrssi(false), _isIdentified(false), _authenticated(false), _rightPassServ(false),
+	_signonTime(time(NULL)), _lastActivity(time(NULL)), _isAway(false), _errorMsgTooLongSent(false), _pingSent(false) {}
 Client::~Client() {}
 
 // --- PRIVATE

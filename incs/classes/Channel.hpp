@@ -14,21 +14,13 @@ class Channel
 		Channel(const Channel& src);
 		Channel& operator=(const Channel& src);
 
-		std::string _name;									// Nom du canal
-		std::string _password;
-		std::string _topic;									// Mot de passe du canal							
-		std::string _topicSetterMask;						// Auteur de la dernière modification du sujet
-		time_t _topicTimestamp;								// Date de la dernière modification du sujet format UNIX
-		time_t _channelTimestamp;							// Moment ou a ete cree le channel
+		std::string _name, _password;								// Nom et mot de passe du canal
+		std::string _topic, _topicSetterMask;						// Sujet du canal et auteur de la dernière modification du topic
+		time_t _channelTimestamp, _topicTimestamp;					// Moment où a ete cree le channel et date de la dernière modification du sujet format UNIX
 
-		std::set<const Client*> _connected;					// Liste des clients connectés au canal	
-		std::set<const Client*> _operators;					// Liste des operators (chefs) du canal
-		std::set<const Client*> _invited;					// Liste des clients invités au canal
+		std::set<const Client*> _connected, _operators, _invited;	// Liste des clients connectés, des opérateurs et des invités	
 		
-		bool _invites; 										// Canal est accessible sur invitation uniquement
-		bool _rightsTopic;
-		int _limits;
-		int _nbUser;
+		bool _invites, _rightsTopic, _limits, nbUser;				// Variables de configuration du canal
 
 	public:
 		Channel(const std::string &name, const std::string& password);

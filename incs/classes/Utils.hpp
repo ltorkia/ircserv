@@ -31,4 +31,5 @@ class Utils
 		static std::string streamArg(const std::string& arg);
 		static void transformingMaj(std::string &str);
 		static std::string truncateStr(const std::string& str);
+		static bool isNumber(const std::string& str);
 };
