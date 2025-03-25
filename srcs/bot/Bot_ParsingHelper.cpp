@@ -33,7 +33,12 @@ bool Bot::_extractSenderNick(std::string& nickname)
 	if (!nickname.empty() && nickname[0] == ':')
 		nickname.erase(0, 1);
 	_clientNickname = nickname;
-	return !_clientNickname.empty() && _clientNickname != server::NAME;
+
+	if (_clientNickname.empty() || _clientNickname == server::NAME)
+		return false;
+
+	_target = _clientNickname;
+	return true;
 }
 
 /**
@@ -45,7 +50,7 @@ bool Bot::_extractSenderNick(std::string& nickname)
  * @param command The command string to be validated against.
  * @return true if the second element of args matches the command string, false otherwise.
  */
-bool Bot::_isValidCommand(const std::vector<std::string>& args, const std::string& command)
+bool Bot::_isRightCommand(const std::vector<std::string>& args, const std::string& command)
 {
 	return args[1] == command;
 }
@@ -112,23 +117,14 @@ bool Bot::_botCommandFound(const std::string& input)
 /**
  * @brief Parses a bot command from the given message.
  *
- * This function extracts the bot command from the provided message string.
- * It checks if the command is valid and extracts any necessary arguments.
+ * This function extracts the command and its potential arguments from the message.
+ * It verifies if the command is valid and, if the command is "AGE", it stores the argument.
  *
- * @param message The message string containing the bot command.
- * @return true if a valid bot command is found and parsed, false otherwise.
+ * @param message The message containing the bot command to be parsed.
+ * @return true if the command is successfully parsed and valid, false otherwise.
  */
 bool Bot::_parseBotCommand(std::string& message)
 {
-	// On vérifie que le message contient une commande bot, si oui _commandPos est actualisé dans _botCommandFound,
-	// Si non ou invalide, et que la cible (client ou channel) envoie un message au bot pour la première fois (_targetGotWelcomePrompt),
-	// on envoie un message à la cible listant les fonctionnalités du bot (_announceFeaturesOnce()).
-	// if (!_botCommandFound(message) || (_commandPos > 0 && !isspace(message[_commandPos - 1])))
-	// {
-	// 	_announceBotFeatures();
-	// 	return false;
-	// }
-
 	// On extrait la commande et ses potentiels arguments du message
 	message = message.substr(_commandPos);
 	std::vector<std::string> argsInput = Utils::getTokens(message, splitter::SENTENCE);

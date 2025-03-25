@@ -47,7 +47,7 @@ void Bot::_handleMessage()
 		std::string message = IrcHelper::extractAndCleanMessage(bufferMessage, pos);
 
 		// Debug : affiche le message reçu
-		std::cout << "---> bot received: " << message << std::endl;
+		// std::cout << "---> bot received: " << message << std::endl;
 
 		// On authentifie le bot auprès du serveur
 		if (_isAuthenticated == false)
@@ -102,7 +102,6 @@ int Bot::_readFromServer()
  */
 void Bot::_sendMessage(const std::string &message) const
 {
-
 	// On formate le message en IRC (ajout du \r\n, si trop long tronqué à 512 caractères)
 	std::string formattedMessage = MessageHandler::ircFormat(message);
 
@@ -113,22 +112,60 @@ void Bot::_sendMessage(const std::string &message) const
 }
 
 /**
- * @brief Announces the bot's features to the client.
+ * @brief Announces the bot features to the target.
  *
- * This function checks if the bot has already sent a welcome prompt to the client.
- * If not, it sends a welcome message and marks the client as having received the prompt.
+ * This function checks if the target is either the client nickname or the channel name.
+ * If the target is the client nickname, it ensures that the client has not already received
+ * the bot prompt. If the client has not received the prompt, it sends a welcome message
+ * and marks the client as having received the prompt. If the target is the channel name,
+ * it sends a welcome message to the channel.
  *
- * @note The function uses the _activeClients map to track which clients have received the welcome prompt.
+ * @note The function does nothing if the target is neither the client nickname nor the channel name.
  */
 void Bot::_announceBotFeatures()
 {
-	if (_activeClients.find(_clientNickname) == _activeClients.end())
-		_activeClients[_clientNickname] = false;
-		
-	bool receivedBotPrompt = _activeClients[_clientNickname];
-	if (!receivedBotPrompt)
+	if (!_clientNickname.empty() && _target != _clientNickname
+		&& _target != _channelName)
+		return;
+
+	if (!_clientNickname.empty() && _target == _clientNickname)
 	{
-		_sendMessage(MessageHandler::botCmdPrivmsg(_clientNickname, MSG_WELCOME_PROMPT));
-		_activeClients[_clientNickname] = true;
+		if (_activeClients.find(_clientNickname) == _activeClients.end())
+			_activeClients[_clientNickname] = false;
+			
+		bool receivedBotPrompt = _activeClients[_clientNickname];
+		if (!receivedBotPrompt)
+		{
+			_sendMessage(MessageHandler::botCmdPrivmsg(_clientNickname, MSG_WELCOME_PROMPT));
+			_activeClients[_clientNickname] = true;
+		}
+		return;
 	}
+	_sendMessage(MessageHandler::botCmdPrivmsg(_target, MSG_WELCOME_PROMPT));
+}
+
+/**
+ * @brief Resets the internal state of the Bot object.
+ *
+ * This function clears all the internal data members of the Bot object,
+ * including target, client nickname, channel name, input, command, age argument,
+ * and resets the command position and date-related members to their initial values.
+ */
+void Bot::_resetInfos()
+{
+	_target.clear();
+	_clientNickname.clear();
+	_channelName.clear();
+
+	_input.clear();
+	_command.clear();
+	_ageArg.clear();
+	_commandPos = 0;
+	
+	_year = 0;
+	_month = 0;
+	_day = 0;
+	_currentYear = 0;
+	_currentMonth = 0;
+	_currentDay = 0;
 }

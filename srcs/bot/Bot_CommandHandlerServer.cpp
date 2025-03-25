@@ -59,10 +59,12 @@ bool Bot::_handlePing(const std::string& input)
  * @brief Handles an invite message and joins the specified channel.
  *
  * This function processes an invite message, verifies its format, extracts the
- * channel name, and sends a command to join the channel.
+ * channel name, and sends a JOIN command to the server. It also announces the
+ * bot's features to the clients in the channel.
  *
- * @param input The invite message to be processed.
- * @return true if the invite message is valid and the join command is sent successfully, false otherwise.
+ * @param input The invite message received.
+ * @return true if the invite message is successfully processed and the bot joins the channel.
+ * @return false if the invite message is invalid or processing fails.
  */
 bool Bot::_handleInvite(const std::string& input)
 {
@@ -72,8 +74,8 @@ bool Bot::_handleInvite(const std::string& input)
 
 	// Vérification du format du message
 	if (args[0] != ":" + server::NAME
-			|| !_isValidCommand(args, commands::NOTICE)
-			|| args[2] != server::NAME)
+		|| !_isRightCommand(args, commands::NOTICE)
+		|| args[2] != server::NAME)
 		return false;
 
 	// Extraction du message d'invitation
@@ -89,10 +91,16 @@ bool Bot::_handleInvite(const std::string& input)
 	// Extraction du nom du channel, 
 	// suppression des caractères non imprimables,
 	// et envoi de la commande JOIN
-	_target = message.substr(channelPos, message.length() - channelPos);
-	_target.erase(std::remove_if(_target.begin(), _target.end(), Utils::isNonPrintableChar), _target.end());
+	_channelName = message.substr(channelPos, message.length() - channelPos);
+	_channelName.erase(std::remove_if(_channelName.begin(), _channelName.end(), Utils::isNonPrintableChar), _channelName.end());
+	_target = _channelName;
 	_sendMessage(MessageHandler::botCmdJoinChannel(_target));
 
+	sleep(1);
+
+	// Envoi d'un message aux clients du channel pour lister les fonctionnalités du bot
+	_announceBotFeatures();
+	
 	return true;
 }
 
@@ -118,10 +126,9 @@ bool Bot::_handleJoin(const std::string& input)
 		return false;
 
 	if (!_extractSenderNick(args.front())
-		|| !_isValidCommand(args, commands::JOIN))
+		|| !_isRightCommand(args, commands::JOIN)
+		|| !_extractTarget(args))
 		return false;
-
-	_target = _clientNickname;
 
 	// Envoi d'un message au client qui vient de join le channel
 	// pour lister les fonctionnalités du bot
@@ -133,12 +140,16 @@ bool Bot::_handleJoin(const std::string& input)
 /**
  * @brief Parses a PRIVMSG command from the input string.
  *
- * This function extracts and validates the sender's nickname, the command, 
- * and the target from the input string. It also extracts the message and 
- * adds the client to the list of active clients if the message is valid.
+ * This function processes an input string to determine if it contains a valid
+ * PRIVMSG command. It extracts the sender's nickname, verifies the command,
+ * extracts the target and message, and then attempts to parse the bot command
+ * from the message. If the message does not contain a valid bot command, it
+ * announces the bot's features to the client.
  *
  * @param input The input string containing the PRIVMSG command.
- * @return true if the PRIVMSG command is successfully parsed and valid, false otherwise.
+ * @return true if the PRIVMSG command is successfully parsed and contains a valid bot command.
+ * @return false if the input is invalid, the command is incorrect, the target or message cannot be extracted,
+ *         or the message does not contain a valid bot command.
  */
 bool Bot::_parsePrivmsg(std::string& input)
 {
@@ -147,7 +158,7 @@ bool Bot::_parsePrivmsg(std::string& input)
 		return false;
 
 	if (!_extractSenderNick(args.front())
-		|| !_isValidCommand(args, commands::PRIVMSG)
+		|| !_isRightCommand(args, commands::PRIVMSG)
 		|| !_extractTarget(args))
 		return false;
 
@@ -155,5 +166,13 @@ bool Bot::_parsePrivmsg(std::string& input)
 	if (message.empty())
 		return false;
 
-	return _parseBotCommand(message);
+	if (!_parseBotCommand(message))
+	{
+		// Envoi d'un message au client pour lister les fonctionnalités du bot.
+		// Il n'est envoyé qu'une fois en message privé.
+		if (!_clientNickname.empty() && _target == _clientNickname)
+			_announceBotFeatures();
+		return false;
+	}
+	return true;
 }

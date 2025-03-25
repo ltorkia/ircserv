@@ -53,7 +53,8 @@ std::string Bot::_handleBotCommand()
  */
 std::string Bot::_getRandomFunfact()
 {
-	_quotes = _getQuotes(bot::QUOTES_PATH);
+	if (_quotes.empty())
+		_quotes = _getQuotes(bot::QUOTES_PATH);
 	std::srand(static_cast<unsigned int>(std::time(NULL)));
 	return _quotes[std::rand() % _quotes.size()];
 }

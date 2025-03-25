@@ -63,6 +63,7 @@ class Bot
 		int _readFromServer();
 		void _sendMessage(const std::string &message) const;
 		void _announceBotFeatures();
+		void _resetInfos();
 
 		// === AUTHENTICATE : Bot_Authenticate.cpp ===
 		void _authenticate(const std::string& message);
@@ -70,7 +71,7 @@ class Bot
 
 		// === PARSING HELPER : Bot_ParsingHelper.cpp ===
 		bool _extractSenderNick(std::string& nickname);
-		bool _isValidCommand(const std::vector<std::string>& args, const std::string& command);
+		bool _isRightCommand(const std::vector<std::string>& args, const std::string& command);
 		bool _extractTarget(const std::vector<std::string>& args);
 		std::string _extractMessage(std::vector<std::string>& args);
 		bool _botCommandFound(const std::string& input);

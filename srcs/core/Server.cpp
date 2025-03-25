@@ -47,7 +47,8 @@ void Server::signalHandler(int signal)
 {
 	const char* signalType;
 
-	switch (signal) {
+	switch (signal)
+	{
 		case SIGINT: signalType = "SIGINT"; break;
 		case SIGTSTP: signalType = "SIGTSTP"; break;
 		default: signalType = "Unknown";

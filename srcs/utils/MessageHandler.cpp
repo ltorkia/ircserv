@@ -959,10 +959,10 @@ std::string MessageHandler::botGetAge(int years, int months, int days)
 }
 
 // Message privé bot to client
-std::string MessageHandler::botCmdPrivmsg(const std::string& receiverName, const std::string& message)
+std::string MessageHandler::botCmdPrivmsg(const std::string& targetName, const std::string& message)
 {
 	std::ostringstream stream;	
-	stream << PRIVMSG << " " << receiverName << " :" << message;
+	stream << PRIVMSG << " " << targetName << " :" << message;
 	return stream.str();
 }
 

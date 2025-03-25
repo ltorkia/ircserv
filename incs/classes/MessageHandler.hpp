@@ -162,6 +162,6 @@ class MessageHandler
 		
 		// === BOT ===
 		static std::string botGetAge(int years, int months, int days);
-		static std::string botCmdPrivmsg(const std::string& receiverName, const std::string& message);
+		static std::string botCmdPrivmsg(const std::string& targetName, const std::string& message);
 		static std::string botCmdJoinChannel(const std::string& channelName);
 };

@@ -68,8 +68,15 @@ namespace bot
 	const std::string REALNAME 				= "bot";
 	const std::string QUOTES_PATH 			= "data/quotes.txt";
 	const std::string AGE_CMD 				= "!age";
-	const std::string FUNFACT_CMD				= "!funfact";
+	const std::string FUNFACT_CMD			= "!funfact";
 	const std::string TIME_CMD 				= "!time";
+
+	enum Target
+	{
+		TARGET_CLIENT  						= 1,
+		TARGET_CHANNEL  					= 2,
+		TARGET_CLIENT_IN_CHANNEL  			= 3
+	};
 }
 
 // === CHANNEL ERRORS ===
