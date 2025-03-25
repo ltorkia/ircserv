@@ -123,11 +123,11 @@ bool Bot::_parseBotCommand(std::string& message)
 	// On vérifie que le message contient une commande bot, si oui _commandPos est actualisé dans _botCommandFound,
 	// Si non ou invalide, et que la cible (client ou channel) envoie un message au bot pour la première fois (_targetGotWelcomePrompt),
 	// on envoie un message à la cible listant les fonctionnalités du bot (_announceFeaturesOnce()).
-	if (!_botCommandFound(message) || (_commandPos > 0 && !isspace(message[_commandPos - 1])))
-	{
-		_announceFeaturesOnce();
-		return false;
-	}
+	// if (!_botCommandFound(message) || (_commandPos > 0 && !isspace(message[_commandPos - 1])))
+	// {
+	// 	_announceBotFeatures();
+	// 	return false;
+	// }
 
 	// On extrait la commande et ses potentiels arguments du message
 	message = message.substr(_commandPos);

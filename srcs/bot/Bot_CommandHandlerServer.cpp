@@ -58,12 +58,11 @@ bool Bot::_handlePing(const std::string& input)
 /**
  * @brief Handles an invite message and joins the specified channel.
  *
- * This function processes an invite message, extracts the channel name from the message,
- * and sends a JOIN command to the IRC server to join the specified channel. It also sends
- * a message to the channel listing the bot's features.
+ * This function processes an invite message, verifies its format, extracts the
+ * channel name, and sends a command to join the channel.
  *
- * @param input The invite message received from the IRC server.
- * @return true if the invite message was successfully processed and the bot joined the channel, false otherwise.
+ * @param input The invite message to be processed.
+ * @return true if the invite message is valid and the join command is sent successfully, false otherwise.
  */
 bool Bot::_handleInvite(const std::string& input)
 {
@@ -93,11 +92,6 @@ bool Bot::_handleInvite(const std::string& input)
 	_target = message.substr(channelPos, message.length() - channelPos);
 	_target.erase(std::remove_if(_target.begin(), _target.end(), Utils::isNonPrintableChar), _target.end());
 	_sendMessage(MessageHandler::botCmdJoinChannel(_target));
-
-	sleep(1);
-
-	// Envoi d'un message au channel listant les fonctionnalités du bot
-	_announceFeaturesOnce();
 
 	return true;
 }
@@ -131,7 +125,7 @@ bool Bot::_handleJoin(const std::string& input)
 
 	// Envoi d'un message au client qui vient de join le channel
 	// pour lister les fonctionnalités du bot
-	_announceFeaturesOnce();
+	_announceBotFeatures();
 
 	return true;
 }
@@ -139,15 +133,9 @@ bool Bot::_handleJoin(const std::string& input)
 /**
  * @brief Parses a PRIVMSG command from the input string.
  *
- * This function processes the input string to extract and validate the components
- * of an IRC PRIVMSG command. It performs the following steps:
- * 1. Tokenizes the input string into arguments.
- * 2. Validates the number of arguments.
- * 3. Extracts and validates the sender's nickname.
- * 4. Validates the PRIVMSG command structure.
- * 5. Extracts the target of the message.
- * 6. Extracts the message content.
- * 7. Parses the bot command from the message content.
+ * This function extracts and validates the sender's nickname, the command, 
+ * and the target from the input string. It also extracts the message and 
+ * adds the client to the list of active clients if the message is valid.
  *
  * @param input The input string containing the PRIVMSG command.
  * @return true if the PRIVMSG command is successfully parsed and valid, false otherwise.

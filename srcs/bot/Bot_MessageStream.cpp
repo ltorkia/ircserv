@@ -113,17 +113,22 @@ void Bot::_sendMessage(const std::string &message) const
 }
 
 /**
- * @brief Announces the bot's features to the target channel once.
+ * @brief Announces the bot's features to the client.
  *
- * This function sends a welcome message to the target channel listing the bot's features.
- * It ensures that the welcome message is sent only once by checking the _targetGotWelcomePrompt flag.
- * If the flag is false, it sends the message and sets the flag to true.
+ * This function checks if the bot has already sent a welcome prompt to the client.
+ * If not, it sends a welcome message and marks the client as having received the prompt.
+ *
+ * @note The function uses the _activeClients map to track which clients have received the welcome prompt.
  */
-void Bot::_announceFeaturesOnce()
+void Bot::_announceBotFeatures()
 {
-	if (!_targetGotWelcomePrompt)
+	if (_activeClients.find(_clientNickname) == _activeClients.end())
+		_activeClients[_clientNickname] = false;
+		
+	bool receivedBotPrompt = _activeClients[_clientNickname];
+	if (!receivedBotPrompt)
 	{
-		_sendMessage(MessageHandler::botCmdPrivmsg(_target, MSG_WELCOME_PROMPT));
-		_targetGotWelcomePrompt = true;
+		_sendMessage(MessageHandler::botCmdPrivmsg(_clientNickname, MSG_WELCOME_PROMPT));
+		_activeClients[_clientNickname] = true;
 	}
 }

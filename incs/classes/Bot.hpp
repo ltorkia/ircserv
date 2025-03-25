@@ -27,12 +27,12 @@ class Bot
 
 		// === LISTEN ACTIVITY : Bot.cpp ===
 		void run();
-		
+
 	
 	private:
 
 		// === BOT INFOS ===
-		bool _hasSentAuthInfos, _isAuthenticated, _targetGotWelcomePrompt;
+		bool _hasSentAuthInfos, _isAuthenticated;
 		int _botFd;
 		std::string _botNick, _botUser, _botReal, _botMask;
 
@@ -53,13 +53,16 @@ class Bot
 		// === QUOTES FOR FACTS ===
 		std::vector<std::string> _quotes;
 
+		// === ACTIVE CLIENTS ===
+		std::map<std::string, bool> _activeClients;
+
 		// ================================================================================
 
 		// === READ / SEND MESSAGES : Bot_MessageStream.cpp ===
 		void _handleMessage();
 		int _readFromServer();
 		void _sendMessage(const std::string &message) const;
-		void _announceFeaturesOnce();
+		void _announceBotFeatures();
 
 		// === AUTHENTICATE : Bot_Authenticate.cpp ===
 		void _authenticate(const std::string& message);
