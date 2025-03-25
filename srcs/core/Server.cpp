@@ -755,7 +755,7 @@ void Server::_handleMessage(std::map<int, Client*>::iterator it)
 
 		// On traite le message extrait,
 		// le reste sera traité à la prochaine itération
-		_processInput(it, message);
+		_processCommand(it, message);
 	}
 
 	// S'il reste un message dans le buffer c'est because CTRL+D
@@ -776,7 +776,7 @@ void Server::_handleMessage(std::map<int, Client*>::iterator it)
  * @param it Iterator to a map of clients, where the key is an integer and the value is a pointer to a Client object.
  * @param message The input message from the client to be processed.
  */
-void Server::_processInput(std::map<int, Client*>::iterator it, std::string message)
+void Server::_processCommand(std::map<int, Client*>::iterator it, std::string message)
 {
 	Client* client = it->second;
 	if (client->errorMsgTooLongSent() == true)

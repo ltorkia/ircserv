@@ -38,28 +38,22 @@ static void setSignal()
 /**
  * @brief Entry point of the bot application.
  * 
- * This function initializes a socket, retrieves server IP and port from environment variables,
- * connects to the server, and sends an identification message.
+ * This function initializes the bot, sets up the server connection, and runs the bot.
+ * It handles any exceptions that may occur during the process.
  * 
- * @return int Returns 0 on successful execution, 1 on error.
+ * @return int Returns 0 on successful execution, 1 if an error occurs.
  * 
- * Error codes:
- * - 1: Socket creation failed.
- * - 1: Environment variable retrieval failed.
- * - 1: Connection to the server failed.
- * - 1: Sending identification message failed.
+ * @throws std::runtime_error If socket creation fails, environment variables are invalid,
+ *                            or connection to the server fails.
  */
 int main(void)
 {
-	int botFd = -1;
-	bool error = false;
-
 	try
 	{
 		setSignal();
 
 		struct sockaddr_in serverAddr;
-		botFd = socket(AF_INET, SOCK_STREAM, 0);
+		int botFd = socket(AF_INET, SOCK_STREAM, 0);
 		if (botFd < 0)
 			throw std::runtime_error(ERR_SOCKET_CREATION);
 
@@ -79,16 +73,12 @@ int main(void)
 
 		std::cout << "🤖 Bot connecté au serveur !" << std::endl;
 
-		bot.listenActivity();
+		bot.run();
 	}
 	catch (const std::exception &e)
 	{
-		error = true;
 		std::cerr << RED << "Error: " << RESET << e.what() << std::endl << std::endl;
+		return 1;
 	}
-
-	if (botFd != -1)
-		close(botFd);
-	
-	return error ? 1 : 0;
+	return 0;
 }

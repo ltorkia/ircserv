@@ -959,9 +959,17 @@ std::string MessageHandler::botGetAge(int years, int months, int days)
 }
 
 // Message privé bot to client
-std::string MessageHandler::ircMsgBotToClient(const std::string& receiverName, const std::string& message)
+std::string MessageHandler::botCmdPrivmsg(const std::string& receiverName, const std::string& message)
 {
 	std::ostringstream stream;	
 	stream << PRIVMSG << " " << receiverName << " :" << message;
+	return stream.str();
+}
+
+// Bot join channel
+std::string MessageHandler::botCmdJoinChannel(const std::string& channelName)
+{
+	std::ostringstream stream;	
+	stream << JOIN << " :" << channelName;
 	return stream.str();
 }

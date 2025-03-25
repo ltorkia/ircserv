@@ -14,17 +14,16 @@ class Bot
 {
 	public:
 
-		// === SIGNAL ===
+		// === SIGNAL : Bot.cpp ===
 		static volatile sig_atomic_t signalReceived;							// Indique si un signal a été reçu
 		static void signalHandler(int signal);									// Gestionnaire de signaux
-		sig_atomic_t isSignalReceived() const; 									// Vérifie si un signal a été reçu	
-	
-		// === CONSTUCTORS / DESTRUCTORS ===
+
+		// === CONSTUCTORS / DESTRUCTORS : Bot.cpp ===
 		Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real);
 		~Bot();
 
-		// === LISTEN ACTIVITY ===
-		void listenActivity();
+		// === LISTEN ACTIVITY : Bot.cpp ===
+		void run();
 	
 	private:
 
@@ -56,25 +55,38 @@ class Bot
 
 		// ================================================================================
 
-		// === COMMAND HANDLER ===
-		void _readInput();
-		void _authenticate();
-		std::vector<std::string>::iterator _getItCommand(std::vector<std::string>& args);
-		bool _parsingFailed(std::string& input);
-		bool _processSpecialMessages(const std::string& input);
+		// === READ / SEND MESSAGES : Bot_MessageProcessor.cpp ===
+		void _handleMessage();
+		int _readFromServer();
+		void _sendMessage(const std::string &message) const;
+
+		// === AUTHENTICATE : Bot_Authenticate.cpp ===
+		void _authenticate(const std::string& message);
+		void _sendAuthInfos();
+		
+		// === COMMAND HANDLER : Bot_CommandHandler.cpp ===
+		void _manageCommand(std::string& message);
 		bool _noBotCommandFound(const std::string& input);
-		std::string _handleCommand();
+		bool _handleSpecialCommands(const std::string& input);
+		bool _handleInvite(const std::string& input);
 
-		// === JOKE COMMAND ===
-		std::string _getJoke();
+		// === PRIVMSG PARSER : Bot_PrivmsgParser.cpp ===
+		bool _parsePrivmsg(std::string& input);
+		bool _extractSenderNick(std::string& nickname);
+		bool _isValidPrivmsg(const std::vector<std::string>& args);
+		bool _extractTarget(const std::vector<std::string>& args);
+		std::string _extractMessage(std::vector<std::string>& args);
+		bool _parseBotCommand(std::string& message);
+
+		// === PRIVMSG HANDLER : Bot_PrivmsgHandler.cpp ===
+		std::string _handlePrivmsgCommand();
+
+		// === --- JOKE COMMAND : Bot_PrivmsgHandler.cpp ===
+		std::string _getRandomJoke();
 		std::vector<std::string> _getQuotes(std::string filename);
-		std::string _getRandomQuote();
 
-		// === AGE COMMAND ===
+		// === --- AGE COMMAND : Bot_PrivmsgHandler.cpp ===
         std::string _getAge();
 		bool _parseAge();
 		std::string _ageCalculator();
-
-		// === SEND MESSAGE ===
-		void _sendMessage(const std::string &message) const;
 };

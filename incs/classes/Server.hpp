@@ -46,7 +46,7 @@ class Server
 		
 		// === MESSAGES / COMMANDS ===
 		void _handleMessage(std::map<int, Client*>::iterator it);				// Gère la lecture des messages d'un client
-		void _processInput(std::map<int, Client*>::iterator it, 
+		void _processCommand(std::map<int, Client*>::iterator it, 
 											std::string message);				// Traite l'entrée du client
 		
 		// === UPDATE CLIENTS ===
