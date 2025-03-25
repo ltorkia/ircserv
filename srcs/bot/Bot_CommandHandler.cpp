@@ -28,32 +28,13 @@
  */
 void Bot::_manageCommand(std::string& message)
 {
-	if (_noBotCommandFound(message)
-		|| _handleSpecialCommands(message)
+	if (_handleSpecialCommands(message)
+		|| _noBotCommandFound(message)
 		|| !_parsePrivmsg(message))
 		return;
 
 	std::string response = _handlePrivmsgCommand();
 	_sendMessage(MessageHandler::botCmdPrivmsg(_target, response));
-}
-
-/**
- * @brief Checks if a bot command is found in the input string.
- *
- * This function determines the position of a bot command within the input string
- * using the IrcHelper::getBotCommandStartPos function. If a bot command is found,
- * it returns false. Otherwise, it returns true.
- *
- * @param input The input string to be checked for a bot command.
- * @return true if no bot command is found, false otherwise.
- */
-bool Bot::_noBotCommandFound(const std::string& input)
-{
-	std::cout << "Checking for bot command..." << std::endl;
-	size_t commandPos = IrcHelper::getBotCommandStartPos(input);
-	if (commandPos != std::string::npos)
-		return false;
-	return true;
 }
 
 /**
@@ -77,6 +58,25 @@ bool Bot::_handleSpecialCommands(const std::string& input)
 	if (_handleInvite(input))
 		return true;
 	return false;
+}
+
+/**
+ * @brief Checks if a bot command is found in the input string.
+ *
+ * This function determines the position of a bot command within the input string
+ * using the IrcHelper::getBotCommandStartPos function. If a bot command is found,
+ * it returns false. Otherwise, it returns true.
+ *
+ * @param input The input string to be checked for a bot command.
+ * @return true if no bot command is found, false otherwise.
+ */
+bool Bot::_noBotCommandFound(const std::string& input)
+{
+	std::cout << "Checking for bot command..." << std::endl;
+	size_t commandPos = IrcHelper::getBotCommandStartPos(input);
+	if (commandPos != std::string::npos)
+		return false;
+	return true;
 }
 
 /**

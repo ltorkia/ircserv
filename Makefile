@@ -26,8 +26,7 @@ UTILS_FILES			=	MessageHandler.cpp		IrcHelper.cpp		Utils.cpp
 MAIN_SERVER_FILES	=	main.cpp \
 						$(addprefix $(CORE_DIR)/, $(CORE_FILES)) \
 						$(addprefix $(CMD_DIR)/, $(CMD_FILES)) \
-						$(addprefix $(UTILS_DIR)/, $(UTILS_FILES)) \
-						$(addprefix $(BOT_DIR)/, Bot.cpp)
+						$(addprefix $(UTILS_DIR)/, $(UTILS_FILES))
 
 MAIN_BOT_FILES		=	$(addprefix $(BOT_DIR)/, $(BOT_FILES)) \
 						$(addprefix $(CORE_DIR)/, $(CORE_FILES)) \

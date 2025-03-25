@@ -66,8 +66,8 @@ class Bot
 		
 		// === COMMAND HANDLER : Bot_CommandHandler.cpp ===
 		void _manageCommand(std::string& message);
-		bool _noBotCommandFound(const std::string& input);
 		bool _handleSpecialCommands(const std::string& input);
+		bool _noBotCommandFound(const std::string& input);
 		bool _handleInvite(const std::string& input);
 
 		// === PRIVMSG PARSER : Bot_PrivmsgParser.cpp ===
@@ -87,6 +87,6 @@ class Bot
 
 		// === --- AGE COMMAND : Bot_PrivmsgHandler.cpp ===
         std::string _getAge();
-		bool _parseAge();
+		bool _parseBirthdate();
 		std::string _ageCalculator();
 };

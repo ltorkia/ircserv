@@ -904,7 +904,7 @@ std::string MessageHandler::msgClientOperatorAdded(const std::string& nickname, 
 }
 std::string MessageHandler::msgClientOperatorRemoved(const std::string& nickname, const std::string& channelName)
 {
-	return msgBuilder("⚠️ " + COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " doesn't operate on channel " + DEFAULT + channelName + COLOR_INFO + " anymore", "");
+	return msgBuilder("⚠️  " + COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " doesn't operate on channel " + DEFAULT + channelName + COLOR_INFO + " anymore", "");
 }
 std::string MessageHandler::msgClientLeftChannel(const std::string& nickname, const std::string& channelName, const std::string& reason)
 {
@@ -954,7 +954,7 @@ std::string MessageHandler::msgSendingFile(const std::string& filename, const st
 std::string MessageHandler::botGetAge(int years, int months, int days)
 {
 	std::ostringstream stream;
-	stream << "⏳ " << "You are : " << years << " years, " << months << " months, " << days << " days old";
+	stream << "⏳ " << "You are " << years << " years, " << months << " months, " << days << " days old";
 	return stream.str();
 }
 
@@ -970,6 +970,6 @@ std::string MessageHandler::botCmdPrivmsg(const std::string& receiverName, const
 std::string MessageHandler::botCmdJoinChannel(const std::string& channelName)
 {
 	std::ostringstream stream;	
-	stream << JOIN << " :" << channelName;
+	stream << JOIN << " " << channelName;
 	return stream.str();
 }

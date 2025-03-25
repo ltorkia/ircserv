@@ -98,7 +98,7 @@ std::vector<std::string> Bot::_getQuotes(std::string filename)
 std::string Bot::_getAge()
 {
 	std::string res;
-	if (_parseAge() == false)
+	if (_parseBirthdate() == false)
 		return INVALID_DATE_FORMAT;
 
 	res = _ageCalculator();
@@ -119,14 +119,14 @@ std::string Bot::_getAge()
  *
  * @return true if the age argument is valid, false otherwise.
  */
-bool Bot::_parseAge()
+bool Bot::_parseBirthdate()
 {
 	if (_ageArg.empty())
 		return false;
 
 	// Vérifier que la chaîne à traiter respecte le format "YYYY-MM-DD"
 	if (_ageArg.size() < 10 || _ageArg[4] != '-' || _ageArg[7] != '-'
-		|| (_ageArg.size() > 10 && !isspace(_ageArg[11])))
+		|| (_ageArg.size() > 10 && !isspace(_ageArg[10])))
 		return false;
 
 	// Ne conserver que les 10 premiers caractères
