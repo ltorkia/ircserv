@@ -36,9 +36,9 @@ void CommandHandler::_changeMode()
 {
 	std::string mode;
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::WORD);
-	std::string cible = *args.begin();					//channel cible
+	std::string cible = *args.begin();
 	if (args.size() > 1)
-		mode = *++args.begin();							//mode
+		mode = *++args.begin();
 	if (_validateModeCommand(cible, mode, args.size()) == false)
 		return ;	
 	
@@ -91,9 +91,9 @@ void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelN
 		int serverClientFd = _server.getClientByNickname(modeArgs.at('o'), NULL);
 		int channelClientFd = channel->getChannelClientByNickname(modeArgs.at('o'), NULL);
 
-		if (IrcHelper::clientExists(serverClientFd) == false)	//erreur si nom de l'operateur inconnu sur le serveur
+		if (IrcHelper::clientExists(serverClientFd) == false)
 			_client->sendMessage(MessageHandler::ircNoSuchNick(_client->getNickname(), modeArgs.at('o')), NULL);
-		else if (IrcHelper::clientExists(channelClientFd) == false)	//erreur si nom de l'operateur inconnu sur le channel
+		else if (IrcHelper::clientExists(channelClientFd) == false)
 			_client->sendMessage(MessageHandler::ircNotInChannel(_client->getNickname(), channelName, modeArgs.at('o')), NULL);
 		else
 		{
@@ -111,8 +111,7 @@ void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelN
 	{
 		if (mode[i] != 'i' && mode[i] != 't' && mode[i] != 'k' && mode[i] != 'o' && mode[i] != 'l' && mode[i] != '-' && mode[i] != '+')
 		{
-			_client->sendMessage(MessageHandler::ircUnknownMode(_client->getNickname(), mode[i]), NULL); //erreur a envoye si des modes sont inconnus une fois les modes connus executes
-			return;
+			_client->sendMessage(MessageHandler::ircUnknownMode(_client->getNickname(), mode[i]), NULL);
 		}
 	}
 }
@@ -141,7 +140,7 @@ void CommandHandler::_validateModeArguments(std::string &mode, const Channel *ch
 		if (mode[i] == 'i' || mode[i] == 't' || mode[i] == 'k' || mode[i] != 'o' || mode[i] != 'l')
 			IrcHelper::assertNoDuplicate(mode, mode[i], i);
 	
-	if (nArgs != IrcHelper::getExpectedArgCount(mode))			//minimum 2 elements attendus et max en fonction du nmbre d args attendus
+	if (nArgs != IrcHelper::getExpectedArgCount(mode))
 		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), MODE)); 
 }
 
@@ -194,7 +193,20 @@ bool CommandHandler::_validateModeCommand(std::string &channelName, std::string 
 
 // === MODE HANDLER ===
 
-// Gestion du mod 'i', se refere au booleen dans Channel.hpp
+/**
+ * @brief Handles the invite-only mode for a channel.
+ *
+ * This function sets or unsets the invite-only mode for the specified channel
+ * based on the provided mode sign. If the mode sign is '+', the invite-only
+ * mode is enabled. If the mode sign is '-', the invite-only mode is disabled.
+ * It also sends a message to all clients in the channel indicating the change
+ * in mode.
+ *
+ * @param channel Pointer to the Channel object for which the invite-only mode
+ *                is to be set or unset.
+ * @param modeSign Character indicating whether to set ('+') or unset ('-')
+ *                 the invite-only mode.
+ */
 void CommandHandler::_inviteOnly(Channel *channel, char modeSign)
 {
 	std::string sign(1, modeSign);
@@ -209,7 +221,17 @@ void CommandHandler::_inviteOnly(Channel *channel, char modeSign)
 	_client->sendToAll(channel, MessageHandler::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "i", ""), true);
 }
 
-// Gestion du mod 't', se refere au booleen dans Channel.hpp
+/**
+ * @brief Handles the topic restriction mode for a given channel.
+ *
+ * This function sets or unsets the topic restriction mode ('t') for the specified channel
+ * based on the provided mode sign. If the mode sign is '+', the topic restriction is enabled.
+ * If the mode sign is '-', the topic restriction is disabled. The function also sends a message
+ * to all clients in the channel to notify them of the mode change.
+ *
+ * @param channel Pointer to the Channel object for which the topic restriction mode is being set.
+ * @param modeSign Character representing the mode sign ('+' to enable, '-' to disable).
+ */
 void CommandHandler::_topicRestriction(Channel *channel, char modeSign)
 {
 	std::string sign(1, modeSign);
@@ -224,7 +246,18 @@ void CommandHandler::_topicRestriction(Channel *channel, char modeSign)
 	_client->sendToAll(channel, MessageHandler::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "t", ""), true);
 }
 
-// Gestion du mod 'k', se refere au booleen dans Channel.hpp
+/**
+ * @brief Handles the password mode change for a channel.
+ *
+ * This function sets or removes the password for a given channel based on the mode sign.
+ * If the mode sign is '+', it sets the password to the provided argument.
+ * If the mode sign is '-', it removes the current password.
+ *
+ * @param args The password to be set or an empty string to remove the password.
+ * @param channel The channel for which the password mode is being changed.
+ * @param modeSign The mode sign indicating whether to set ('+') or remove ('-') the password.
+ * @param client The client requesting the password mode change.
+ */
 void CommandHandler::_passwordMode(std::string args, Channel *channel, char modeSign, Client *client)
 {
 	std::string sign(1, modeSign);
@@ -245,7 +278,18 @@ void CommandHandler::_passwordMode(std::string args, Channel *channel, char mode
 
 	_client->sendToAll(channel, MessageHandler::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "k", ""), true);
 }
-// Gestion du mod 'o', se refere au booleen dans Channel.hpp et Client.hpp
+
+/**
+ * @brief Handles the operator privilege mode change for a given channel.
+ *
+ * This function adds or removes an operator privilege for a client in a specified channel
+ * based on the mode sign provided. It also sends a notification to all clients in the channel
+ * about the mode change.
+ *
+ * @param channel Pointer to the Channel object where the mode change is to be applied.
+ * @param modeSign Character indicating the mode change ('+' to add operator, '-' to remove operator).
+ * @param newOp Pointer to the Client object representing the client whose operator status is to be changed.
+ */
 void CommandHandler::_operatorPrivilege(Channel *channel, char modeSign, Client *newOp)
 {
 	std::string sign(1, modeSign);
@@ -260,7 +304,18 @@ void CommandHandler::_operatorPrivilege(Channel *channel, char modeSign, Client 
 	_client->sendToAll(channel, MessageHandler::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "o", newOp->getNickname()), true);
 }
 
-// Gestion du mod 'l', se refere au booleen dans Channel.hpp et Client.hpp
+/**
+ * @brief Handles the channel limit mode change.
+ *
+ * This function processes the mode change for channel limits. It sets or removes
+ * the limit on the number of users that can join the channel based on the mode sign
+ * and arguments provided.
+ *
+ * @param channel Pointer to the Channel object where the mode change is applied.
+ * @param modeSign Character indicating the mode change ('+' to set limit, '-' to remove limit).
+ * @param args String containing the limit value when setting the limit.
+ * @return true if the mode change was successfully applied, false otherwise.
+ */
 bool CommandHandler::_channelLimit(Channel *channel, char modeSign, std::string args)
 {
 	std::string sign(1, modeSign);
