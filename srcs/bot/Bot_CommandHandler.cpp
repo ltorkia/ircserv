@@ -49,7 +49,6 @@ void Bot::_manageCommand(std::string& message)
  */
 bool Bot::_handleSpecialCommands(const std::string& input)
 {
-	std::cout << "Processing special messages..." << std::endl;
 	if (input == MessageHandler::ircPing())
 	{
 		_sendMessage(MessageHandler::ircPong());
@@ -72,7 +71,6 @@ bool Bot::_handleSpecialCommands(const std::string& input)
  */
 bool Bot::_noBotCommandFound(const std::string& input)
 {
-	std::cout << "Checking for bot command..." << std::endl;
 	size_t commandPos = IrcHelper::getBotCommandStartPos(input);
 	if (commandPos != std::string::npos)
 		return false;

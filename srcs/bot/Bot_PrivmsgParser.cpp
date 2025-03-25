@@ -30,7 +30,6 @@
  */
 bool Bot::_parsePrivmsg(std::string& input)
 {
-	std::cout << "Parsing input..." << std::endl;
 	std::vector<std::string> args = Utils::getTokens(input, splitter::WORD);
 	if (args.size() < 4)
 		return false;
@@ -66,8 +65,6 @@ bool Bot::_extractSenderNick(std::string& nickname)
 	if (!nickname.empty() && nickname[0] == ':')
 		nickname.erase(0, 1);
 	_clientNickname = nickname;
-
-	std::cout << "Nick : " << _clientNickname << std::endl;
 	return !_clientNickname.empty() && _clientNickname != server::NAME;
 }
 
@@ -104,7 +101,6 @@ bool Bot::_extractTarget(const std::vector<std::string>& args)
 	if (_target.empty())
 		return false;
 
-	std::cout << "target : " << _target << std::endl;
 	return true;
 }
 
@@ -125,8 +121,6 @@ std::string Bot::_extractMessage(std::vector<std::string>& args)
 	std::string message = Utils::stockVector(itArg, args);
 	if (!message.empty() && message[0] == ':')
 		message.erase(0, 1);
-
-	std::cout << "Message : " << message << std::endl;
 	return message;
 }
 
@@ -154,12 +148,8 @@ bool Bot::_parseBotCommand(std::string& message)
 	if (IrcHelper::isInvalidBotCommand(_command))
 		return false;
 
-	std::cout << "Commande : " << _command << std::endl;
-
 	if (_command == bot::AGE_CMD && argsInput.size() > 1)
-	{
 		_ageArg = argsInput[1];
-		std::cout << "Arguments : " << _ageArg << std::endl;
-	}
+
 	return true;
 }
