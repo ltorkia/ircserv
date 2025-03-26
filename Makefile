@@ -4,9 +4,9 @@ NAME_BOT			=	ircbot
 
 #-----> DIRECTORY NAMES (SRCS, OBJS, OBJS_BOT, COMMON_OBJS)
 SRCS_DIR			=	srcs
-OBJS_DIR			= 	build_server
-OBJS_DIR_BOT		= 	build_bot
-COMMON_OBJS_DIR		= 	build_common
+OBJS_DIR			=	build_server
+OBJS_DIR_BOT		=	build_bot
+COMMON_OBJS_DIR		=	build_common
 
 #-----> COMMON LIBRARY (SHARED BY SERVER + BOT)
 LIB_COMMON			=	$(COMMON_OBJS_DIR)/libcommon.a
@@ -18,14 +18,14 @@ BOT_DIR				=	bot
 UTILS_DIR			=	utils
 
 #-----> ALL SOURCES FILES
-CORE_FILES  		=	Server.cpp		Client.cpp		Channel.cpp
+CORE_FILES			=	Server.cpp		Client.cpp		Channel.cpp
 
 CMD_FILES			=	CommandHandler.cpp				CommandHandler_Auth.cpp \
 						CommandHandler_Channel.cpp 		CommandHandler_File.cpp \
 						CommandHandler_Log.cpp 			CommandHandler_Message.cpp \
 						CommandHandler_Mode.cpp
 
-BOT_FILES  			=	main.cpp				Bot.cpp							Bot_MessageStream.cpp \
+BOT_FILES			=	main.cpp				Bot.cpp							Bot_MessageStream.cpp \
 						Bot_Authenticate.cpp	Bot_CommandHandlerServer.cpp	Bot_CommandHandlerUser.cpp \
 						Bot_ParsingHelper.cpp
 
