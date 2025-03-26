@@ -193,6 +193,7 @@ irssi -c 127.0.0.1 -p 6667 -w super_pass
 - Test commands like:
 - `/join #test_channel`
 - `/msg user Hello!`
+- `/msg #channel Hello!`
 - `/kick user`
 
 ---
