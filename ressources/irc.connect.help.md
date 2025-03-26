@@ -1,6 +1,6 @@
 # IRC connection guide
 
-- This file contains common commands for running and interacting with the IRC server and client.
+- This file contains common commands for running the IRC server and client.
 - Use `valgrind` for memory leak detection when debugging the server.
 - The `quote` command is primarily used during the authentication phase of the connection.
 - Use logging commands for troubleshooting and debugging the IRC communication.
