@@ -175,7 +175,7 @@ make re       # Cleans and recompiles everything
 
 ### Running `server` :
 ```bash
-./ircserv 6667 myPass
+./ircserv 6667 my_password
 ```
 
 ### Connecting with `nc` :
@@ -196,7 +196,7 @@ com^Dman^Dd
 
 ### Connecting with `irssi` :
 ```bash
-irssi -c 127.0.0.1 -p 6667 -w myPass
+irssi -c 127.0.0.1 -p 6667 -w my_password
 ```
 - Test commands like:
 - `/join #test_channel`

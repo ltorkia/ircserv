@@ -9,13 +9,13 @@
 ## Running the IRC Server:
 **To start the server on port 6667 with the argument "bla":**
 ```bash
-./ircserv 6667 myPass
+./ircserv 6667 my_password
 ```
 
 ### With flags for debugging and memory checks:
 **To run the server with memory leak checks using `valgrind`:**
 ```bash
-valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s --track-fds=yes ./ircserv 6667 myPass
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s --track-fds=yes ./ircserv 6667 my_password
 ```
 
 ## Netcat (Testing the server with Netcat):
@@ -41,7 +41,7 @@ irssi
 ### Connect to the server with parameters (nickname and password):
 **To connect to the server with a specific nickname and password:**
 ```bash
-irssi -c 127.0.0.1 -p 6667 -n myNick -w myPass
+irssi -c 127.0.0.1 -p 6667 -n my_nickname -w my_password
 ```
 
 ### Quote Command (for authentication, then not needed after):
