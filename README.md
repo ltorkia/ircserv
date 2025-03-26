@@ -196,7 +196,9 @@ NICK test_user
 USER test_user 0 * :Real Name
 ```
 - Packet framentation test with `CTRL+D`:
-`com^Dman^Dd`
+```bash
+com^Dman^Dd
+```
 
 ### Connecting with `irssi` :
 ```bash
@@ -204,7 +206,7 @@ irssi -c 127.0.0.1 -p 6667 -w "my_password"
 ```
 - Test commands like:
 ```bash
-/join #test_channel
+/join #channel
 ```
 ```bash
 /msg user Hello!
