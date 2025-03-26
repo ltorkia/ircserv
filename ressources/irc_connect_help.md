@@ -7,15 +7,15 @@
 - Use logging commands for troubleshooting and debugging the IRC communication.
 
 ## Running the IRC Server:
-**To start the server on port 6667 with the argument "bla":**
+**To start the server on port 6667 with the password `bla`:**
 ```bash
-./ircserv 6667 my_password
+./ircserv 6667 "bla"
 ```
 
 ### With flags for debugging and memory checks:
 **To run the server with memory leak checks using `valgrind`:**
 ```bash
-valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s --track-fds=yes ./ircserv 6667 my_password
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s --track-fds=yes ./ircserv 6667 "bla"
 ```
 
 ## Netcat (Testing the server with Netcat):
@@ -39,9 +39,9 @@ irssi
 ```
 
 ### Connect to the server with parameters (nickname and password):
-**To connect to the server with a specific nickname and password:**
+**To connect to the server with a specific nickname `Lee` and password `bla`:**
 ```bash
-irssi -c 127.0.0.1 -p 6667 -n my_nickname -w my_password
+irssi -c 127.0.0.1 -p 6667 -n "Lee" -w "bla"
 ```
 
 ### Quote Command (for authentication, then not needed after):

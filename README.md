@@ -173,9 +173,11 @@ make re       # Cleans and recompiles everything
 
 ## **Testing & Usage**
 
+**If you have any issues connecting, refer to [the `irc_connect_help.md` file](https://github.com/ltorkia/ircserv/blob/tree/en.subject.pdf).**
+
 ### Running `server` :
 ```bash
-./ircserv 6667 my_password
+./ircserv 6667 "my_password"
 ```
 
 ### Connecting with `nc` :
@@ -196,7 +198,7 @@ com^Dman^Dd
 
 ### Connecting with `irssi` :
 ```bash
-irssi -c 127.0.0.1 -p 6667 -w my_password
+irssi -c 127.0.0.1 -p 6667 -w "my_password"
 ```
 - Test commands like:
 - `/join #test_channel`
