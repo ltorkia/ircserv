@@ -30,7 +30,7 @@ L'objectif est de développer un serveur IRC fonctionnant en TCP/IP, capable de 
 
 ### Fonctions externes autorisées :
 - `socket`, `close`, `setsockopt`, `bind`, `connect`, `listen`, `accept`...
-- Voir la liste complète dans la [consigne]((https://github.com/ltorkia/ircserv/blob/main/fr.subject.pdf)).
+- Voir la liste complète dans la [consigne](https://github.com/ltorkia/ircserv/blob/main/fr.subject.pdf).
 
 ---
 
@@ -157,9 +157,14 @@ com^Dman^Dd
 
 ---
 
-## **Partie bonus gérée**
+## **Partie bonus**
 
 ### Fonctionnalités supplémentaires possibles :
 1. **Envoi de fichiers** : Permet aux clients de s'envoyer des fichiers via le protocole DCC.
 2. **Bot IRC** : Fournit sur demande des `!funfact`, l'heure `!time`, et notre `!age` au jour près.
+
+**Exécution du bot :**
+```bash
+./ircbot
+```
 ---
