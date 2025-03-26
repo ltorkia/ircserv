@@ -106,10 +106,10 @@ Bot::~Bot()
  * @details
  * - Initializes the file descriptor set.
  * - Enters an infinite loop to monitor the bot's file descriptor.
+ * - Resets internal information.
  * - Breaks the loop if a termination signal is received.
  * - Uses select() to wait for activity on the file descriptor.
  * - If activity is detected, calls _handleMessage() to process the message.
- * - Resets internal information after handling the message.
  * - Clears the file descriptor set before exiting.
  */
 void Bot::run()
@@ -118,6 +118,7 @@ void Bot::run()
 	FD_ZERO(&readFds);
 	while (true)
 	{
+		_resetInfos();
 		if (signalReceived)
 			break;
 			
@@ -127,7 +128,6 @@ void Bot::run()
 		int activity = select(_botFd + 1, &readFds, NULL, NULL, &timeout);
 		if (activity > 0 && FD_ISSET(_botFd, &readFds))
 			_handleMessage();
-		_resetInfos();
 	}
 	FD_CLR(_botFd, &readFds);
 }
