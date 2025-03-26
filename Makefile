@@ -1,6 +1,7 @@
 #-----> PROGRAM NAMES (SERVER + BOT)
 NAME_SERVER			=	ircserv
 NAME_BOT			=	ircbot
+NAME_LIB			=	libcommon.a
 
 #-----> DIRECTORY NAMES (SRCS, OBJS, OBJS_BOT, COMMON_OBJS)
 SRCS_DIR			=	srcs
@@ -9,7 +10,7 @@ OBJS_DIR_BOT		=	build_bot
 COMMON_OBJS_DIR		=	build_common
 
 #-----> COMMON LIBRARY (SHARED BY SERVER + BOT)
-LIB_COMMON			=	$(COMMON_OBJS_DIR)/libcommon.a
+LIB_COMMON			=	$(COMMON_OBJS_DIR)/$(NAME_LIB)
 
 #-----> SOURCES DIRECTORIES
 CORE_DIR			=	core
@@ -103,7 +104,7 @@ ${NAME_SERVER}: ${OBJS} $(LIB_COMMON)
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
-	@echo "${CYAN}####                    LINKING                    ####${RESET}"
+	@echo "${CYAN}####                LINKING SERVER                 ####${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	@echo "${GREEN}--> ${NAME_SERVER}${RESET}\n"
@@ -121,7 +122,7 @@ ${NAME_BOT}: ${OBJS_BOT} $(LIB_COMMON)
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
-	@echo "${CYAN}####                    LINKING                    ####${RESET}"
+	@echo "${CYAN}####                  LINKING BOT                  ####${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	@echo "${GREEN}--> ${NAME_BOT}${RESET}\n"
@@ -138,10 +139,10 @@ $(LIB_COMMON): $(COMMON_OBJS)
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
-	@echo "${CYAN}####                    LINKING                    ####${RESET}"
+	@echo "${CYAN}####                LINKING LIBRARY                ####${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
-	@echo "\n${GREEN}--> ${LIB_COMMON}${RESET}\n"
+	@echo "${GREEN}--> $(NAME_LIB)${RESET}\n"
 	@mkdir -p $(dir $(LIB_COMMON))
 	ar rcs $(LIB_COMMON) $(COMMON_OBJS) 
 
