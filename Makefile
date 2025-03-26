@@ -3,7 +3,7 @@ NAME_SERVER			=	ircserv
 NAME_BOT			=	ircbot
 NAME_LIB			=	libcommon.a
 
-##############################################################################################
+#########################################################
 
 #-----> DIRECTORY NAMES (SRCS, OBJS, OBJS_BOT, COMMON_OBJS)
 SRCS_DIR			=	srcs
@@ -14,7 +14,7 @@ COMMON_OBJS_DIR		=	build_common
 #-----> COMMON LIBRARY (SHARED BY SERVER + BOT)
 LIB_COMMON			=	$(COMMON_OBJS_DIR)/$(NAME_LIB)
 
-##############################################################################################
+#########################################################
 
 #-----> SOURCES DIRECTORIES
 #---> FIRST LEVEL
@@ -27,7 +27,7 @@ CHANNELS_DIR		=	channels
 CLIENTS_DIR			=	clients
 CMD_DIR				=	commands
 
-##############################################################################################
+#########################################################
 
 #-----> ALL SOURCES FILES
 SERVER_FILES		=	main.cpp
@@ -45,7 +45,7 @@ CMD_FILES			=	CommandHandler.cpp				CommandHandler_Auth.cpp \
 BOT_FILES			=	main.cpp						Bot.cpp							Bot_MessageHandler.cpp \
 						Bot_Authenticate.cpp			Bot_CommandParser.cpp			Bot_CommandHandler.cpp
 
-##############################################################################################
+#########################################################
 
 #-----> JOIN SOURCES FOR EACH PROGRAM OR COMMON USE
 COMMON_FILES 		= 	$(addprefix $(UTILS_DIR)/, $(COMMON_UTILS_FILES))
@@ -79,6 +79,8 @@ SRCS_BOT			= 	${addprefix $(SRCS_DIR)/,$(MAIN_BOT_FILES)}
 OBJS_BOT			= 	${SRCS_BOT:%.cpp=${OBJS_DIR_BOT}/%.o}
 DEPS_BOT			= 	${OBJS_BOT:.o=.d}
 
+#########################################################
+
 #-----> INCLUDES
 INC_DIR				=	incs
 CONFIG_DIR			=	config
@@ -87,6 +89,8 @@ INC_DIRS			= 	-I./$(INC_DIR)/$(SERVER_DIR) \
 						-I./$(INC_DIR)/$(BOT_DIR) \
 						-I./$(INC_DIR)/$(UTILS_DIR) \
 						-I./$(INC_DIR)/$(CONFIG_DIR)
+
+#########################################################
 
 #-----> COMPILATION FLAGS
 CXX					= 	c++
@@ -128,6 +132,8 @@ ${NAME_SERVER}: ${OBJS} $(LIB_COMMON)
 	@echo "${GREEN}--> ${NAME_SERVER}${RESET}\n"
 	${CXX} ${OBJS} -o ${NAME_SERVER} -L$(COMMON_OBJS_DIR) -lcommon
 
+#########################################################
+
 #-----> BOT
 $(OBJS_DIR_BOT)/%.o: %.cpp
 	@mkdir -p ${dir $@}
@@ -146,6 +152,8 @@ ${NAME_BOT}: ${OBJS_BOT} $(LIB_COMMON)
 	@echo "${GREEN}--> ${NAME_BOT}${RESET}\n"
 	${CXX} ${OBJS_BOT} -o ${NAME_BOT} -L$(COMMON_OBJS_DIR) -lcommon
 
+#########################################################
+
 #-----> COMMON OBJECTS
 ${COMMON_OBJS_DIR}/%.o: %.cpp
 	@mkdir -p ${dir $@}
@@ -163,6 +171,8 @@ $(LIB_COMMON): $(COMMON_OBJS)
 	@echo "${GREEN}--> $(NAME_LIB)${RESET}\n"
 	@mkdir -p $(dir $(LIB_COMMON))
 	ar rcs $(LIB_COMMON) $(COMMON_OBJS) 
+
+#########################################################
 
 #-----> CLEANING / RECOMPILATION
 clean:
@@ -196,6 +206,8 @@ re: fclean
 #-----> DEBUG
 debug: fclean
 	@$(MAKE) CXXFLAGS="$(CXXFLAGS_DEBUG)" all
+
+#########################################################
 
 #-----> INCLUDE DEPENDENCIES
 -include ${DEPS} ${DEPS_BOT} ${COMMON_DEPS}
