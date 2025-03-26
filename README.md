@@ -1,4 +1,4 @@
-# Projet IRC Server ---> [SUJET FR](https://github.com/ltorkia/ft_irc/blob/lee/fr.subject.pdf)
+# Projet IRC Server 42: [SUJET FR](https://github.com/ltorkia/ircserv/blob/main/fr.subject.pdf)
 
 Ce projet consiste à développer un serveur IRC en C++ 98, conforme à la norme et capable de gérer plusieurs clients simultanément.
 
@@ -26,11 +26,11 @@ L'objectif est de développer un serveur IRC fonctionnant en TCP/IP, capable de 
 - Norme C++ 98 uniquement.
 - Pas de forking.
 - Opérations d'entrée/sortie non bloquantes.
-- Un seul appel à `poll()` ou équivalent (select, epoll, kqueue).
+- Un seul appel à `poll()` ou équivalent. Ici nous avons choisi `select()`.
 
 ### Fonctions externes autorisées :
 - `socket`, `close`, `setsockopt`, `bind`, `connect`, `listen`, `accept`...
-- Voir la liste complète dans la [consigne](https://github.com/ltorkia/ft_irc/blob/lee/fr.subject.pdf).
+- Voir la liste complète dans la [consigne]((https://github.com/ltorkia/ircserv/blob/main/fr.subject.pdf)).
 
 ---
 
@@ -51,8 +51,8 @@ L'objectif est de développer un serveur IRC fonctionnant en TCP/IP, capable de 
      - `MODE` : Gérer les modes du channel (`i`, `t`, `k`, `o`, `l`).
 4. Communication conforme au protocole TCP/IP.
 
-### Spécificités MacOS :
-Pour MacOS, utilisez `fcntl()` pour les fichiers non bloquants :
+### Spécificités :
+Utiliser `fcntl()` uniquement pour les fichiers non bloquants :
 ```cpp
 fcntl(fd, F_SETFL, O_NONBLOCK);
 ```
@@ -60,43 +60,80 @@ fcntl(fd, F_SETFL, O_NONBLOCK);
 
 ## **Structure des fichiers**
 
-### Exemple d'organisation :
+### Organisation :
 ```
-project_root/
+
 ├── Makefile
-├── srcs/
-│   ├── main.cpp
-│   ├── server.cpp
-│   └── ...
-├── incs/
-│   ├── server.hpp
-│   └── ...
-└── config/
-    └── ircserv.conf (optionnel)
+├── README.md
+├── data
+│   └── quotes.txt
+├── incs
+│   ├── classes
+│   │   ├── bot
+│   │   │   └── Bot.hpp
+│   │   ├── commands
+│   │   │   ├── CommandHandler_File.hpp
+│   │   │   └── CommandHandler.hpp
+│   │   ├── core
+│   │   │   ├── Channel.hpp
+│   │   │   ├── Client.hpp
+│   │   │   └── Server.hpp
+│   │   └── utils
+│   │       ├── IrcHelper.hpp
+│   │       ├── MessageHandler.hpp
+│   │       └── Utils.hpp
+│   └── config
+│       ├── bot.hpp
+│       ├── colors.hpp
+│       ├── commands.hpp
+│       ├── irc_config.hpp
+│       ├── irc_replies.hpp
+│       ├── server_libs.hpp
+│       └── server_messages.hpp
+└── srcs
+    ├── bot
+    │   ├── Bot_Authenticate.cpp
+    │   ├── Bot_CommandHandlerServer.cpp
+    │   ├── Bot_CommandHandlerUser.cpp
+    │   ├── Bot.cpp
+    │   ├── Bot_MessageStream.cpp
+    │   ├── Bot_ParsingHelper.cpp
+    │   └── main.cpp
+    ├── commands
+    │   ├── CommandHandler_Auth.cpp
+    │   ├── CommandHandler_Channel.cpp
+    │   ├── CommandHandler.cpp
+    │   ├── CommandHandler_File.cpp
+    │   ├── CommandHandler_Log.cpp
+    │   ├── CommandHandler_Message.cpp
+    │   └── CommandHandler_Mode.cpp
+    ├── core
+    │   ├── Channel.cpp
+    │   ├── Client.cpp
+    │   └── Server.cpp
+    ├── main.cpp
+    └── utils
+        ├── IrcHelper.cpp
+        ├── MessageHandler.cpp
+        └── Utils.cpp
 ```
 ---
 
-## **Difficultés et points à surveiller**
+## **Gestion du projet**
 
 1. **Gestion non bloquante :**
-   - Toutes les opérations d'entrée/sortie doivent être non bloquantes.
-   - Assurez-vous que `poll()` ou équivalent est correctement utilisé pour surveiller les descripteurs de fichier.
+   - Toutes les opérations d'entrée/sortie sont non bloquantes.
 
-2. **Tests avec un client IRC de référence :**
-   - Choisissez un client (par ex. `WeeChat`, `irssi`, ou `mIRC`).
-   - Testez chaque fonctionnalité obligatoire avec ce client.
+2. **Client IRC de référence :**
+   - `irssi`
 
 3. **Gestion des erreurs :**
-   - Vérifiez toutes les erreurs possibles : connexions interrompues, données partielles, etc.
-   - Utilisez un `try/catch` pour capturer les exceptions et éviter les crashs.
+   - Connexions interrompues, données partielles, etc.
+   - Utilisation de blocs `try/catch` pour capturer les exceptions et éviter les crashs.
 
 4. **Respect de la norme C++ 98 :**
    - Pas de nouvelles fonctionnalités C++ 11 ou supérieures.
-   - Évitez les bibliothèques non autorisées.
-
-5. **Qualité du code :**
-   - Structure claire et modulaire.
-   - Documentation dans le code pour chaque classe et fonction.
+   - Pas de bibliothèque non autorisée.
 
 ---
 
@@ -110,20 +147,19 @@ com^Dman^Dd
 - Envoyez une commande fragmentée pour tester la reconstitution des paquets.
 
 ### Test avec un client IRC :
-1. Connectez-vous au serveur :
+1. Connection au serveur :
    ```bash
    /server 127.0.0.1 6667
    ```
-2. Authentifiez-vous avec le mot de passe.
-3. Testez les commandes :
+2. Authentification avec mot de passe.
+3. Tester les commandes :
    - `NICK`, `USER`, `JOIN`, `PRIVMSG`, `KICK`, etc.
 
 ---
 
-## **Partie bonus**
+## **Partie bonus gérée**
 
 ### Fonctionnalités supplémentaires possibles :
-1. **Envoi de fichiers** : Permettre aux clients de s'envoyer des fichiers.
-2. **Bot IRC** : Ajouter un bot automatisé pour répondre aux messages ou fournir des services.
-
+1. **Envoi de fichiers** : Permet aux clients de s'envoyer des fichiers via le protocole DCC.
+2. **Bot IRC** : Fournit sur demande des `!funfact`, l'heure `!time`, et notre `!age` au jour près.
 ---
