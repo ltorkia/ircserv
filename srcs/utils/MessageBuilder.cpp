@@ -2,7 +2,6 @@
 
 // === OTHER CLASSES ===
 #include "../../incs/utils/Utils.hpp"
-#include "../../incs/utils/IrcHelper.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
@@ -817,7 +816,7 @@ void MessageBuilder::displayWelcome(const std::string &serverIp, int port, const
 std::string MessageBuilder::msgTimeServerCreation()
 {
 	std::tm now;
-	IrcHelper::getCurrentTime(now);
+	Utils::getCurrentTime(now);
 
 	std::ostringstream stream;
 	stream 

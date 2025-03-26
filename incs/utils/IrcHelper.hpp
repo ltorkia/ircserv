@@ -1,9 +1,7 @@
 #pragma once
 
 #include <iostream>						// gestion chaînes de caractères -> std::cout, std::cerr, std::string
-#include <fstream>						// gestion fichiers -> std::ifstream, std::ofstream
 #include <sstream>						// gestion flux -> std::ostringstream
-#include <ctime> 						// gestion temps -> std::time_t, std::tm
 #include <map>							// container map
 #include <vector>						// container vector
 #include <cstdlib> 						// std::strtol
@@ -26,8 +24,6 @@ class IrcHelper
 
 		// === SERVER CONNECT HELPER ===
 		static int validatePort(const std::string& port);
-		static void writeEnvFile(const std::string& serverIp, int port, const std::string& password);
-		static std::string getEnvValue(const std::string& key);
 
 		// === AUTHENTICATION HELPER ===
 		static int getCommand(const Client& client);
@@ -38,7 +34,6 @@ class IrcHelper
 		static std::string formatUsername(const std::string& username);
 
 		// === MESSAGES HELPER ===
-		static std::string extractAndCleanMessage(std::string& bufferMessage, size_t pos);
 		static std::string sanitizeIrcMessage(std::string msg, const std::string& cmd, const std::string& nickname);
 
 		// === CHANNEL HELPER ===
@@ -56,10 +51,4 @@ class IrcHelper
 		static void assertNoDuplicate(std::string &str, char c, size_t i);
 		static bool noChangeToMake(char modeSign, bool modeEnabled);
 		static bool isValidLimit(std::string &limit);
-
-		// === BOT HELPER ===
-		static size_t getBotCommandStartPos(const std::string& message);
-		static bool isInvalidBotCommand(const std::string& command);
-		static void getCurrentTime(std::tm &outTime);
-		static std::string getTimeString();
 };

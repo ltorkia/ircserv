@@ -547,7 +547,7 @@ void Server::_init()
 	_setServerSocket();
 
 	_timeCreationStr = MessageBuilder::msgTimeServerCreation();
-	IrcHelper::writeEnvFile(_localIp, _port, _password);
+	Utils::writeEnvFile(_localIp, _port, _password);
 	MessageBuilder::displayWelcome(_localIp, _port, _password);
 }
 
@@ -732,7 +732,7 @@ void Server::_handleMessage(std::map<int, Client*>::iterator it)
 		// On extrait le message jusqu'au \n (non inclus)
 		// + on enlève le \r s'il y en a un (cas irssi)
 		// + on supprime la commande traitée du buffer
-		std::string message = IrcHelper::extractAndCleanMessage(bufferMessage, pos);
+		std::string message = Utils::extractAndCleanMessage(bufferMessage, pos);
 
 		// Debug : affiche le message reçu
 		// std::cout << "---> " << message << std::endl;

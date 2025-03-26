@@ -8,13 +8,11 @@
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
-#include "../../incs/config/bot_config.hpp"
 #include "../../incs/config/server_messages.hpp"
 #include "../../incs/config/commands.hpp"
 #include "../../incs/config/colors.hpp"
 
 using namespace server_messages;
-using namespace bot_config;
 using namespace name_type;
 using namespace auth_cmd;
 using namespace commands;
@@ -58,63 +56,6 @@ int IrcHelper::validatePort(const std::string& port)
 		throw std::invalid_argument(ERR_INVALID_PORT_NUMBER);
 
 	return static_cast<int>(portNumber);
-}
-
-/**
- * @brief Writes the server IP and port to the environment configuration file.
- *
- * This function creates or truncates the environment configuration file and writes
- * the provided server IP address and port number to it. If the file cannot be created
- * or opened, an error message is printed to the standard error output.
- *
- * @param serverIp The IP address of the server to be written to the environment file.
- * @param port The port number to be written to the environment file.
- * @param password The server password to be written to the environment file.
- */
-void IrcHelper::writeEnvFile(const std::string& serverIp, int port, const std::string& password)
-{
-	std::ofstream file(env::PATH.c_str(), std::ios::trunc); // Ouvre en mode écriture et écrase le contenu existant
-	if (!file)
-	{
-		std::cerr << "Erreur : Impossible de créer incs/config/.env" << std::endl;
-		return;
-	}
-	file << env::SERVER_IP_KEY << "=" << serverIp << '\n';
-	file << env::SERVER_PORT_KEY << "=" << port << '\n';
-	file << env::PASS_KEY << "=" << password << '\n';
-	file.close();
-}
-
-/**
- * @brief Retrieves the value of a specified environment variable from a configuration file.
- *
- * This function opens the configuration file specified by `server::ENV_PATH` and searches for a line
- * that contains the given key. If the key is found, the function extracts and returns the value
- * associated with the key. If the file cannot be opened or the key is not found, an empty string is returned.
- *
- * @param key The environment variable key to search for in the configuration file.
- * @return The value associated with the specified key, or an empty string if the key is not found or the file cannot be opened.
- */
-std::string IrcHelper::getEnvValue(const std::string& key)
-{
-	std::ifstream file(env::PATH.c_str());
-	if (!file)
-	{
-		std::cerr << "Erreur : Impossible d'ouvrir config/.env" << std::endl;
-		return "";
-	}
-
-	std::string line;
-	while (std::getline(file, line))
-	{
-		if (line.find(key) != std::string::npos)
-		{
-			file.close();
-			return line.substr(line.find('=') + 1);
-		}
-	}
-	file.close();
-	return "";
 }
 
 // === AUTHENTICATION HELPER ===
@@ -340,32 +281,6 @@ std::string IrcHelper::formatUsername(const std::string& username)
 
 
 // === MESSAGES HELPER ===
-
-/**
- * @brief Extracts and cleans a message from the buffer.
- *
- * This function extracts a message from the provided buffer up to the specified position (excluding the newline character).
- * If the extracted message ends with a carriage return character ('\r'), it is removed.
- * The processed part of the buffer is then erased.
- *
- * @param bufferMessage The buffer containing the message to be extracted and cleaned.
- * @param pos The position up to which the message should be extracted.
- * @return A cleaned message string.
- */
-std::string IrcHelper::extractAndCleanMessage(std::string& bufferMessage, size_t pos)
-{
-	// On extrait le message jusqu'au \n (non inclus)
-	std::string message = bufferMessage.substr(0, pos);
-
-	// On enlève le \r s'il y en a un (cas irssi)
-	if (!message.empty() && message[message.size() - 1] == '\r')
-		message.erase(message.size() - 1);
-
-	// On supprime la commande traitée du buffer
-	bufferMessage.erase(0, pos + 1);
-
-	return message;
-}
 
 /**
  * @brief Sanitizes an IRC message by removing the leading character if necessary.
@@ -660,77 +575,4 @@ bool IrcHelper::noChangeToMake(char modeSign, bool modeEnabled)
 bool IrcHelper::isValidLimit(std::string &limit)
 {
 	return (!(limit.find_first_not_of("0123456789") != std::string::npos) && std::atol(limit.c_str()) > 0 && std::atol(limit.c_str()) <= 2147483647);
-}
-
-
-// === BOT HELPER ===
-
-/**
- * @brief Finds the starting position of a bot command in the given message.
- *
- * This function searches for predefined bot commands (FUNFACT_CMD, AGE_CMD, TIME_CMD)
- * within the provided message string. If any of these commands are found, the
- * function returns the starting position of the first occurrence. If none of the
- * commands are found, it returns std::string::npos.
- *
- * @param message The message string to search for bot commands.
- * @return The starting position of the first found bot command, or std::string::npos if none are found.
- */
-size_t IrcHelper::getBotCommandStartPos(const std::string& message)
-{
-	const std::string commands[] = {FUNFACT_CMD, AGE_CMD, TIME_CMD};
-
-	for (size_t i = 0; i < 3; ++i)
-	{
-		size_t pos = message.find(commands[i]);
-		if (pos != std::string::npos)
-			return pos;
-	}
-	return std::string::npos;
-}
-
-/**
- * @brief Checks if the given command is an invalid bot command.
- *
- * This function compares the provided command against a set of predefined
- * valid bot commands (FUNFACT_CMD, AGE_CMD, TIME_CMD). If the command does not
- * match any of these, it is considered invalid.
- *
- * @param command The command string to be checked.
- * @return true if the command is invalid, false if it is a valid bot command.
- */
-bool IrcHelper::isInvalidBotCommand(const std::string& command)
-{
-	return command != FUNFACT_CMD && command != AGE_CMD && command != TIME_CMD;
-}
-
-/**
- * @brief Retrieves the current local time.
- *
- * This function fills the provided std::tm structure with the current local time.
- *
- * @param[out] outTime A reference to a std::tm structure that will be filled with the current local time.
- */
-void IrcHelper::getCurrentTime(std::tm &outTime)
-{
-	std::time_t now = std::time(0);
-	std::memset(&outTime, 0, sizeof(outTime));
-	std::tm *localTime = std::localtime(&now);
-	if (localTime)
-		outTime = *localTime;
-}
-
-/**
- * @brief Get the current time as a string.
- * 
- * This function retrieves the current system time and returns it as a 
- * human-readable string. The format of the returned string is determined 
- * by the ctime function.
- * 
- * @return std::string The current time as a string.
- */
-std::string IrcHelper::getTimeString()
-{
-	time_t now = time(0);
-	return ctime(&now);
 }

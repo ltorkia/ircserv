@@ -18,6 +18,85 @@ Utils::~Utils() {}
 
 // --- PUBLIC
 
+// === TIME ===
+
+/**
+ * @brief Retrieves the current local time.
+ *
+ * This function fills the provided std::tm structure with the current local time.
+ *
+ * @param[out] outTime A reference to a std::tm structure that will be filled with the current local time.
+ */
+void Utils::getCurrentTime(std::tm &outTime)
+{
+	std::time_t now = std::time(0);
+	std::memset(&outTime, 0, sizeof(outTime));
+	std::tm *localTime = std::localtime(&now);
+	if (localTime)
+		outTime = *localTime;
+}
+
+
+// === ENV ===
+
+/**
+ * @brief Writes the server IP and port to the environment configuration file.
+ *
+ * This function creates or truncates the environment configuration file and writes
+ * the provided server IP address and port number to it. If the file cannot be created
+ * or opened, an error message is printed to the standard error output.
+ *
+ * @param serverIp The IP address of the server to be written to the environment file.
+ * @param port The port number to be written to the environment file.
+ * @param password The server password to be written to the environment file.
+ */
+void Utils::writeEnvFile(const std::string& serverIp, int port, const std::string& password)
+{
+	std::ofstream file(env::PATH.c_str(), std::ios::trunc); // Ouvre en mode écriture et écrase le contenu existant
+	if (!file)
+	{
+		std::cerr << "Erreur : Impossible de créer incs/config/.env" << std::endl;
+		return;
+	}
+	file << env::SERVER_IP_KEY << "=" << serverIp << '\n';
+	file << env::SERVER_PORT_KEY << "=" << port << '\n';
+	file << env::PASS_KEY << "=" << password << '\n';
+	file.close();
+}
+
+/**
+ * @brief Retrieves the value of a specified environment variable from a configuration file.
+ *
+ * This function opens the configuration file specified by `server::ENV_PATH` and searches for a line
+ * that contains the given key. If the key is found, the function extracts and returns the value
+ * associated with the key. If the file cannot be opened or the key is not found, an empty string is returned.
+ *
+ * @param key The environment variable key to search for in the configuration file.
+ * @return The value associated with the specified key, or an empty string if the key is not found or the file cannot be opened.
+ */
+std::string Utils::getEnvValue(const std::string& key)
+{
+	std::ifstream file(env::PATH.c_str());
+	if (!file)
+	{
+		std::cerr << "Erreur : Impossible d'ouvrir config/.env" << std::endl;
+		return "";
+	}
+
+	std::string line;
+	while (std::getline(file, line))
+	{
+		if (line.find(key) != std::string::npos)
+		{
+			file.close();
+			return line.substr(line.find('=') + 1);
+		}
+	}
+	file.close();
+	return "";
+}
+
+
 // === PARSING HELPER ===
 
 /**
@@ -315,4 +394,33 @@ bool Utils::isNumber(const std::string& str)
 	for (size_t i = 0; i < str.size(); ++i)
 		if (!std::isdigit(str[i])) return false;
 	return true;
+}
+
+
+// === BUFFER CLEANER ===
+
+/**
+ * @brief Extracts and cleans a message from the buffer.
+ *
+ * This function extracts a message from the provided buffer up to the specified position (excluding the newline character).
+ * If the extracted message ends with a carriage return character ('\r'), it is removed.
+ * The processed part of the buffer is then erased.
+ *
+ * @param bufferMessage The buffer containing the message to be extracted and cleaned.
+ * @param pos The position up to which the message should be extracted.
+ * @return A cleaned message string.
+ */
+std::string Utils::extractAndCleanMessage(std::string& bufferMessage, size_t pos)
+{
+	// On extrait le message jusqu'au \n (non inclus)
+	std::string message = bufferMessage.substr(0, pos);
+
+	// On enlève le \r s'il y en a un (cas irssi)
+	if (!message.empty() && message[message.size() - 1] == '\r')
+		message.erase(message.size() - 1);
+
+	// On supprime la commande traitée du buffer
+	bufferMessage.erase(0, pos + 1);
+
+	return message;
 }

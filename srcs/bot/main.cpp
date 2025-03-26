@@ -1,7 +1,7 @@
 #include "../../incs/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/utils/IrcHelper.hpp"
+#include "../../incs/utils/Utils.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/bot_config.hpp"
@@ -36,8 +36,8 @@ int main(void)
 
 		Bot bot(botFd, BOTNICK, BOTUSER, BOTREAL);
 
-		std::string serverIp = IrcHelper::getEnvValue(env::SERVER_IP_KEY);
-		int port = atoi(IrcHelper::getEnvValue(env::SERVER_PORT_KEY).c_str());
+		std::string serverIp = Utils::getEnvValue(env::SERVER_IP_KEY);
+		int port = atoi(Utils::getEnvValue(env::SERVER_PORT_KEY).c_str());
 		if (serverIp.empty() || port == 0)
 			throw std::runtime_error(ERR_ENV_VALUE);
 

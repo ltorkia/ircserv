@@ -2,7 +2,10 @@
 
 #include <iostream>						// gestion chaînes de caractères -> std::cout, std::cerr, std::string
 #include <sstream>						// gestion flux -> std::ostringstream
+#include <fstream>						// gestion fichiers -> std::ifstream, std::ofstream
 #include <vector>						// container vector
+#include <cstring>						// memset()
+#include <ctime> 						// gestion temps -> std::time_t, std::tm
 
 // =========================================================================================
 
@@ -15,6 +18,13 @@ class Utils
 		~Utils();
 
 	public:
+
+		// === TIME ===
+		static void getCurrentTime(std::tm &outTime);
+
+		// === ENV ===
+		static void writeEnvFile(const std::string& serverIp, int port, const std::string& password);
+		static std::string getEnvValue(const std::string& key);
 
 		// === PARSING HELPER ===
 		static bool paramCheckNeeded(const std::string& cmd);
@@ -33,4 +43,7 @@ class Utils
 		static void transformingMaj(std::string &str);
 		static std::string truncateStr(const std::string& str);
 		static bool isNumber(const std::string& str);
+
+		// === BUFFER CLEANER ===
+		static std::string extractAndCleanMessage(std::string& bufferMessage, size_t pos);
 };

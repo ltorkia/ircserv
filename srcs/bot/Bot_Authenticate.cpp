@@ -1,7 +1,7 @@
 #include "../../incs/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/utils/IrcHelper.hpp"
+#include "../../incs/utils/Utils.hpp"
 #include "../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
@@ -55,7 +55,7 @@ void Bot::_authenticate(const std::string& message)
  */
 void Bot::_sendAuthInfos()
 {
-	std::string pass = IrcHelper::getEnvValue(env::PASS_KEY);
+	std::string pass = Utils::getEnvValue(env::PASS_KEY);
 	if (pass.empty())
 		throw std::invalid_argument(ERR_ENV_VALUE);
 

@@ -1,7 +1,7 @@
 #include "../../incs/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/utils/IrcHelper.hpp"
+#include "../../incs/utils/Utils.hpp"
 #include "../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
@@ -46,7 +46,7 @@ void Bot::_handleMessage()
 		// On extrait le message jusqu'au \n (non inclus)
 		// + on enlève le \r s'il y en a un (cas irssi)
 		// + on supprime la commande traitée du buffer
-		std::string message = IrcHelper::extractAndCleanMessage(bufferMessage, pos);
+		std::string message = Utils::extractAndCleanMessage(bufferMessage, pos);
 
 		// Debug : affiche le message reçu
 		// std::cout << "---> bot received: " << message << std::endl;
@@ -144,30 +144,4 @@ void Bot::_announceBotFeatures()
 		return;
 	}
 	_sendMessage(MessageBuilder::botCmdPrivmsg(_target, MSG_WELCOME_PROMPT));
-}
-
-/**
- * @brief Resets the internal state of the Bot object.
- *
- * This function clears all the internal data members of the Bot object,
- * including target, client nickname, channel name, input, command, age argument,
- * and resets the command position and date-related members to their initial values.
- */
-void Bot::_resetInfos()
-{
-	_target.clear();
-	_clientNickname.clear();
-	_channelName.clear();
-
-	_input.clear();
-	_command.clear();
-	_ageArg.clear();
-	_commandPos = 0;
-	
-	_year = 0;
-	_month = 0;
-	_day = 0;
-	_currentYear = 0;
-	_currentMonth = 0;
-	_currentDay = 0;
 }

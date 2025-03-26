@@ -60,33 +60,40 @@ class Bot
 
 		// ================================================================================
 
-		// === READ / SEND MESSAGES : Bot_MessageStream.cpp ===
+		// === RESET INFOS : Bot.cpp ===
+		void _resetInfos();
+
+		// === READ / SEND MESSAGES : Bot_MessageHandler.cpp ===
 		void _handleMessage();
 		int _readFromServer();
 		void _sendMessage(const std::string &message) const;
 		void _announceBotFeatures();
-		void _resetInfos();
 
 		// === AUTHENTICATE : Bot_Authenticate.cpp ===
 		void _authenticate(const std::string& message);
 		void _sendAuthInfos();
 
-		// === PARSING HELPER : Bot_ParsingHelper.cpp ===
+		// === SERVER COMMAND PARSER : Bot_CommandParser.cpp ===
+		bool _parsePrivmsg(std::string& input);
 		bool _extractSenderNick(std::string& nickname);
 		bool _isRightCommand(const std::vector<std::string>& args, const std::string& command);
 		bool _extractTarget(const std::vector<std::string>& args);
 		std::string _extractMessage(std::vector<std::string>& args);
-		bool _botCommandFound(const std::string& input);
-		bool _parseBotCommand(std::string& message);
 		
-		// === COMMAND HANDLER SERVER : Bot_CommandHandlerServer.cpp ===
+		// === BOT COMMAND PARSER : Bot_CommandParser.cpp ===
+		bool _parseBotCommand(std::string& message);
+		bool _isValidBotCommand(const std::string& command);
+		bool _parseBirthdate();
+		bool _extractDate(const std::string& dateStr);
+		bool _isValidDate();
+
+		// === COMMAND HANDLER SERVER : Bot_CommandHandler.cpp ===
 		void _manageServerCommand(std::string& message);
 		bool _handlePing(const std::string& input);
 		bool _handleInvite(const std::string& input);
 		bool _handleJoin(const std::string& input);
-		bool _parsePrivmsg(std::string& input);
 
-		// === COMMAND HANDLER USER : Bot_CommandHandlerUser.cpp ===
+		// === COMMAND HANDLER (USER) : Bot_CommandHandler.cpp ===
 		std::string _handleBotCommand();
 
 		// ---> FUNFACT COMMAND
@@ -95,8 +102,8 @@ class Bot
 
 		// ---> AGE COMMAND
         std::string _getAge();
-		bool _parseBirthdate();
-		bool _extractDate(const std::string& dateStr);
-		bool _isValidDate();
 		std::string _ageCalculator();
+
+		// ---> TIME COMMAND
+		std::string _getTimeString();
 };

@@ -34,8 +34,8 @@ SERVER_FILES		=	main.cpp
 CORE_FILES			=	Server.cpp
 CHANNELS_FILES		=	Channel.cpp
 CLIENTS_FILES		=	Client.cpp
-
-UTILS_FILES			=	MessageBuilder.cpp		IrcHelper.cpp		Utils.cpp
+COMMON_UTILS_FILES	=	MessageBuilder.cpp		Utils.cpp
+SERVER_UTILS_FILES	=	IrcHelper.cpp
 
 CMD_FILES			=	CommandHandler.cpp				CommandHandler_Auth.cpp \
 						CommandHandler_Channel.cpp 		CommandHandler_File.cpp \
@@ -43,19 +43,19 @@ CMD_FILES			=	CommandHandler.cpp				CommandHandler_Auth.cpp \
 						CommandHandler_Log.cpp
 
 BOT_FILES			=	main.cpp						Bot.cpp							Bot_MessageHandler.cpp \
-						Bot_Authenticate.cpp			Bot_CommandHandlerServer.cpp	Bot_CommandHandlerUser.cpp \
-						Bot_ParsingHelper.cpp
+						Bot_Authenticate.cpp			Bot_CommandParser.cpp			Bot_CommandHandler.cpp
 
 ##############################################################################################
 
 #-----> JOIN SOURCES FOR EACH PROGRAM OR COMMON USE
-COMMON_FILES 		= 	$(addprefix $(SERVER_DIR)/, $(addprefix $(CORE_DIR)/, $(CORE_FILES))) \
+COMMON_FILES 		= 	$(addprefix $(UTILS_DIR)/, $(COMMON_UTILS_FILES))
+
+MAIN_SERVER_FILES	=	$(addprefix $(SERVER_DIR)/, $(SERVER_FILES)) \
+						$(addprefix $(SERVER_DIR)/, $(addprefix $(CORE_DIR)/, $(CORE_FILES))) \
 						$(addprefix $(SERVER_DIR)/, $(addprefix $(CHANNELS_DIR)/, $(CHANNELS_FILES))) \
 						$(addprefix $(SERVER_DIR)/, $(addprefix $(CLIENTS_DIR)/, $(CLIENTS_FILES))) \
 						$(addprefix $(SERVER_DIR)/, $(addprefix $(CMD_DIR)/, $(CMD_FILES))) \
-						$(addprefix $(UTILS_DIR)/, $(UTILS_FILES))
-
-MAIN_SERVER_FILES	=	$(addprefix $(SERVER_DIR)/, $(SERVER_FILES))
+						$(addprefix $(UTILS_DIR)/, $(SERVER_UTILS_FILES))
 
 MAIN_BOT_FILES		=	$(addprefix $(BOT_DIR)/, $(BOT_FILES))
 
@@ -116,7 +116,7 @@ ${OBJS_DIR}/%.o: %.cpp
 	@echo "\n${GREEN}--> Compiling server $<${RESET}"
 	${CXX} -MMD -c ${CXXFLAGS} $< -o $@
 
-all: ${NAME_SERVER} bot
+all: $(LIB_COMMON) $(NAME_SERVER) $(NAME_BOT)
 
 ${NAME_SERVER}: ${OBJS} $(LIB_COMMON)
 	@echo "\n"
@@ -157,7 +157,7 @@ $(LIB_COMMON): $(COMMON_OBJS)
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
-	@echo "${CYAN}####                LINKING LIBRARY                ####${RESET}"
+	@echo "${CYAN}####               CREATING LIBRARY                ####${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	@echo "${GREEN}--> $(NAME_LIB)${RESET}\n"

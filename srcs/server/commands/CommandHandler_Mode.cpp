@@ -189,6 +189,7 @@ bool CommandHandler::_validateModeCommand(std::string &channelName, std::string 
 	return true ;
 }
 
+// =========================================================================================
 
 // === MODE HANDLER ===
 

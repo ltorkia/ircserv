@@ -1,7 +1,7 @@
 #include "../../incs/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/utils/IrcHelper.hpp"
+#include "../../incs/utils/Utils.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
@@ -80,7 +80,7 @@ void Bot::setSignal()
 
 Bot::Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real)
 	: _hasSentAuthInfos(false), _isAuthenticated(false), _botFd(botFd),
-	_botNick(nick), _botUser(user), _botReal(real), _botMask(_botNick + "!" + '~' + _botUser + "@" + IrcHelper::getEnvValue(env::SERVER_IP_KEY))
+	_botNick(nick), _botUser(user), _botReal(real), _botMask(_botNick + "!" + '~' + _botUser + "@" + Utils::getEnvValue(env::SERVER_IP_KEY))
 {
 	setSignal();
 }
@@ -131,4 +131,30 @@ void Bot::run()
 			_handleMessage();
 	}
 	FD_CLR(_botFd, &readFds);
+}
+
+/**
+ * @brief Resets the internal state of the Bot object.
+ *
+ * This function clears all the internal data members of the Bot object,
+ * including target, client nickname, channel name, input, command, age argument,
+ * and resets the command position and date-related members to their initial values.
+ */
+void Bot::_resetInfos()
+{
+	_target.clear();
+	_clientNickname.clear();
+	_channelName.clear();
+
+	_input.clear();
+	_command.clear();
+	_ageArg.clear();
+	_commandPos = 0;
+	
+	_year = 0;
+	_month = 0;
+	_day = 0;
+	_currentYear = 0;
+	_currentMonth = 0;
+	_currentDay = 0;
 }
