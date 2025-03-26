@@ -7,7 +7,7 @@
 - Use logging commands for troubleshooting and debugging the IRC communication.
 
 ## Running the IRC Server:
-**To start the server on port 6667 with the password `bla`:**
+**To start the server on port `6667` with the password `bla`:**
 ```bash
 ./ircserv 6667 "bla"
 ```
@@ -18,7 +18,7 @@
 valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s --track-fds=yes ./ircserv 6667 "bla"
 ```
 
-## Netcat (Testing the server with Netcat):
+## Testing with Netcat:
 **To test the server by connecting with Netcat:**
 ```bash
 nc 127.0.0.1 6667
@@ -52,9 +52,9 @@ irssi -c 127.0.0.1 -p 6667 -n "Lee" -w "bla"
 
 ## Window Management in Irssi:
 
-- **To change windows** (channels): Alt + <window_number>
-- **To send Irssi to the background** without disconnecting: Ctrl + Z
-- **To bring Irssi back** to the foreground: fg
+- **To change windows (channels):** Alt + <window_number>
+- **To send Irssi to the background without disconnecting:** CTRL + Z
+- **To bring Irssi back to the foreground:** fg
 
 ## Debugging and Logging in Irssi:
 
