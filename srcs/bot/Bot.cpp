@@ -1,20 +1,18 @@
-#include "../../incs/classes/Bot.hpp"
+#include "../../incs/classes/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/IrcHelper.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/server_messages.hpp"
+#include "../../incs/config/colors.hpp"
+
+using namespace server_messages;
+using namespace colors;
 
 // =========================================================================================
-
-// --- PUBLIC
-Bot::Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real)
-	: _hasSentAuthInfos(false), _isAuthenticated(false), _botFd(botFd),
-	_botNick(nick), _botUser(user), _botReal(real), _botMask(_botNick + "!" + '~' + _botUser + "@" + IrcHelper::getEnvValue(env::SERVER_IP_KEY)) {}
-Bot::~Bot() {close(_botFd);}
-
 
 // === SIGNAL ===
 
@@ -50,27 +48,86 @@ void Bot::signalHandler(int signal)
 		default: signalType = "Unknown";
 	}
 
-	std::cout << MessageHandler::msgSignalCaught(signalType) << std::endl;
+	std::cout << " " << signalType << " " << COLOR_ERR << BOT_DISCONNECTED << RESET << std::endl;
 	signalReceived = boolean::TRUE;
+}
+
+/**
+ * @brief Sets the signal handler for SIGINT and SIGTSTP signals.
+ *
+ * This function sets the signal handler for SIGINT and SIGTSTP signals to the `signalHandler` function.
+ * The signal handler function is responsible for handling the termination of the server gracefully.
+ *
+ * @return void
+ *
+ * @throws std::runtime_error If an error occurs while setting the signal handler.
+ *
+ * @see signalHandler
+ */
+void Bot::setSignal()
+{
+	struct sigaction sa;
+	sa.sa_handler = &Bot::signalHandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	if (sigaction(SIGINT, &sa, NULL) == -1 || sigaction(SIGTSTP, &sa, NULL) == -1)
+		throw std::runtime_error(ERR_SET_SIGNAL);
+}
+
+
+// === CONSTRUCTOR / DESTRUCTOR ===
+
+Bot::Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real)
+	: _hasSentAuthInfos(false), _isAuthenticated(false), _botFd(botFd),
+	_botNick(nick), _botUser(user), _botReal(real), _botMask(_botNick + "!" + '~' + _botUser + "@" + IrcHelper::getEnvValue(env::SERVER_IP_KEY))
+{
+	setSignal();
+}
+Bot::~Bot()
+{
+	if (_botFd != -1)
+		close(_botFd);
 }
 
 
 // === LISTEN ACTIVITY ===
 
 /**
- * @brief Runs the bot's main loop.
- *
- * This function enters an infinite loop where it continuously checks for a signal.
- * If a signal is received, the loop breaks and the function exits.
- * Otherwise, it handles incoming messages.
+ * @brief Runs the bot's main loop, handling incoming messages and signals.
+ * 
+ * This function continuously monitors the bot's file descriptor for incoming
+ * messages using the select() system call. It breaks out of the loop if a 
+ * termination signal is received. The function sets up a timeout for the 
+ * select() call to periodically check for new messages and handle them 
+ * appropriately.
+ * 
+ * @note The function uses a timeout of 500 milliseconds for the select() call.
+ * 
+ * @details
+ * - Initializes the file descriptor set.
+ * - Enters an infinite loop to monitor the bot's file descriptor.
+ * - Breaks the loop if a termination signal is received.
+ * - Uses select() to wait for activity on the file descriptor.
+ * - If activity is detected, calls _handleMessage() to process the message.
+ * - Resets internal information after handling the message.
+ * - Clears the file descriptor set before exiting.
  */
 void Bot::run()
 {
+	fd_set readFds;
+	FD_ZERO(&readFds);
 	while (true)
 	{
 		if (signalReceived)
 			break;
-		_handleMessage();
+			
+		FD_SET(_botFd, &readFds);
+		struct timeval timeout = {0, 500000};
+		
+		int activity = select(_botFd + 1, &readFds, NULL, NULL, &timeout);
+		if (activity > 0 && FD_ISSET(_botFd, &readFds))
+			_handleMessage();
 		_resetInfos();
 	}
+	FD_CLR(_botFd, &readFds);
 }

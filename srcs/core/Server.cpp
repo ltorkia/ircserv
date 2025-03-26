@@ -1,13 +1,13 @@
-#include "../../incs/classes/Server.hpp"
+#include "../../incs/classes/core/Server.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/Client.hpp"
-#include "../../incs/classes/Channel.hpp"
-#include "../../incs/classes/CommandHandler.hpp"
-#include "../../incs/classes/CommandHandler_File.hpp"
-#include "../../incs/classes/Utils.hpp"
-#include "../../incs/classes/IrcHelper.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/core/Client.hpp"
+#include "../../incs/classes/core/Channel.hpp"
+#include "../../incs/classes/commands/CommandHandler.hpp"
+#include "../../incs/classes/commands/CommandHandler_File.hpp"
+#include "../../incs/classes/utils/Utils.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
@@ -118,20 +118,6 @@ void Server::launch()
 	} catch (const std::exception &e) {
 		std::cerr << MessageHandler::msgServerException(e) << std::endl;
 	}
-}
-
-/**
- * @brief Cleanly exits the server.
- *
- * This function prints a message indicating that the server is exiting,
- * performs necessary cleanup operations by calling the _clean() method,
- * and then terminates the program with an exit status of 0.
- */
-void Server::cleanExit()
-{
-	std::cout << "Exiting server..." << std::endl;
-	_clean();
-	exit(0);
 }
 
 

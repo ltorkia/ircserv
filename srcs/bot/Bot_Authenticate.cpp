@@ -1,11 +1,11 @@
-#include "../../incs/classes/Bot.hpp"
+#include "../../incs/classes/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/IrcHelper.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/bot.hpp"
 #include "../../incs/config/commands.hpp"
 #include "../../incs/config/server_messages.hpp"
 
@@ -60,15 +60,17 @@ void Bot::_sendAuthInfos()
 	if (pass.empty())
 		throw std::invalid_argument(ERR_ENV_VALUE);
 
-	_sendMessage(commands::PASS + " " + pass);
+	const std::string BOTPASS_CMD = commands::PASS + " " + pass;
+
+	_sendMessage(BOTPASS_CMD);
 	std::cout << MSG_SENDING_PASSWORD << std::endl << std::endl; 
 	sleep(1);
 
-	_sendMessage(commands::NICK + " " + _botNick);
+	_sendMessage(BOTNICK_CMD);
 	std::cout << MSG_SENDING_NICKNAME << std::endl << std::endl; 
 	sleep(1);
 
-	_sendMessage(commands::USER + " " + _botUser + " 0 * :" + _botReal);
+	_sendMessage(BOTUSER_CMD);
 	std::cout << MSG_SENDING_USERNAME << std::endl << std::endl; 
 	sleep(1);
 

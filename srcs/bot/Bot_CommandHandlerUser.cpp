@@ -1,11 +1,12 @@
-#include "../../incs/classes/Bot.hpp"
+#include "../../incs/classes/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/Utils.hpp"
-#include "../../incs/classes/IrcHelper.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/utils/Utils.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
+#include "../../incs/config/bot.hpp"
 #include "../../incs/config/irc_replies.hpp"
 #include "../../incs/config/server_messages.hpp"
 

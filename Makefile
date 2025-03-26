@@ -1,15 +1,23 @@
-NAME_SERVER	= ircserv
-NAME_BOT	= ircbot
+#-----> PROGRAM NAMES (SERVER + BOT)
+NAME_SERVER			=	ircserv
+NAME_BOT			=	ircbot
 
+#-----> DIRECTORY NAMES (SRCS, OBJS, OBJS_BOT, COMMON_OBJS)
 SRCS_DIR			=	srcs
-OBJS_DIR			= 	build
+OBJS_DIR			= 	build_server
 OBJS_DIR_BOT		= 	build_bot
+COMMON_OBJS_DIR		= 	build_common
 
+#-----> COMMON LIBRARY (SHARED BY SERVER + BOT)
+LIB_COMMON			=	$(COMMON_OBJS_DIR)/libcommon.a
+
+#-----> SOURCES DIRECTORIES
 CORE_DIR			=	core
 CMD_DIR				=	commands
 BOT_DIR				=	bot
 UTILS_DIR			=	utils
 
+#-----> ALL SOURCES FILES
 CORE_FILES  		=	Server.cpp		Client.cpp		Channel.cpp
 
 CMD_FILES			=	CommandHandler.cpp				CommandHandler_Auth.cpp \
@@ -23,38 +31,50 @@ BOT_FILES  			=	main.cpp				Bot.cpp							Bot_MessageStream.cpp \
 
 UTILS_FILES			=	MessageHandler.cpp		IrcHelper.cpp		Utils.cpp
 
-MAIN_SERVER_FILES	=	main.cpp \
-						$(addprefix $(CORE_DIR)/, $(CORE_FILES)) \
+#-----> JOIN SOURCES FOR EACH PROGRAM OR COMMON USE
+COMMON_FILES 		= 	$(addprefix $(CORE_DIR)/, $(CORE_FILES)) \
 						$(addprefix $(CMD_DIR)/, $(CMD_FILES)) \
 						$(addprefix $(UTILS_DIR)/, $(UTILS_FILES))
 
-MAIN_BOT_FILES		=	$(addprefix $(BOT_DIR)/, $(BOT_FILES)) \
-						$(addprefix $(CORE_DIR)/, $(CORE_FILES)) \
-						$(addprefix $(CMD_DIR)/, $(CMD_FILES)) \
-						$(addprefix $(UTILS_DIR)/, $(UTILS_FILES))
+MAIN_SERVER_FILES	=	main.cpp
+
+MAIN_BOT_FILES		=	$(addprefix $(BOT_DIR)/, $(BOT_FILES))
 
 #########################################################
 #############         COMPILATION            ############
 #########################################################
 
-#-----> SERVEUR IRC
+#-----> COMMON LIB
+COMMON_SRCS			= 	${addprefix $(SRCS_DIR)/,$(COMMON_FILES)}
+COMMON_OBJS			= 	${COMMON_SRCS:%.cpp=${COMMON_OBJS_DIR}/%.o}
+COMMON_DEPS			= 	${COMMON_OBJS:.o=.d}
 
+#-----> SERVEUR IRC
 SRCS				= 	${addprefix $(SRCS_DIR)/,$(MAIN_SERVER_FILES)}
 OBJS				= 	${SRCS:%.cpp=${OBJS_DIR}/%.o}
 DEPS				= 	${OBJS:.o=.d}
 
 #-----> BOT
-
 SRCS_BOT			= 	${addprefix $(SRCS_DIR)/,$(MAIN_BOT_FILES)}
 OBJS_BOT			= 	${SRCS_BOT:%.cpp=${OBJS_DIR_BOT}/%.o}
 DEPS_BOT			= 	${OBJS_BOT:.o=.d}
 
-INC_DIRS			= 	-I./incs/classes/ -I./incs/config/
+#-----> INCLUDES
+INC_DIR				=	incs
+INC_CLASSES			=	classes
+INC_CONFIG			=	config
+INC_DIRS			= 	-I./$(INC_DIR)/$(INC_CLASSES)/$(CORE_DIR) \
+						-I./$(INC_DIR)/$(INC_CLASSES)/$(CMD_DIR) \
+						-I./$(INC_DIR)/$(INC_CLASSES)/$(BOT_DIR) \
+						-I./$(INC_DIR)/$(INC_CLASSES)/$(UTILS_DIR) \
+						-I./$(INC_DIR)/$(INC_CONFIG)
 
+#-----> COMPILATION FLAGS
 CXX					= 	c++
 CXXFLAGS			= 	-Wall -Wextra -Werror -std=c++98 $(INC_DIRS)
 CXXFLAGS_DEBUG		=	$(CXXFLAGS) -g3 -DDEBUG
 
+#-----> CLEANING
 RM					= 	rm -rf
 
 
@@ -72,16 +92,14 @@ RESET				= \033[0m
 #########################################################
 
 #-----> SERVEUR IRC
-
 ${OBJS_DIR}/%.o: %.cpp
 	@mkdir -p ${dir $@}
-	@echo "\n${GREEN}--> Compiling $<${RESET}"
+	@echo "\n${GREEN}--> Compiling server $<${RESET}"
 	${CXX} -MMD -c ${CXXFLAGS} $< -o $@
 
-all: ${NAME_SERVER}
-	@$(MAKE) bot
+all: ${NAME_SERVER} bot
 
-${NAME_SERVER}: ${OBJS}
+${NAME_SERVER}: ${OBJS} $(LIB_COMMON)
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
@@ -89,11 +107,9 @@ ${NAME_SERVER}: ${OBJS}
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	@echo "${GREEN}--> ${NAME_SERVER}${RESET}\n"
-	${CXX} ${OBJS} -o ${NAME_SERVER}
+	${CXX} ${OBJS} -o ${NAME_SERVER} -L$(COMMON_OBJS_DIR) -lcommon
 
 #-----> BOT
-
-# Règle pour compiler les fichiers du bot
 $(OBJS_DIR_BOT)/%.o: %.cpp
 	@mkdir -p ${dir $@}
 	@echo "\n${GREEN}--> Compiling ircbot $<${RESET}"
@@ -101,7 +117,7 @@ $(OBJS_DIR_BOT)/%.o: %.cpp
 
 bot: ${NAME_BOT}
 
-${NAME_BOT}: ${OBJS_BOT}
+${NAME_BOT}: ${OBJS_BOT} $(LIB_COMMON)
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
@@ -109,10 +125,27 @@ ${NAME_BOT}: ${OBJS_BOT}
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	@echo "${GREEN}--> ${NAME_BOT}${RESET}\n"
-	${CXX} ${OBJS_BOT} -o ${NAME_BOT}
+	${CXX} ${OBJS_BOT} -o ${NAME_BOT} -L$(COMMON_OBJS_DIR) -lcommon
+
+#-----> COMMON OBJECTS
+${COMMON_OBJS_DIR}/%.o: %.cpp
+	@mkdir -p ${dir $@}
+	@echo "\n${GREEN}--> Compiling library $<${RESET}"
+	${CXX} -MMD -c ${CXXFLAGS} $< -o $@
+
+#-----> COMMON LIBRARY (libcommon.a)
+$(LIB_COMMON): $(COMMON_OBJS)
+	@echo "\n"
+	@echo "${CYAN}#######################################################${RESET}"
+	@echo "${CYAN}####                                               ####${RESET}"
+	@echo "${CYAN}####                    LINKING                    ####${RESET}"
+	@echo "${CYAN}####                                               ####${RESET}"
+	@echo "${CYAN}#######################################################${RESET}\n"
+	@echo "\n${GREEN}--> ${LIB_COMMON}${RESET}\n"
+	@mkdir -p $(dir $(LIB_COMMON))
+	ar rcs $(LIB_COMMON) $(COMMON_OBJS) 
 
 #-----> CLEANING / RECOMPILATION
-
 clean:
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
@@ -122,6 +155,7 @@ clean:
 	@echo "${CYAN}#######################################################${RESET}\n"
 	${RM} ${OBJS_DIR}
 	${RM} ${OBJS_DIR_BOT}
+	${RM} $(COMMON_OBJS_DIR)
 
 fclean:
 	@echo "\n"
@@ -131,20 +165,20 @@ fclean:
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	${RM} ${OBJS_DIR}
-	${RM} ${NAME_SERVER}
 	${RM} ${OBJS_DIR_BOT}
+	${RM} ${NAME_SERVER}
 	${RM} ${NAME_BOT}
+	${RM} $(COMMON_OBJS_DIR)
+	${RM} $(LIB_COMMON)
 
 re: fclean
 	@$(MAKE) all
 
 #-----> DEBUG
-
 debug: fclean
 	@$(MAKE) CXXFLAGS="$(CXXFLAGS_DEBUG)" all
 
 #-----> INCLUDE DEPENDENCIES
-
--include ${DEPS}
+-include ${DEPS} ${DEPS_BOT} ${COMMON_DEPS}
 
 .PHONY: all clean fclean re debug bot

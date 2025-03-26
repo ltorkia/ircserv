@@ -1,4 +1,4 @@
-#include "../incs/classes/Server.hpp"
+#include "../incs/classes/core/Server.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/server_messages.hpp"

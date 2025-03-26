@@ -8,6 +8,7 @@
 #include <map>					// container map
 #include <cstring>				// memset()
 #include <arpa/inet.h>			// inet_addr()
+#include <sys/select.h>			// select()
 #include <unistd.h>				// close()
 #include <csignal>				// gestion signaux -> SIGINT, SIGTSTP
 
@@ -20,6 +21,7 @@ class Bot
 		// === SIGNAL : Bot.cpp ===
 		static volatile sig_atomic_t signalReceived;
 		static void signalHandler(int signal);
+		void setSignal();
 
 		// === CONSTUCTORS / DESTRUCTORS : Bot.cpp ===
 		Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real);

@@ -1,19 +1,16 @@
-#include "../../incs/classes/CommandHandler.hpp"
+#include "../../incs/classes/commands/CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/Utils.hpp"
-#include "../../incs/classes/IrcHelper.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/utils/Utils.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
 #include "../../incs/config/commands.hpp"
 #include "../../incs/config/server_messages.hpp"
 #include "../../incs/config/colors.hpp"
 
 using namespace commands;
-using namespace name_type;
-using namespace auth_cmd;
 using namespace server_messages;
 using namespace colors;
 
@@ -44,7 +41,7 @@ void CommandHandler::_authenticateCommand()
 	std::map<std::string, void (CommandHandler::*)()>::iterator it_function = _fctMap.find(*_itInput);
 
 	if (it_function == _fctMap.end() || IrcHelper::isCommandIgnored(cmd, true)
-		|| (cmd == NICK && toDo != NICK_CMD) || (cmd == USER && toDo != USER_CMD))
+		|| (cmd == NICK && toDo != auth_cmd::NICK_CMD) || (cmd == USER && toDo != auth_cmd::USER_CMD))
 	{
 		if (_client->isIdentified() == true)
 		{
@@ -61,13 +58,13 @@ void CommandHandler::_authenticateCommand()
 	(this->*it_function->second)();
 
 	toDo = IrcHelper::getCommand(*_client);
-	if (toDo < CMD_ALL_SET && IrcHelper::isCommandIgnored(cmd, false) && !_client->isIdentified())
+	if (toDo < auth_cmd::CMD_ALL_SET && IrcHelper::isCommandIgnored(cmd, false) && !_client->isIdentified())
 	{
 		command_to_send = IrcHelper::commandToSend(*_client);
 		_client->sendMessage(MessageHandler::ircCommandPrompt(command_to_send, "", false), NULL);
 	}
 
-	if (toDo == CMD_ALL_SET && _client->isAuthenticated() == false)
+	if (toDo == auth_cmd::CMD_ALL_SET && _client->isAuthenticated() == false)
 	{
 		_client->setUsermask();
 		_client->authenticate();
@@ -94,9 +91,9 @@ void CommandHandler::_preRegister(const std::string& cmd, int toDo) {
 	if (_vectorInput.begin() + 1 != _vectorInput.end())
 	{
 		std::vector<std::string> identCmd(_vectorInput.begin() + 1, _vectorInput.end());
-		if (cmd == "NICK" && toDo != NICK_CMD)
+		if (cmd == "NICK" && toDo != auth_cmd::NICK_CMD)
 			_client->setIdentNickCmd(identCmd);
-		if (cmd == "USER" && toDo != USER_CMD)
+		if (cmd == "USER" && toDo != auth_cmd::USER_CMD)
 			_client->setIdentUsernameCmd(identCmd);
 	}
 }
@@ -173,7 +170,7 @@ void CommandHandler::_setNicknameClient(void)
 	std::string enteredNickname = *_itInput;
 
 	// On check s'il y a des caractères interdits
-	if (IrcHelper::isValidName(enteredNickname, NICKNAME) == false)
+	if (IrcHelper::isValidName(enteredNickname, name_type::NICKNAME) == false)
 		throw std::invalid_argument(MessageHandler::ircErroneusNickname(nickname, enteredNickname));
 	
 	// On check si le nickname est déjà pris
@@ -265,7 +262,7 @@ void CommandHandler::_setUsernameClient(void)
 void CommandHandler::_usernameSettings(const std::vector<std::string>::iterator& itArg)
 {
 	std::string username = *itArg;
-	if (IrcHelper::isValidName(username, USERNAME) == false)
+	if (IrcHelper::isValidName(username, name_type::USERNAME) == false)
 		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), USER));
 
 	// La machine n'étant pas identifiée par le ident protocol (non géré sur ce serveur),
@@ -289,7 +286,7 @@ void CommandHandler::_usernameSettings(const std::vector<std::string>::iterator&
 void CommandHandler::_hostnameSettings(std::vector<std::string>::iterator& itArg)
 {
 	std::string hostname = *++itArg;
-	if (IrcHelper::isValidName(hostname, HOSTNAME) == false)
+	if (IrcHelper::isValidName(hostname, name_type::HOSTNAME) == false)
 	{
 		_client->setUsername("");
 		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), USER));
@@ -331,7 +328,7 @@ void CommandHandler::_realNameSettings(std::vector<std::string>::iterator& itArg
 	}
 	realName.erase(0, 1);
 
-	if (IrcHelper::isValidName(realName, REALNAME) == false)
+	if (IrcHelper::isValidName(realName, name_type::REALNAME) == false)
 	{
 		_client->setUsername("");
 		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), USER));

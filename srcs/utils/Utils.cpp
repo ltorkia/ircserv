@@ -1,4 +1,4 @@
-#include "../../incs/classes/Utils.hpp"
+#include "../../incs/classes/utils/Utils.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"

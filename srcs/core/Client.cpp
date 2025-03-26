@@ -1,11 +1,11 @@
-#include "../../incs/classes/Client.hpp"
+#include "../../incs/classes/core/Client.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/Server.hpp"
-#include "../../incs/classes/Channel.hpp"
-#include "../../incs/classes/Utils.hpp"
-#include "../../incs/classes/IrcHelper.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/core/Server.hpp"
+#include "../../incs/classes/core/Channel.hpp"
+#include "../../incs/classes/utils/Utils.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"

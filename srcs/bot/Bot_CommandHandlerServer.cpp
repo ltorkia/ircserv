@@ -1,12 +1,12 @@
-#include "../../incs/classes/Bot.hpp"
+#include "../../incs/classes/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/Utils.hpp"
-#include "../../incs/classes/IrcHelper.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/utils/Utils.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/bot.hpp"
 #include "../../incs/config/commands.hpp"
 #include "../../incs/config/server_messages.hpp"
 
@@ -74,7 +74,7 @@ bool Bot::_handleInvite(const std::string& input)
 
 	// Vérification du format du message
 	if (args[0] != ":" + server::NAME
-		|| !_isRightCommand(args, commands::NOTICE)
+		|| !_isRightCommand(args, bot::NOTICE_CMD)
 		|| args[2] != server::NAME)
 		return false;
 

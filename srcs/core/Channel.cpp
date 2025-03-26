@@ -1,8 +1,8 @@
-#include "../../incs/classes/Channel.hpp"
+#include "../../incs/classes/core/Channel.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/Client.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/core/Client.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"

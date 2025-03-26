@@ -15,7 +15,6 @@ namespace commands
 	const std::string KICK					= "KICK";
 	const std::string PART 					= "PART";
 	const std::string MODE					= "MODE";
-	const std::string NOTICE 				= "NOTICE";
 	const std::string PRIVMSG 				= "PRIVMSG";
 	const std::string PING 					= "PING";
 	const std::string PONG 					= "PONG";

@@ -1,4 +1,7 @@
 build
+build_bot
+build_common
 ircserv
+ircbot
 *.o
 *.d

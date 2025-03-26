@@ -1,10 +1,10 @@
-#include "../../incs/classes/CommandHandler.hpp"
-#include "../../incs/classes/CommandHandler_File.hpp"
+#include "../../incs/classes/commands/CommandHandler.hpp"
+#include "../../incs/classes/commands/CommandHandler_File.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/Utils.hpp"
-#include "../../incs/classes/IrcHelper.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/utils/Utils.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"

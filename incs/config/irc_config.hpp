@@ -19,7 +19,7 @@ namespace server
 // === ENV INFOS ===
 namespace env
 {
-	const std::string PATH 					= "incs/config/.env";
+	const std::string PATH 					= ".env";
 	const std::string SERVER_IP_KEY 		= "SERVER_IP";
 	const std::string SERVER_PORT_KEY 		= "SERVER_PORT";
 	const std::string PASS_KEY 				= "PASSWORD";
@@ -57,25 +57,6 @@ namespace name_type
 		USERNAME  							= 2,
 		HOSTNAME  							= 3,
 		REALNAME  							= 4
-	};
-}
-
-// === BOT ===
-namespace bot
-{
-	const std::string NICK 					= "BOTTY";
-	const std::string USER 					= "bot";
-	const std::string REALNAME 				= "bot";
-	const std::string QUOTES_PATH 			= "data/quotes.txt";
-	const std::string AGE_CMD 				= "!age";
-	const std::string FUNFACT_CMD			= "!funfact";
-	const std::string TIME_CMD 				= "!time";
-
-	enum Target
-	{
-		TARGET_CLIENT  						= 1,
-		TARGET_CHANNEL  					= 2,
-		TARGET_CLIENT_IN_CHANNEL  			= 3
 	};
 }
 

@@ -1,10 +1,10 @@
-#include "../../incs/classes/Bot.hpp"
+#include "../../incs/classes/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/IrcHelper.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/bot.hpp"
 #include "../../incs/config/server_messages.hpp"
 #include "../../incs/config/colors.hpp"
 
@@ -14,34 +14,12 @@ using namespace colors;
 // =========================================================================================
 
 /**
- * @brief Sets the signal handler for SIGINT and SIGTSTP signals.
- *
- * This function sets the signal handler for SIGINT and SIGTSTP signals to the `signalHandler` function.
- * The signal handler function is responsible for handling the termination of the server gracefully.
- *
- * @return void
- *
- * @throws std::runtime_error If an error occurs while setting the signal handler.
- *
- * @see signalHandler
- */
-static void setSignal()
-{
-	struct sigaction sa;
-	sa.sa_handler = &Bot::signalHandler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
-	if (sigaction(SIGINT, &sa, NULL) == -1 || sigaction(SIGTSTP, &sa, NULL) == -1)
-		throw std::runtime_error(ERR_SET_SIGNAL);
-}
-
-/**
  * @brief Entry point of the bot application.
  * 
  * This function initializes the bot, sets up the server connection, and runs the bot.
- * It handles any exceptions that may occur during the process.
+ * It handles exceptions and prints error messages if any occur during execution.
  * 
- * @return int Returns 0 on successful execution, 1 if an error occurs.
+ * @return int Returns 0 on successful execution, 1 on error.
  * 
  * @throws std::runtime_error If socket creation fails, environment variables are invalid,
  *                            or connection to the server fails.
@@ -50,8 +28,6 @@ int main(void)
 {
 	try
 	{
-		setSignal();
-
 		struct sockaddr_in serverAddr;
 		int botFd = socket(AF_INET, SOCK_STREAM, 0);
 		if (botFd < 0)
@@ -72,7 +48,7 @@ int main(void)
 			throw std::runtime_error(ERR_ECHEC_CONNECTION);
 
 		std::cout << std::endl << BOT_CONNECTED << std::endl << std::endl;
-
+		
 		bot.run();
 	}
 	catch (const std::exception &e)

@@ -1,16 +1,15 @@
-#include "../../incs/classes/CommandHandler.hpp"
+#include "../../incs/classes/commands/CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/Utils.hpp"
-#include "../../incs/classes/IrcHelper.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/utils/Utils.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
 #include "../../incs/config/commands.hpp"
 
 using namespace commands;
-using namespace channel_error;
 using namespace error_display;
 
 // =========================================================================================
@@ -164,7 +163,7 @@ bool CommandHandler::_validateModeCommand(std::string &channelName, std::string 
 	// fait un premier check d erreurs potentiolles et parse les bons elements avant de lancer checkargandexecute
 
 	if ((channelName == _client->getNickname() && mode == "+i")
-		|| (IrcHelper::isRightChannel(*_client, channelName, _channels, PRINT_ERROR) != ALL_RIGHT))
+		|| (IrcHelper::isRightChannel(*_client, channelName, _channels, PRINT_ERROR) != channel_error::ALL_RIGHT))
 		return false;
 
 	Channel* channel = _channels[channelName];

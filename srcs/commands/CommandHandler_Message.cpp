@@ -1,16 +1,15 @@
-#include "../../incs/classes/CommandHandler.hpp"
+#include "../../incs/classes/commands/CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/Utils.hpp"
-#include "../../incs/classes/IrcHelper.hpp"
-#include "../../incs/classes/MessageHandler.hpp"
+#include "../../incs/classes/utils/Utils.hpp"
+#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/classes/utils/MessageHandler.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
 #include "../../incs/config/commands.hpp"
 
 using namespace commands;
-using namespace channel_error;
 using namespace error_display;
 
 // =========================================================================================
@@ -38,7 +37,7 @@ void CommandHandler::_sendPrivateMessage()
 	std::vector<std::string>::iterator itMessage = ++args.begin();
 	std::string	message = itMessage != args.end() ? *itMessage : "";
 
-	if (IrcHelper::isRightChannel(*_client, *itTarget, _channels, HIDE_ERROR) != INVALID_FORMAT)
+	if (IrcHelper::isRightChannel(*_client, *itTarget, _channels, HIDE_ERROR) != channel_error::INVALID_FORMAT)
 		_sendToChannel(targets, message);
 	else
 		_sendToClient(targets, message);

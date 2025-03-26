@@ -1,7 +1,7 @@
 #pragma once
 
 // === SERVER LIBRARIES ===
-#include "../config/server_libs.hpp"
+#include "../../config/server_libs.hpp"
 
 // =========================================================================================
 
@@ -61,7 +61,6 @@ class Server
 		~Server();
 
 		void launch();
-		void cleanExit(); 																			// Fermeture propre du serveur
 
 		// === SERVER INFOS ===
 		int getServerSocketFd() const; 																// Récupère le descripteur de socket du serveur
