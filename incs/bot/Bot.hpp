@@ -87,13 +87,13 @@ class Bot
 		bool _extractDate(const std::string& dateStr);
 		bool _isValidDate();
 
-		// === COMMAND HANDLER SERVER : Bot_CommandHandler.cpp ===
+		// === SERVER COMMAND HANDLER : Bot_CommandHandler.cpp ===
 		void _manageServerCommand(std::string& message);
 		bool _handlePing(const std::string& input);
 		bool _handleInvite(const std::string& input);
 		bool _handleJoin(const std::string& input);
 
-		// === COMMAND HANDLER (USER) : Bot_CommandHandler.cpp ===
+		// === BOT COMMAND HANDLER : Bot_CommandHandler.cpp ===
 		std::string _handleBotCommand();
 
 		// ---> FUNFACT COMMAND

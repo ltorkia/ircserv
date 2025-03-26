@@ -14,7 +14,7 @@ using namespace server_messages;
 
 // =========================================================================================
 
-// === COMMAND HANDLER SERVER ===
+// === SERVER COMMAND HANDLER ===
 
 /**
  * @brief Manages the incoming command message for the bot.
@@ -139,7 +139,7 @@ bool Bot::_handleJoin(const std::string& input)
 
 // =========================================================================================
 
-// === COMMAND HANDLER USER ===
+// === BOT COMMAND HANDLER ===
 
 /**
  * @brief Handles the input command and returns the appropriate response.
