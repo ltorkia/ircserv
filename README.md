@@ -1,4 +1,4 @@
-# IRC Server 42 Project: [EN SUBJECT](https://github.com/ltorkia/ircserv/blob/tree/en.subject.pdf)
+# IRC Server 42 Project: [ENGLISH SUBJECT](https://github.com/ltorkia/ircserv/blob/tree/en.subject.pdf)
 
 This project involves developing an **IRC server** in **C++ 98**, designed to handle multiple clients simultaneously while respecting the IRC protocol standards. The goal is to implement a lightweight, efficient, and modular server with robust error handling and non-blocking operations.
 
