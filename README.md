@@ -4,9 +4,9 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 
 ---
 
-## **Project Overview**
+## **Project Overview** 📚
 
-### Objectives :
+### Objectives 🎯:
 - Develop an **IRC server** running on **TCP/IP**.
 - Support **multiple simultaneous clients** without blocking.
 - Provide essential **IRC functionalities**, such as authentication, private messaging, and channel management.
@@ -21,21 +21,21 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 
 ---
 
-## **Technical Requirements**
+## **Technical Requirements** 🔧
 
-### Constraints :
+### Constraints ⚙️:
 - **C++ 98 standard only** (no C++11 or later features).
 - **Non-blocking I/O operations**.
 - **Only one call to `poll()` or equivalent** (we used `select()`).
 - **No forking or multi-threading**.
 
-### Allowed External Functions :
+### Allowed External Functions 🧑‍💻:
 - `socket`, `close`, `setsockopt`, `bind`, `connect`, `listen`, `accept`...
 - Full list [here](https://github.com/ltorkia/ircserv/blob/tree/en.subject.pdf).
 
 ---
 
-## **Core Features**
+## **Core Features** ⚡
 
 ### Basic Functionalities :
 - **Client Authentication** using a password.
@@ -43,26 +43,26 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 - **Message Parsing and Routing** compliant with the IRC protocol.
 - **Proper Error Handling** to avoid crashes and connection failures.
 
-### IRC Commands :
+### IRC Commands ⌨️:
 - **Connection Commands**: `PASS`, `NICK`, `USER`
 - **Messaging**: `PRIVMSG`
 - **Channel Management**: `JOIN`, `PART`, `TOPIC`, `MODE`, `INVITE`, `KICK`
 - **Operator Commands**: Assigning and managing user privileges.
 
-### Channel Modes (`MODE`) Implementation :
+### Channel Modes (`MODE`) Implementation 🔐:
 - `+i` (Invite-only channels)
 - `+t` (Only operators can change the topic)
 - `+k` (Password-protected channels)
 - `+o` (Grant/revoke operator status)
 - `+l` (User limit in a channel)
 
- ### Network Handling
+ ### Network Handling 🌐
 - **Efficient message broadcasting** using a select-based non-blocking event loop.
 - **Packet fragmentation handling** to support broken or delayed messages.
 
 ---
 
-## **Project Structure**
+## **Project Structure** 🗂️
 
 ### File Organization :
 ```
@@ -131,29 +131,29 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 ```
 ---
 
-## **Project Approach**
+## **Project Approach** 💡
 
-**1. Object-Oriented Design**
+**1. Object-Oriented Design** 💼
 - **`Server` Class**: Manages network connections and client sessions.
 - **`Client` Class**: Represents an IRC user with its state and actions.
 - **`Channel` Class**: Handles channel-specific logic and member management.
 - **`CommandHandler` Class**: Parses and executes IRC commands.
 - **`Bot` Class (Bonus)**: Implements additional interactive features.
 
-**2. Non-Blocking Event Handling**
+**2. Non-Blocking Event Handling** 🔄
 - **File descriptor management** using `select()` for handling multiple clients concurrently.
 - **Setting sockets to non-blocking mode** with `fcntl()`:
 ```bash
 fcntl(fd, F_SETFL, O_NONBLOCK);
 ```
 
-**3. Error Handling & Debugging**
+**3. Error Handling & Debugging** ⚠️
 - **Try-catch blocks** to prevent crashes.
 - **Logging mechanisms** for debugging unexpected behaviors.
 
 ---
 
-## **Installation & Compilation**
+## **Installation & Compilation** 🛠️
 
 ### Compiling the Server and the Bot :
 ```bash
@@ -171,21 +171,21 @@ make re       # Cleans and recompiles everything
 
 ---
 
-## **Testing & Usage**
+## **Testing & Usage** 🧪
 
 **If you have any issues, refer to [`irc.connect.help.md`](https://github.com/ltorkia/ircserv/blob/tree/ressources/irc.connect.help.md)**
 
-### Running `server` :
+### Running `server` 🚀:
 ```bash
 ./ircserv 6667 "my_password"
 ```
 
-### Connecting with `nc` :
+### Connecting with `nc` 🌐:
 ```bash
 nc 127.0.0.1 6667
 ```
 
-- Authentication commands:
+- Authentication commands 🛂:
 ```bash
 PASS pass_server
 ```
@@ -200,7 +200,7 @@ USER test_user 0 * :Real Name
 com^Dman^Dd
 ```
 
-### Connecting with `irssi` :
+### Connecting with `irssi` 💻:
 ```bash
 irssi -c 127.0.0.1 -p 6667 -w "my_password"
 ```
@@ -220,9 +220,9 @@ irssi -c 127.0.0.1 -p 6667 -w "my_password"
 
 ---
 
-## **Bonus Features**
+## **Bonus Features** 🎉
 
-### IRC Bot :
+### IRC Bot 🤖:
 **Interactive commands**:
 - `!funfact`: Returns a random tech-related fun fact.
 - `!age <YYYY-MM-DD>`: Calculates and displays the user's exact age in years, months, and days.
@@ -233,10 +233,10 @@ irssi -c 127.0.0.1 -p 6667 -w "my_password"
 ./ircbot
 ```
 
-### File Transfer Support (`DCC Protocol`) :
+### File Transfer Support (`DCC Protocol`) 📁:
 - **Direct peer-to-peer file sharing** between users.
 
-### Advanced Logging System :
+### Advanced Logging System 📑:
 - **Detailed event logs** for debugging and server management.
 - **Real-time monitoring** of connections and messages.
 ---
