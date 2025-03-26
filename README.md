@@ -1,4 +1,4 @@
-# IRC Server 42 Project: [EN SUBJECT](https://github.com/ltorkia/ircserv/blob/main/fr.subject.pdf)
+# IRC Server 42 Project: [EN SUBJECT](https://github.com/ltorkia/ircserv/blob/tree/en.subject.pdf)
 
 This project involves developing an **IRC server** in **C++ 98**, designed to handle multiple clients simultaneously while respecting the IRC protocol standards. The goal is to implement a lightweight, efficient, and modular server with robust error handling and non-blocking operations.
 
@@ -31,7 +31,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 
 ### Allowed External Functions :
 - `socket`, `close`, `setsockopt`, `bind`, `connect`, `listen`, `accept`...
-- Full list [here](https://github.com/ltorkia/ircserv/blob/main/fr.subject.pdf).
+- Full list [here](https://github.com/ltorkia/ircserv/blob/tree/en.subject.pdf).
 
 ---
 
@@ -72,50 +72,57 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 ├── data
 │   └── quotes.txt
 ├── incs
-│   ├── classes
-│   │   ├── bot
-│   │   │   └── Bot.hpp
-│   │   ├── commands
-│   │   │   ├── CommandHandler_File.hpp
-│   │   │   └── CommandHandler.hpp
-│   │   ├── core
-│   │   │   ├── Channel.hpp
-│   │   │   ├── Client.hpp
-│   │   │   └── Server.hpp
-│   │   └── utils
-│   │       ├── IrcHelper.hpp
-│   │       ├── MessageHandler.hpp
-│   │       └── Utils.hpp
-│   └── config
-│       ├── bot.hpp
-│       ├── colors.hpp
-│       ├── commands.hpp
-│       ├── irc_config.hpp
-│       ├── irc_replies.hpp
-│       ├── server_libs.hpp
-│       └── server_messages.hpp
+│   └── bot
+│   │   └── Bot.hpp
+│   ├── config
+│   │   ├── bot_config.hpp
+│   │   ├── colors.hpp
+│   │   ├── commands.hpp
+│   │   ├── irc_config.hpp
+│   │   ├── irc_replies.hpp
+│   │   ├── messages_system.hpp
+│   │   └── server_libs.hpp
+│   ├── server
+│   │   ├── CommandHandler_File.hpp
+│   │   ├── CommandHandler.hpp
+│   │   ├── Channel.hpp
+│   │   ├── Client.hpp
+│   │   └── Server.hpp
+│   └── utils
+│       ├── IrcHelper.hpp
+│       ├── MessageHandler.hpp
+│       └── Utils.hpp
 └── srcs
-    ├── main.cpp
+    ├── server
+    │   ├── channels
+    │   │   ├── Channel_Bla.cpp
+    │   │   └── Channel.cpp
+    │   ├── clients
+    │   │   ├── Client_Bla.cpp
+    │   │   └── Client.cpp
+    │   ├── commands
+    │   │   ├── CommandHandler_Auth.cpp
+    │   │   ├── CommandHandler_Channel.cpp
+    │   │   ├── CommandHandler.cpp
+    │   │   ├── CommandHandler_File.cpp
+    │   │   ├── CommandHandler_Log.cpp
+    │   │   ├── CommandHandler_Message.cpp
+    │   │   └── CommandHandler_Mode.cpp
+    │   ├── core
+    │   │   ├── Server_Signal.cpp
+    │   │   ├── Server_Init.cpp
+    │   │   ├── Server_Getter.cpp
+    │   │   ├── Server_Setter.cpp
+    │   │   ├── Server_MessageStream.cpp
+    │   └── main.cpp
     ├── bot
     │   ├── Bot_Authenticate.cpp
     │   ├── Bot_CommandHandlerServer.cpp
     │   ├── Bot_CommandHandlerUser.cpp
-    │   ├── Bot.cpp
     │   ├── Bot_MessageStream.cpp
     │   ├── Bot_ParsingHelper.cpp
+    │   ├── Bot.cpp
     │   └── main.cpp
-    ├── commands
-    │   ├── CommandHandler_Auth.cpp
-    │   ├── CommandHandler_Channel.cpp
-    │   ├── CommandHandler.cpp
-    │   ├── CommandHandler_File.cpp
-    │   ├── CommandHandler_Log.cpp
-    │   ├── CommandHandler_Message.cpp
-    │   └── CommandHandler_Mode.cpp
-    ├── core
-    │   ├── Channel.cpp
-    │   ├── Client.cpp
-    │   └── Server.cpp
     └── utils
         ├── IrcHelper.cpp
         ├── MessageHandler.cpp
@@ -193,6 +200,7 @@ irssi -c 127.0.0.1 -p 6667 -w super_pass
 - Test commands like:
 - `/join #test_channel`
 - `/msg user Hello!`
+- `/msg #channel Hello!`
 - `/kick user`
 
 ---
