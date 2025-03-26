@@ -4,10 +4,8 @@ SERVEUR:
 -> avec flags:
 valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s --track-fds=yes ./ircserv 6667 "bla"
 
-
-CLIENT VIA NETCAT:
+NETCAT:
 nc 127.0.0.1 6667
-
 
 CLIENT VIA IRSSI:
 
