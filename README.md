@@ -91,6 +91,7 @@ fcntl(fd, F_SETFL, O_NONBLOCK);
 │       ├── server_libs.hpp
 │       └── server_messages.hpp
 └── srcs
+    ├── main.cpp
     ├── bot
     │   ├── Bot_Authenticate.cpp
     │   ├── Bot_CommandHandlerServer.cpp
@@ -111,7 +112,6 @@ fcntl(fd, F_SETFL, O_NONBLOCK);
     │   ├── Channel.cpp
     │   ├── Client.cpp
     │   └── Server.cpp
-    ├── main.cpp
     └── utils
         ├── IrcHelper.cpp
         ├── MessageHandler.cpp
