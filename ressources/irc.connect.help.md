@@ -53,16 +53,20 @@ irssi -c 127.0.0.1 -p 6667 -n "Lee" -w "bla"
 
 ## Window Management in Irssi:
 
-- **To change windows (channels):** Alt + <window_number>
-- **To send Irssi to the background without disconnecting:** CTRL + Z
-- **To bring Irssi back to the foreground:** fg
+- **To change windows (channels):** `Alt + <window_number>`
+- **To send Irssi to the background without disconnecting:** `CTRL + Z`
+- **To bring Irssi back to the foreground:** `fg`
 
 ## Debugging and Logging in Irssi:
 
 - **To enable autologging:**
+```bash
   /SET autolog ON
+  ```
 - **To open a log file and start logging IRC messages:**
+```bash
   /LOG OPEN irclog.txt
+  ```
 
 ## Quit Irssi:
 **To quit Irssi and disconnect from the server:**
