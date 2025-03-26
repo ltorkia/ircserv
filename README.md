@@ -144,7 +144,7 @@ fcntl(fd, F_SETFL, O_NONBLOCK);
 nc 127.0.0.1 6667
 com^Dman^Dd
 ```
-- Envoyez une commande fragmentée pour tester la reconstitution des paquets.
+- Envoyer une commande fragmentée pour tester la reconstitution des paquets.
 
 ### Test avec un client IRC :
 1. Connection au serveur :
