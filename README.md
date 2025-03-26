@@ -223,15 +223,15 @@ irssi -c 127.0.0.1 -p 6667 -w "my_password"
 ## **Bonus Features** 🎉
 
 ### IRC Bot 🤖:
-**Interactive commands**:
-- `!funfact`: Returns a random tech-related fun fact.
-- `!age <YYYY-MM-DD>`: Calculates and displays the user's exact age in years, months, and days.
-- `!time`: Displays the current time.
-
 **Bot execution :**
 ```bash
 ./ircbot
 ```
+
+**Interactive commands**:
+- `!funfact`: Returns a random tech-related fun fact.
+- `!age <YYYY-MM-DD>`: Calculates and displays the user's exact age in years, months, and days.
+- `!time`: Displays the current time.
 
 ### File Transfer Support (`DCC Protocol`) 📁:
 - **Direct peer-to-peer file sharing** between users.
