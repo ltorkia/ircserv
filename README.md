@@ -1,66 +1,69 @@
-# Projet IRC Server 42: [SUJET FR](https://github.com/ltorkia/ircserv/blob/main/fr.subject.pdf)
+# IRC Server 42 Project: [EN SUBJECT](https://github.com/ltorkia/ircserv/blob/main/fr.subject.pdf)
 
-Ce projet consiste à développer un serveur IRC en C++ 98, conforme à la norme et capable de gérer plusieurs clients simultanément.
+This project involves developing an IRC server in C++ 98, designed to handle multiple clients simultaneously while respecting the IRC protocol standards. The goal is to implement a lightweight, efficient, and modular server with robust error handling and non-blocking operations.
 
 ---
 
-## **Description du projet**
+## **Project Overview**
 
-L'objectif est de développer un serveur IRC fonctionnant en TCP/IP, capable de :
-- Gérer plusieurs clients simultanément sans jamais bloquer.
-- Fournir les fonctionnalités de base d'un serveur IRC (authentification, messages privés, channels, etc.).
-- Être utilisé avec un client IRC de référence.
+- Develop an IRC server running on TCP/IP.
+- Support multiple simultaneous clients without blocking.
+- Provide essential IRC functionalities, such as authentication, private messaging, and channel management.
+- Ensure compliance with a reference IRC client like irssi.
 
-**Exécution du programme :**
+**Execution :**
 ```bash
 ./ircserv <port> <password>
 ```
-- `port` : Numéro de port pour les connexions entrantes.
-- `password` : Mot de passe pour s'authentifier sur le serveur.
+- `port` : Port number for incoming connections.
+- `password` : Password required for user authentication.
 
 ---
 
-## **Prérequis**
+## **Technical Requirements**
 
-### Contraintes techniques :
-- Norme C++ 98 uniquement.
-- Pas de forking.
-- Opérations d'entrée/sortie non bloquantes.
-- Un seul appel à `poll()` ou équivalent. Ici nous avons choisi `select()`.
+### Constraints :
+- C++ 98 standard only (no C++11 or later features).
+- Non-blocking I/O operations.
+- Only one call to poll() or equivalent (we use select()).
+- No forking or multi-threading.
 
-### Fonctions externes autorisées :
+### Allowed External Functions :
 - `socket`, `close`, `setsockopt`, `bind`, `connect`, `listen`, `accept`...
-- Voir la liste complète dans la [consigne](https://github.com/ltorkia/ircserv/blob/main/fr.subject.pdf).
+- See full list [here](https://github.com/ltorkia/ircserv/blob/main/fr.subject.pdf).
 
 ---
 
-## **Fonctionnalités obligatoires**
+## **Core Features**
 
-### Fonctionnalités de base :
-1. Authentification avec mot de passe.
-2. Gestion de plusieurs clients simultanément.
-3. Commandes IRC essentielles :
-   - Connexion (nickname, username).
-   - Gestion des channels :
-     - Rejoindre un channel.
-     - Envoyer et recevoir des messages dans un channel.
-   - Commandes opérateurs :
-     - `KICK` : Éjecter un client.
-     - `INVITE` : Inviter un client.
-     - `TOPIC` : Modifier/afficher le sujet.
-     - `MODE` : Gérer les modes du channel (`i`, `t`, `k`, `o`, `l`).
-4. Communication conforme au protocole TCP/IP.
+### Basic Functionalities :
+•	Client Authentication using a password.
+•	Handling Multiple Clients concurrently.
+•	Message Parsing and Routing compliant with the IRC protocol.
+•	Proper Error Handling to avoid crashes and connection failures.
 
-### Spécificités :
-Utiliser `fcntl()` uniquement pour les fichiers non bloquants :
-```cpp
-fcntl(fd, F_SETFL, O_NONBLOCK);
-```
+### IRC Commands :
+•	Connection Commands: `PASS`, `NICK`, `USER`
+•	Messaging: `PRIVMSG`
+•	Channel Management: `JOIN`, `PART`, `TOPIC`, `MODE`, `INVITE`, `KICK`
+•	Operator Commands: Assigning and managing user privileges.
+
+### Channel Modes (MODE) Implementation :
+•	+i (Invite-only channels)
+•	+t (Only operators can change the topic)
+•	+k (Password-protected channels)
+•	+o (Grant/revoke operator status)
+•	+l (User limit in a channel)
+
+ ### Network Handling
+•	Efficient message broadcasting using a select-based non-blocking event loop.
+•	Packet fragmentation handling to support broken or delayed messages.
+
 ---
 
-## **Structure des fichiers**
+## **Project Structure**
 
-### Organisation :
+### File Organization :
 ```
 
 ├── Makefile
@@ -119,52 +122,71 @@ fcntl(fd, F_SETFL, O_NONBLOCK);
 ```
 ---
 
-## **Gestion du projet**
+## **Project Approach**
 
-1. **Gestion non bloquante :**
-   - Toutes les opérations d'entrée/sortie sont non bloquantes.
+1. Object-Oriented Design
+•	Server Class: Manages network connections and client sessions.
+•	Client Class: Represents an IRC user with its state and actions.
+•	Channel Class: Handles channel-specific logic and member management.
+•	CommandHandler Class: Parses and executes IRC commands.
+•	Bot Class (Bonus): Implements additional interactive features.
 
-2. **Client IRC de référence :**
-   - `irssi`
+2. Non-Blocking Event Handling
+•	File descriptor management using select() for efficient client handling.
+•	Asynchronous message parsing to process multiple requests simultaneously.
 
-3. **Gestion des erreurs :**
-   - Connexions interrompues, données partielles, etc.
-   - Utilisation de blocs `try/catch` pour capturer les exceptions et éviter les crashs.
-
-4. **Respect de la norme C++ 98 :**
-   - Pas de nouvelles fonctionnalités C++ 11 ou supérieures.
-   - Pas de bibliothèque non autorisée.
+3. Error Handling & Debugging
+•	Try-catch blocks to prevent crashes.
+•	Logging mechanisms for debugging unexpected behaviors.
 
 ---
 
-## **Exemples de tests**
+## **Testing & Usage**
 
-### Test basique avec `nc` :
+### Connect to server :
 ```bash
-nc 127.0.0.1 6667
+./ircserv 127.0.0.1 6667
+```
+
+### Basic Test with `nc` :
+```bash
+PASS pass_server
+NICK test_user
+USER test_user 0 * :Real Name
+```
+Packet framentation test with CTRL+D  :
+```bash
 com^Dman^Dd
 ```
-- Envoyer une commande fragmentée pour tester la reconstitution des paquets.
 
-### Test avec un client IRC :
-1. Connection au serveur :
-   ```bash
-   /server 127.0.0.1 6667
-   ```
-2. Authentification avec mot de passe.
-3. Tester les commandes :
-   - `NICK`, `USER`, `JOIN`, `PRIVMSG`, `KICK`, etc.
+### Connecting with irssi :
+```bash
+irssi 127.0.0.1 6667 -c <nickname> -w <password>
+```
+Test commands like:
+	•	/join #test_channel
+	•	/msg user Hello!
+	•	/kick user
 
 ---
 
-## **Partie bonus**
+## **Bonus Features**
 
-### Fonctionnalités supplémentaires possibles :
-1. **Envoi de fichiers** : Permet aux clients de s'envoyer des fichiers via le protocole DCC.
-2. **Bot IRC** : Fournit sur demande des `!funfact`, l'heure `!time`, et notre `!age` au jour près.
+### IRC Bot :
+•	Interactive commands: !time, !funfact, !age.
+•	Automated responses for user interactions.
+•	Role management for different access levels.
 
-**Exécution du bot :**
+**Bot execution :**
 ```bash
 ./ircbot
 ```
+
+### File Transfer Support (DCC Protocol) :
+•	Direct peer-to-peer file sharing between users.
+•	Secure authentication for file transfers.
+
+### Advanced Logging System :
+•	Detailed event logs for debugging and server management.
+•	Real-time monitoring of connections and messages.
 ---
