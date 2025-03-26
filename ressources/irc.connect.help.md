@@ -1,10 +1,11 @@
-# IRC Server and Client Commands
+# IRC connection guide
 
-## Additional Notes:
 - This file contains common commands for running and interacting with the IRC server and client.
 - Use `valgrind` for memory leak detection when debugging the server.
 - The `quote` command is primarily used during the authentication phase of the connection.
 - Use logging commands for troubleshooting and debugging the IRC communication.
+
+---
 
 ## Running the IRC Server:
 **To start the server on port `6667` with the password `bla`:**
