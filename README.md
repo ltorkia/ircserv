@@ -173,7 +173,7 @@ make re       # Cleans and recompiles everything
 
 ## **Testing & Usage**
 
-**If you have any issues connecting, refer to the [`irc_connect_help.md`](https://github.com/ltorkia/ircserv/blob/tree/ressources/irc_connect_help.md) file.**
+**If you have any issues connecting, refer to the [`irc_connect_help.md`](https://github.com/ltorkia/ircserv/blob/tree/ressources/irc.connect.help.md) file.**
 
 ### Running `server` :
 ```bash
