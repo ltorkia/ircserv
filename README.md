@@ -93,11 +93,9 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 └── srcs
 │   ├── bot
 │   │   ├── Bot_Authenticate.cpp
-│   │   ├── Bot_CommandHandlerServer.cpp
-│   │   ├── Bot_CommandHandlerUser.cpp
+│   │   ├── Bot_CommandHandler.cpp
+│   │   ├── Bot_CommandParser.cpp
 │   │   ├── Bot_MessageHandler.cpp
-│   │   ├── Bot_ParsingHelper.cpp
-│   │   ├── Bot_Utils.cpp
 │   │   ├── Bot.cpp
 │   │   └── main.cpp
 │   ├── server
