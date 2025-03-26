@@ -78,19 +78,27 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   │   ├── commands.hpp
 │   │   ├── irc_config.hpp
 │   │   ├── irc_replies.hpp
-│   │   ├── messages_system.hpp
-│   │   └── server_libs.hpp
+│   │   ├── server_libs.hpp
+│   │   └── server_messages.hpp
 │   ├── server
-│   │   ├── CommandHandler_File.hpp
-│   │   ├── CommandHandler.hpp
 │   │   ├── Channel.hpp
 │   │   ├── Client.hpp
+│   │   ├── CommandHandler_File.hpp
+│   │   ├── CommandHandler.hpp
 │   │   └── Server.hpp
 │   └── utils
 │       ├── IrcHelper.hpp
-│       ├── MessageHandler.hpp
+│       ├── MessageBuilder.hpp
 │       └── Utils.hpp
 └── srcs
+│   ├── bot
+│   │   ├── Bot_Authenticate.cpp
+│   │   ├── Bot_CommandHandlerServer.cpp
+│   │   ├── Bot_CommandHandlerUser.cpp
+│   │   ├── Bot_MessageHandler.cpp
+│   │   ├── Bot_ParsingHelper.cpp
+│   │   ├── Bot.cpp
+│   │   └── main.cpp
 │   ├── server
 │   │   ├── channels
 │   │   │   ├── Channel_Bla.cpp
@@ -113,17 +121,9 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   │   │   ├── Server_Setter.cpp
 │   │   │   └── Server_MessageStream.cpp
 │   │   └── main.cpp
-│   ├── bot
-│   │   ├── Bot_Authenticate.cpp
-│   │   ├── Bot_CommandHandlerServer.cpp
-│   │   ├── Bot_CommandHandlerUser.cpp
-│   │   ├── Bot_MessageStream.cpp
-│   │   ├── Bot_ParsingHelper.cpp
-│   │   ├── Bot.cpp
-│   │   └── main.cpp
 │   └── utils
 │       ├── IrcHelper.cpp
-│       ├── MessageHandler.cpp
+│       ├── MessageBuilder.cpp
 │       └── Utils.cpp
 ├── Makefile
 └── README.md

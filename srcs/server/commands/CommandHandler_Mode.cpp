@@ -1,13 +1,13 @@
-#include "../../incs/classes/commands/CommandHandler.hpp"
+#include "../../../incs/server/CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../../incs/utils/Utils.hpp"
+#include "../../../incs/utils/IrcHelper.hpp"
+#include "../../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
-#include "../../incs/config/commands.hpp"
+#include "../../../incs/config/irc_config.hpp"
+#include "../../../incs/config/commands.hpp"
 
 using namespace commands;
 using namespace error_display;
@@ -91,9 +91,9 @@ void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelN
 		int channelClientFd = channel->getChannelClientByNickname(modeArgs.at('o'), NULL);
 
 		if (IrcHelper::clientExists(serverClientFd) == false)
-			_client->sendMessage(MessageHandler::ircNoSuchNick(_client->getNickname(), modeArgs.at('o')), NULL);
+			_client->sendMessage(MessageBuilder::ircNoSuchNick(_client->getNickname(), modeArgs.at('o')), NULL);
 		else if (IrcHelper::clientExists(channelClientFd) == false)
-			_client->sendMessage(MessageHandler::ircNotInChannel(_client->getNickname(), channelName, modeArgs.at('o')), NULL);
+			_client->sendMessage(MessageBuilder::ircNotInChannel(_client->getNickname(), channelName, modeArgs.at('o')), NULL);
 		else
 		{
 			Client *newOp = _clients[_server.getClientByNickname(modeArgs.at('o'), NULL)];
@@ -104,13 +104,13 @@ void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelN
 	{
 		_modeSign = mode[IrcHelper::findCharBeforeIndex(mode, '-', '+', mode.find('l'))];
 		if (!_channelLimit(channel, _modeSign, modeArgs['l']))
-			_client->sendMessage(MessageHandler::ircInvalidModeParams(_client->getNickname(), channelName, "l", modeArgs['l']), NULL); //erreur si l arg est pas compose de digit
+			_client->sendMessage(MessageBuilder::ircInvalidModeParams(_client->getNickname(), channelName, "l", modeArgs['l']), NULL); //erreur si l arg est pas compose de digit
 	}
 	for (int i = 1; mode[i]; i++)
 	{
 		if (mode[i] != 'i' && mode[i] != 't' && mode[i] != 'k' && mode[i] != 'o' && mode[i] != 'l' && mode[i] != '-' && mode[i] != '+')
 		{
-			_client->sendMessage(MessageHandler::ircUnknownMode(_client->getNickname(), mode[i]), NULL);
+			_client->sendMessage(MessageBuilder::ircUnknownMode(_client->getNickname(), mode[i]), NULL);
 		}
 	}
 }
@@ -133,14 +133,14 @@ void CommandHandler::_validateModeArguments(std::string &mode, const Channel *ch
 {
 	// Check si le nombre d arguments et les arguments attendus sont les bons.
 	if (mode.empty() || mode.size() < 2 || (mode[0] != '-' && mode[0] != '+'))
-		throw std::invalid_argument((MessageHandler::ircChannelModeIs(_client->getNickname(), channel->getName(), channel->getMode())));
+		throw std::invalid_argument((MessageBuilder::ircChannelModeIs(_client->getNickname(), channel->getName(), channel->getMode())));
 	
 	for (size_t i = 0; i < mode.size(); i++)
 		if (mode[i] == 'i' || mode[i] == 't' || mode[i] == 'k' || mode[i] != 'o' || mode[i] != 'l')
 			IrcHelper::assertNoDuplicate(mode, mode[i], i);
 	
 	if (nArgs != IrcHelper::getExpectedArgCount(mode))
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), MODE)); 
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), MODE)); 
 }
 
 /**
@@ -170,20 +170,20 @@ bool CommandHandler::_validateModeCommand(std::string &channelName, std::string 
 
 	if (nArgs == 1)
 	{
-		_client->sendMessage((MessageHandler::ircChannelModeIs(_client->getNickname(), channelName, channel->getMode())), NULL);	
+		_client->sendMessage((MessageBuilder::ircChannelModeIs(_client->getNickname(), channelName, channel->getMode())), NULL);	
 		return false;
 	}
 	if (mode == "b")
 	{
-		_client->sendMessage(MessageHandler::ircEndOfBannedList(_client->getNickname(), channelName), NULL);
+		_client->sendMessage(MessageBuilder::ircEndOfBannedList(_client->getNickname(), channelName), NULL);
 		return false;	
 	}
 
 	int channelClientFd = channel->getChannelClientByNickname(_client->getNickname(), NULL);
 	if (IrcHelper::clientExists(channelClientFd) == false)
-		throw std::invalid_argument(MessageHandler::ircCurrentNotInChannel(_client->getNickname(), channelName));
+		throw std::invalid_argument(MessageBuilder::ircCurrentNotInChannel(_client->getNickname(), channelName));
 	if (_client->isOperator(channel) == false)
-		throw std::invalid_argument(MessageHandler::ircNotChanOperator(channelName));
+		throw std::invalid_argument(MessageBuilder::ircNotChanOperator(channelName));
 
 	_validateModeArguments(mode, channel, nArgs);
 	return true ;
@@ -217,7 +217,7 @@ void CommandHandler::_inviteOnly(Channel *channel, char modeSign)
 	else
 		channel->setInvites(false);
 
-	_client->sendToAll(channel, MessageHandler::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "i", ""), true);
+	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "i", ""), true);
 }
 
 /**
@@ -242,7 +242,7 @@ void CommandHandler::_topicRestriction(Channel *channel, char modeSign)
 	else
 		channel->setRightsTopic(false);
 
-	_client->sendToAll(channel, MessageHandler::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "t", ""), true);
+	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "t", ""), true);
 }
 
 /**
@@ -262,8 +262,8 @@ void CommandHandler::_passwordMode(std::string args, Channel *channel, char mode
 	std::string sign(1, modeSign);
 	if (!IrcHelper::isValidPassword(args, false) && modeSign == '+')
 	{
-		_client->sendMessage(MessageHandler::ircInvalidPasswordFormat(client->getNickname(), channel->getName()), NULL);
-		_client->sendMessage(MessageHandler::ircCurrentNotInChannel(_client->getNickname(), channel->getName()), NULL);
+		_client->sendMessage(MessageBuilder::ircInvalidPasswordFormat(client->getNickname(), channel->getName()), NULL);
+		_client->sendMessage(MessageBuilder::ircCurrentNotInChannel(_client->getNickname(), channel->getName()), NULL);
 		return ;
 	}
 
@@ -275,7 +275,7 @@ void CommandHandler::_passwordMode(std::string args, Channel *channel, char mode
 	else
 		channel->setPassword("");
 
-	_client->sendToAll(channel, MessageHandler::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "k", ""), true);
+	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "k", ""), true);
 }
 
 /**
@@ -300,7 +300,7 @@ void CommandHandler::_operatorPrivilege(Channel *channel, char modeSign, Client 
 	else
 		channel->removeOperator(newOp);
 		
-	_client->sendToAll(channel, MessageHandler::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "o", newOp->getNickname()), true);
+	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "o", newOp->getNickname()), true);
 }
 
 /**
@@ -335,6 +335,6 @@ bool CommandHandler::_channelLimit(Channel *channel, char modeSign, std::string 
 	else
 		channel->setLimits(-1);
 		
-	_client->sendToAll(channel, MessageHandler::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "l", args), true);
+	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "l", args), true);
 	return true;
 }

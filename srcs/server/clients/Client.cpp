@@ -1,14 +1,14 @@
-#include "../../incs/classes/core/Client.hpp"
+#include "../../../incs/server/Client.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/core/Server.hpp"
-#include "../../incs/classes/core/Channel.hpp"
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../../incs/server/Server.hpp"
+#include "../../../incs/server/Channel.hpp"
+#include "../../../incs/utils/Utils.hpp"
+#include "../../../incs/utils/IrcHelper.hpp"
+#include "../../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
+#include "../../../incs/config/irc_config.hpp"
 
 // =========================================================================================
 // === CONSTUCTORS / DESTRUCTORS ===
@@ -216,7 +216,7 @@ bool Client::pingSent() const
 void Client::sendMessage(const std::string &message, Client* sender) const
 {
 	// On formate le message en IRC (ajout du \r\n, si trop long tronqué à 512 caractères)
-	std::string formattedMessage = MessageHandler::ircFormat(message);
+	std::string formattedMessage = MessageBuilder::ircFormat(message);
 	if (send(_clientSocketFd, formattedMessage.c_str(), formattedMessage.length(), MSG_NOSIGNAL) == -1)
 	{
 		perror("send() failed");
@@ -228,7 +228,7 @@ void Client::sendMessage(const std::string &message, Client* sender) const
 	// l'erreur ne sera envoyée qu'une seule fois à l'envoyeur grâce à un booléen qu'on set à true
 	if (message.length() > server::BUFFER_SIZE && sender && sender->errorMsgTooLongSent() == false)
 	{
-		sender->sendMessage(MessageHandler::ircLineTooLong(sender->getNickname()), NULL);
+		sender->sendMessage(MessageBuilder::ircLineTooLong(sender->getNickname()), NULL);
 		sender->setErrorMsgTooLongSent(true);
 	}
 }
@@ -284,7 +284,7 @@ void Client::joinChannel(const std::string& channelName, const std::string& pass
 {
 	if (!IrcHelper::isValidChannelName(channelName) || !Utils::isOnlyAlphaNum((channelName).substr(1)))
 	{
-		sendMessage(MessageHandler::ircBadChannelName(_nickname, channelName), NULL);
+		sendMessage(MessageBuilder::ircBadChannelName(_nickname, channelName), NULL);
 		return;
 	}
 
@@ -319,13 +319,13 @@ void Client::createChannel(const std::string& channelName, const std::string& pa
 		channels[channelName] = new Channel(channelName, password);
 		if (!password.empty()) {
 			if (!IrcHelper::isValidPassword(password, false)) {
-				sendMessage(MessageHandler::ircInvalidPasswordFormat(_nickname, channelName), NULL);
+				sendMessage(MessageBuilder::ircInvalidPasswordFormat(_nickname, channelName), NULL);
 				deleteChannel(channels[channelName], channels);
 				return;
 			}
 			channels[channelName]->setPassword(password);
 		}
-		std::cout << MessageHandler::msgClientCreatedChannel(_nickname, channelName, password) << std::endl;
+		std::cout << MessageBuilder::msgClientCreatedChannel(_nickname, channelName, password) << std::endl;
 		channels[channelName]->addOperator(this);
 		addToChannel(channels[channelName], password, channelName, channels);
 	}
@@ -347,7 +347,7 @@ void Client::addToChannel(Channel* channel, const std::string& password, const s
 {
 	if (!IrcHelper::channelExists(channelName, channels))
 	{
-		sendMessage(MessageHandler::ircNoSuchChannel(_nickname, channelName), NULL);
+		sendMessage(MessageBuilder::ircNoSuchChannel(_nickname, channelName), NULL);
 		return;
 	}
 
@@ -355,7 +355,7 @@ void Client::addToChannel(Channel* channel, const std::string& password, const s
 	{
 		if (channel->getInvites() && channels[channelName]->isInvited(this) == false)
 		{
-			sendMessage(MessageHandler::ircInviteOnly(getNickname(), channelName), NULL);
+			sendMessage(MessageBuilder::ircInviteOnly(getNickname(), channelName), NULL);
 			return;
 		}
 
@@ -363,7 +363,7 @@ void Client::addToChannel(Channel* channel, const std::string& password, const s
 			return;
 		if (channel->isFull())
 		{
-			sendMessage(MessageHandler::ircChannelFull(this->getNickname(), channel->getName()), NULL);
+			sendMessage(MessageBuilder::ircChannelFull(this->getNickname(), channel->getName()), NULL);
 			return ;
 		}
 		channel->addClient(this);
@@ -389,17 +389,17 @@ void Client::addToChannel(Channel* channel, const std::string& password, const s
 void Client::msgAfterJoin(Channel* channel, const std::string& channelName)
 {
 
-	sendToAll(channel, MessageHandler::ircClientJoinChannel(_usermask, channelName), false);
-	sendMessage((MessageHandler::ircChannelModeIs(_nickname, channelName, channel->getMode())), NULL);
-	sendMessage(MessageHandler::ircCreationTime(_nickname, channelName, channel->getCreationTime()), NULL);
+	sendToAll(channel, MessageBuilder::ircClientJoinChannel(_usermask, channelName), false);
+	sendMessage((MessageBuilder::ircChannelModeIs(_nickname, channelName, channel->getMode())), NULL);
+	sendMessage(MessageBuilder::ircCreationTime(_nickname, channelName, channel->getCreationTime()), NULL);
 
 	if (channel->hasTopic())
 	{
-		sendMessage(MessageHandler::ircTopic(_nickname, channel->getName(), channel->getTopic()), NULL);
-		sendMessage(MessageHandler::ircTopicWhoTime(_nickname, channel->getTopicSetterMask(), channel->getName(), channel->getTopicTimestamp()), NULL);
+		sendMessage(MessageBuilder::ircTopic(_nickname, channel->getName(), channel->getTopic()), NULL);
+		sendMessage(MessageBuilder::ircTopicWhoTime(_nickname, channel->getTopicSetterMask(), channel->getName(), channel->getTopicTimestamp()), NULL);
 	}
-	sendMessage(MessageHandler::ircNameReply(_nickname, channelName, channel->getNicknames()), NULL);
-	std::cout << MessageHandler::msgClientJoinedChannel(_nickname, channelName) << std::endl;
+	sendMessage(MessageBuilder::ircNameReply(_nickname, channelName, channel->getNicknames()), NULL);
+	std::cout << MessageBuilder::msgClientJoinedChannel(_nickname, channelName) << std::endl;
 }
 
 /**
@@ -421,13 +421,13 @@ bool Client::hasRightPassword(Channel* channel, const std::string& password)
 	if (channel->hasPassword())
 	{
 		if (password.empty() || (!password.empty() && password != channel->getPassword()))
-			sendMessage(MessageHandler::ircWrongChannelPass(_nickname, channel->getName()), NULL);
+			sendMessage(MessageBuilder::ircWrongChannelPass(_nickname, channel->getName()), NULL);
 		else
 			return true;
 		return false;
 	}
 	if (!channel->hasPassword() && !password.empty())
-		sendMessage(MessageHandler::ircNoPassNeeded(_nickname), NULL);
+		sendMessage(MessageBuilder::ircNoPassNeeded(_nickname), NULL);
 	return true;
 }
 
@@ -448,7 +448,7 @@ void Client::passwordSetting(Channel* channel, const std::string& password)
 		channel->setPassword(password);
 		return;
 	}
-	sendMessage(MessageHandler::ircNotChanOperator(channel->getName()), NULL);
+	sendMessage(MessageBuilder::ircNotChanOperator(channel->getName()), NULL);
 }
 
 /**
@@ -483,7 +483,7 @@ void Client::isInvitedToChannel(Channel *channel, const Client* inviter)
 	if (!isInChannel(channel->getName()))
 		channel->addClientToInvitedList(this, inviter);
 	else
-		inviter->sendMessage(MessageHandler::ircAlreadyOnChannel(inviter->getNickname(), _nickname, channel->getName()), NULL);
+		inviter->sendMessage(MessageBuilder::ircAlreadyOnChannel(inviter->getNickname(), _nickname, channel->getName()), NULL);
 }
 
 /**
@@ -534,8 +534,8 @@ void Client::deleteChannel(Channel* channel, std::map<std::string, Channel*>& ch
 {
 	if (!channel->hasClients())
 	{
-		std::cout << MessageHandler::msgNoClientInChannel(channel->getName()) << std::endl;
-		std::cout << MessageHandler::msgChannelDestroyed(channel->getName()) << std::endl;
+		std::cout << MessageBuilder::msgNoClientInChannel(channel->getName()) << std::endl;
+		std::cout << MessageBuilder::msgChannelDestroyed(channel->getName()) << std::endl;
 		channels.erase(channel->getName());
 		delete channel;
 	}

@@ -1,11 +1,11 @@
-#include "../../incs/classes/core/Channel.hpp"
+#include "../../../incs/server/Channel.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/core/Client.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../../incs/server/Client.hpp"
+#include "../../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
+#include "../../../incs/config/irc_config.hpp"
 
 // =========================================================================================
 /**************************************** PUBLIC ****************************************/
@@ -62,8 +62,8 @@ void Channel::topicSettings(const std::string& topic, const Client* setter)
 
 	if (!topic.empty())
 	{
-		setter->sendMessage(MessageHandler::ircTopic(setter->getNickname(), _name, _topic), NULL);
-		setter->sendMessage(MessageHandler::ircTopicWhoTime(setter->getNickname(), _topicSetterMask, _name, _topicTimestamp), NULL);
+		setter->sendMessage(MessageBuilder::ircTopic(setter->getNickname(), _name, _topic), NULL);
+		setter->sendMessage(MessageBuilder::ircTopicWhoTime(setter->getNickname(), _topicSetterMask, _name, _topicTimestamp), NULL);
 	}
 }
 
@@ -288,12 +288,12 @@ void Channel::addClientToInvitedList(const Client* invited, const Client* invite
 	if (!isInvited(invited))
 	{
 		_invited.insert(invited);
-		inviter->sendMessage(MessageHandler::ircInviting(inviter->getNickname(), invited->getNickname(), _name), NULL);
-		invited->sendMessage(MessageHandler::ircInvitedToChannel(inviter->getNickname(), _name), NULL);
-		std::cout << MessageHandler::msgIsInvitedToChannel(invited->getNickname(), inviter->getNickname(), _name) << std::endl;
+		inviter->sendMessage(MessageBuilder::ircInviting(inviter->getNickname(), invited->getNickname(), _name), NULL);
+		invited->sendMessage(MessageBuilder::ircInvitedToChannel(inviter->getNickname(), _name), NULL);
+		std::cout << MessageBuilder::msgIsInvitedToChannel(invited->getNickname(), inviter->getNickname(), _name) << std::endl;
 	} 
 	else
-		inviter->sendMessage(MessageHandler::ircAlreadyInvitedToChannel(invited->getNickname(), _name), NULL);
+		inviter->sendMessage(MessageBuilder::ircAlreadyInvitedToChannel(invited->getNickname(), _name), NULL);
 }
 
 /**
@@ -311,7 +311,7 @@ void Channel::addOperator(Client* client)
 	if (!isOperator(client))
 	{
 		_operators.insert(client);
-		std::cout << MessageHandler::msgClientOperatorAdded(client->getNickname(), _name) << std::endl;
+		std::cout << MessageBuilder::msgClientOperatorAdded(client->getNickname(), _name) << std::endl;
 		return;
 	}
 	// message is already operator
@@ -331,7 +331,7 @@ void Channel::removeOperator(Client* client)
 	if (isOperator(client))
 	{
 		_operators.erase(client);
-		std::cout << MessageHandler::msgClientOperatorRemoved(client->getNickname(), _name) << std::endl;
+		std::cout << MessageBuilder::msgClientOperatorRemoved(client->getNickname(), _name) << std::endl;
 	}
 }
 
@@ -354,17 +354,17 @@ void Channel::removeClient(Client* client, const Client* kicker, const std::stri
 
 		if (kicker && reasonCode == leaving_code::KICKED)
 		{
-			sendToAll(MessageHandler::ircClientKickUser(kicker->getUsermask(), _name, client->getNickname(), reason), client, true);
-			std::cout << MessageHandler::msgClientKickedFromChannel(client->getNickname(), kicker->getNickname(), _name, reason) << std::endl;
+			sendToAll(MessageBuilder::ircClientKickUser(kicker->getUsermask(), _name, client->getNickname(), reason), client, true);
+			std::cout << MessageBuilder::msgClientKickedFromChannel(client->getNickname(), kicker->getNickname(), _name, reason) << std::endl;
 		}
 		if (reasonCode == leaving_code::LEFT)
 		{
-			sendToAll(MessageHandler::ircClientPartChannel(client->getUsermask(), _name, reason), client, true);
-			client->sendMessage(MessageHandler::ircCurrentNotInChannel(client->getNickname(), _name), NULL);
-			std::cout << MessageHandler::msgClientLeftChannel(client->getNickname(), _name, reason) << std::endl;
+			sendToAll(MessageBuilder::ircClientPartChannel(client->getUsermask(), _name, reason), client, true);
+			client->sendMessage(MessageBuilder::ircCurrentNotInChannel(client->getNickname(), _name), NULL);
+			std::cout << MessageBuilder::msgClientLeftChannel(client->getNickname(), _name, reason) << std::endl;
 		}
 		if (reasonCode == leaving_code::QUIT_SERV)
-			sendToAll(MessageHandler::ircClientQuitServer(client->getUsermask(), reason), client, false);
+			sendToAll(MessageBuilder::ircClientQuitServer(client->getUsermask(), reason), client, false);
 
 		// On supprime le client des clients connectes au canal
 		_connected.erase(client);
@@ -400,10 +400,10 @@ void Channel::sendToAll(const std::string &message, Client* sender, bool include
 	{
 		if (_invites && isInvited(sender) == false)
 		{
-			sender->sendMessage(MessageHandler::ircInviteOnly(sender->getNickname(), _name), NULL);
+			sender->sendMessage(MessageBuilder::ircInviteOnly(sender->getNickname(), _name), NULL);
 			return;
 		}
-		sender->sendMessage(MessageHandler::ircCurrentNotInChannel(sender->getNickname(), _name), NULL);
+		sender->sendMessage(MessageBuilder::ircCurrentNotInChannel(sender->getNickname(), _name), NULL);
 		return;
 	}
 

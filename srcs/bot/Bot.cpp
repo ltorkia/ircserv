@@ -1,14 +1,15 @@
-#include "../../incs/classes/bot/Bot.hpp"
+#include "../../incs/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../incs/utils/IrcHelper.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/bot_config.hpp"
 #include "../../incs/config/server_messages.hpp"
 #include "../../incs/config/colors.hpp"
 
+using namespace bot_config;
 using namespace server_messages;
 using namespace colors;
 

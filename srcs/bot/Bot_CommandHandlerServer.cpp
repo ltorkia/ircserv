@@ -1,16 +1,14 @@
-#include "../../incs/classes/bot/Bot.hpp"
+#include "../../incs/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../incs/utils/Utils.hpp"
+#include "../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/bot.hpp"
-#include "../../incs/config/commands.hpp"
-#include "../../incs/config/server_messages.hpp"
+#include "../../incs/config/bot_config.hpp"
+#include "../../incs/config/irc_config.hpp"
 
-using namespace server_messages;
+using namespace bot_config;
 
 // =========================================================================================
 
@@ -34,7 +32,7 @@ void Bot::_manageServerCommand(std::string& message)
 		return;
 
 	std::string response = _handleBotCommand();
-	_sendMessage(MessageHandler::botCmdPrivmsg(_target, response));
+	_sendMessage(MessageBuilder::botCmdPrivmsg(_target, response));
 }
 
 /**
@@ -49,9 +47,9 @@ void Bot::_manageServerCommand(std::string& message)
  */
 bool Bot::_handlePing(const std::string& input)
 {
-	if (input != MessageHandler::ircPing())
+	if (input != MessageBuilder::ircPing())
 		return false;
-	_sendMessage(MessageHandler::ircPong());
+	_sendMessage(MessageBuilder::ircPong());
 	return true;
 }
 
@@ -74,7 +72,7 @@ bool Bot::_handleInvite(const std::string& input)
 
 	// Vérification du format du message
 	if (args[0] != ":" + server::NAME
-		|| !_isRightCommand(args, bot::NOTICE_CMD)
+		|| !_isRightCommand(args, NOTICE_CMD)
 		|| args[2] != server::NAME)
 		return false;
 
@@ -94,7 +92,7 @@ bool Bot::_handleInvite(const std::string& input)
 	_channelName = message.substr(channelPos, message.length() - channelPos);
 	_channelName.erase(std::remove_if(_channelName.begin(), _channelName.end(), Utils::isNonPrintableChar), _channelName.end());
 	_target = _channelName;
-	_sendMessage(MessageHandler::botCmdJoinChannel(_target));
+	_sendMessage(MessageBuilder::botCmdJoinChannel(_target));
 
 	sleep(1);
 

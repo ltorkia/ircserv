@@ -1,13 +1,15 @@
-#include "../../incs/classes/bot/Bot.hpp"
+#include "../../incs/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../incs/utils/IrcHelper.hpp"
+#include "../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
+#include "../../incs/config/bot_config.hpp"
+#include "../../incs/config/irc_config.hpp"
 #include "../../incs/config/server_messages.hpp"
 
-// using namespace irc_replies;
+using namespace bot_config;
 using namespace server_messages;
 
 // =========================================================================================
@@ -103,7 +105,7 @@ int Bot::_readFromServer()
 void Bot::_sendMessage(const std::string &message) const
 {
 	// On formate le message en IRC (ajout du \r\n, si trop long tronqué à 512 caractères)
-	std::string formattedMessage = MessageHandler::ircFormat(message);
+	std::string formattedMessage = MessageBuilder::ircFormat(message);
 
 	// std::cout << "<--- bot sent: " << formattedMessage << std::endl;
 
@@ -136,12 +138,12 @@ void Bot::_announceBotFeatures()
 		bool receivedBotPrompt = _activeClients[_clientNickname];
 		if (!receivedBotPrompt)
 		{
-			_sendMessage(MessageHandler::botCmdPrivmsg(_clientNickname, MSG_WELCOME_PROMPT));
+			_sendMessage(MessageBuilder::botCmdPrivmsg(_clientNickname, MSG_WELCOME_PROMPT));
 			_activeClients[_clientNickname] = true;
 		}
 		return;
 	}
-	_sendMessage(MessageHandler::botCmdPrivmsg(_target, MSG_WELCOME_PROMPT));
+	_sendMessage(MessageBuilder::botCmdPrivmsg(_target, MSG_WELCOME_PROMPT));
 }
 
 /**

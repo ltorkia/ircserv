@@ -1,14 +1,13 @@
-#include "../../incs/classes/commands/CommandHandler.hpp"
-#include "../../incs/classes/commands/CommandHandler_File.hpp"
+#include "../../../incs/server/CommandHandler.hpp"
+#include "../../../incs/server/CommandHandler_File.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../../incs/utils/Utils.hpp"
+#include "../../../incs/utils/IrcHelper.hpp"
+#include "../../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
-#include "../../incs/config/server_messages.hpp"
+#include "../../../incs/config/irc_config.hpp"
 
 using namespace file_cmd;
 
@@ -92,7 +91,7 @@ void CommandHandler::_sendFile(std::vector<std::string> entry)
 	std::vector<std::string> req = Utils::getTokens(entry.back(), splitter::WORD);
 	if (req.empty())
 	{
-		_client->sendMessage(MessageHandler::ircNeedMoreParams(_client->getNickname(), SEND_CMD), NULL);
+		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), SEND_CMD), NULL);
 		return ;
 	}
 	Request	request(req, SEND_CMD);
@@ -101,7 +100,7 @@ void CommandHandler::_sendFile(std::vector<std::string> entry)
 
 	if (argsSize < 2)
 	{
-		_client->sendMessage(MessageHandler::ircNeedMoreParams(_client->getNickname(), SEND_CMD), NULL);
+		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), SEND_CMD), NULL);
 		return ;
 	}
 
@@ -110,13 +109,13 @@ void CommandHandler::_sendFile(std::vector<std::string> entry)
 		int clientFd = _server.getClientByNickname(args[0], _client);
 		if (IrcHelper::clientExists(clientFd) == false)
 		{
-			_client->sendMessage(MessageHandler::ircNoSuchNick(_client->getNickname(), args[1]), NULL);
+			_client->sendMessage(MessageBuilder::ircNoSuchNick(_client->getNickname(), args[1]), NULL);
 			return ;
 		}
 		std::fstream ifs(args[1].c_str(), std::fstream::in);
 		if (ifs.fail())
 		{
-			_client->sendMessage(MessageHandler::errorMsgSendFile(args[1]), NULL);
+			_client->sendMessage(MessageBuilder::errorMsgSendFile(args[1]), NULL);
 			return ;
 		}
 		size_t pos = args[1].find_last_of('/');
@@ -124,7 +123,7 @@ void CommandHandler::_sendFile(std::vector<std::string> entry)
 		File file(filename, args[1], _client->getNickname(), args[0]);
 		_server.getFiles().insert(std::pair<std::string, File>(filename, file));
 		_client->sendMessage("DCC SEND request sent to " + args[0] + ": " + filename + eol::IRC, NULL);
-		_clients[clientFd]->sendMessage(MessageHandler::msgSendFile(filename, _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
+		_clients[clientFd]->sendMessage(MessageBuilder::msgSendFile(filename, _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
 		args.erase(args.begin() +1 );
 	}
 }
@@ -155,7 +154,7 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 	std::vector<std::string> req = Utils::getTokens(entry.back(), splitter::WORD);
 	if (req.empty())
 	{
-		_client->sendMessage(MessageHandler::ircNeedMoreParams(_client->getNickname(), GET_CMD), NULL);
+		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD), NULL);
 		return ;
 	}
 	Request	request(req, GET_CMD);
@@ -163,7 +162,7 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 	std::vector<std::string> args = request.getArgs();
 	if (argsSize < 2)
 	{
-		_client->sendMessage(MessageHandler::ircNeedMoreParams(_client->getNickname(), GET_CMD), NULL);
+		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD), NULL);
 		return ;
 	}
 	std::map<std::string, File> non = _server.getFiles();
@@ -172,7 +171,7 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 		int clientFd = _server.getClientByNickname(args[0], _client);
 		if (IrcHelper::clientExists(clientFd) == false)
 		{
-			_client->sendMessage(MessageHandler::ircNoSuchNick(_client->getNickname(), args[1]), NULL);
+			_client->sendMessage(MessageBuilder::ircNoSuchNick(_client->getNickname(), args[1]), NULL);
 			return ;
 		}
 		if (non.find(args[1]) == non.end())
@@ -191,7 +190,7 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 			_client->sendMessage("DCC no file offered by " + args[0] + eol::IRC, NULL);
 			return ;
 		}
-		_clients[clientFd]->sendMessage(MessageHandler::msgSendingFile(args[1], _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
+		_clients[clientFd]->sendMessage(MessageBuilder::msgSendingFile(args[1], _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
 		std::fstream	ofs(args[1].c_str(), std::fstream::out);
 		std::fstream	ifs(path.c_str(), std::fstream::in);
 		if (ofs.is_open())

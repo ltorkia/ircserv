@@ -3,6 +3,8 @@ NAME_SERVER			=	ircserv
 NAME_BOT			=	ircbot
 NAME_LIB			=	libcommon.a
 
+##############################################################################################
+
 #-----> DIRECTORY NAMES (SRCS, OBJS, OBJS_BOT, COMMON_OBJS)
 SRCS_DIR			=	srcs
 OBJS_DIR			=	build_server
@@ -12,34 +14,51 @@ COMMON_OBJS_DIR		=	build_common
 #-----> COMMON LIBRARY (SHARED BY SERVER + BOT)
 LIB_COMMON			=	$(COMMON_OBJS_DIR)/$(NAME_LIB)
 
+##############################################################################################
+
 #-----> SOURCES DIRECTORIES
-CORE_DIR			=	core
-CMD_DIR				=	commands
+#---> FIRST LEVEL
+SERVER_DIR			=	server
 BOT_DIR				=	bot
 UTILS_DIR			=	utils
+#---> SECOND LEVEL
+CORE_DIR			=	core
+CHANNELS_DIR		=	channels
+CLIENTS_DIR			=	clients
+CMD_DIR				=	commands
+
+##############################################################################################
 
 #-----> ALL SOURCES FILES
-CORE_FILES			=	Server.cpp		Client.cpp		Channel.cpp
+SERVER_FILES		=	main.cpp
+CORE_FILES			=	Server.cpp
+CHANNELS_FILES		=	Channel.cpp
+CLIENTS_FILES		=	Client.cpp
+
+UTILS_FILES			=	MessageBuilder.cpp		IrcHelper.cpp		Utils.cpp
 
 CMD_FILES			=	CommandHandler.cpp				CommandHandler_Auth.cpp \
 						CommandHandler_Channel.cpp 		CommandHandler_File.cpp \
-						CommandHandler_Log.cpp 			CommandHandler_Message.cpp \
-						CommandHandler_Mode.cpp
+						CommandHandler_Mode.cpp 		CommandHandler_Message.cpp \
+						CommandHandler_Log.cpp
 
-BOT_FILES			=	main.cpp				Bot.cpp							Bot_MessageStream.cpp \
-						Bot_Authenticate.cpp	Bot_CommandHandlerServer.cpp	Bot_CommandHandlerUser.cpp \
+BOT_FILES			=	main.cpp						Bot.cpp							Bot_MessageHandler.cpp \
+						Bot_Authenticate.cpp			Bot_CommandHandlerServer.cpp	Bot_CommandHandlerUser.cpp \
 						Bot_ParsingHelper.cpp
 
-UTILS_FILES			=	MessageHandler.cpp		IrcHelper.cpp		Utils.cpp
+##############################################################################################
 
 #-----> JOIN SOURCES FOR EACH PROGRAM OR COMMON USE
-COMMON_FILES 		= 	$(addprefix $(CORE_DIR)/, $(CORE_FILES)) \
-						$(addprefix $(CMD_DIR)/, $(CMD_FILES)) \
+COMMON_FILES 		= 	$(addprefix $(SERVER_DIR)/, $(addprefix $(CORE_DIR)/, $(CORE_FILES))) \
+						$(addprefix $(SERVER_DIR)/, $(addprefix $(CHANNELS_DIR)/, $(CHANNELS_FILES))) \
+						$(addprefix $(SERVER_DIR)/, $(addprefix $(CLIENTS_DIR)/, $(CLIENTS_FILES))) \
+						$(addprefix $(SERVER_DIR)/, $(addprefix $(CMD_DIR)/, $(CMD_FILES))) \
 						$(addprefix $(UTILS_DIR)/, $(UTILS_FILES))
 
-MAIN_SERVER_FILES	=	main.cpp
+MAIN_SERVER_FILES	=	$(addprefix $(SERVER_DIR)/, $(SERVER_FILES))
 
 MAIN_BOT_FILES		=	$(addprefix $(BOT_DIR)/, $(BOT_FILES))
+
 
 #########################################################
 #############         COMPILATION            ############
@@ -62,13 +81,12 @@ DEPS_BOT			= 	${OBJS_BOT:.o=.d}
 
 #-----> INCLUDES
 INC_DIR				=	incs
-INC_CLASSES			=	classes
-INC_CONFIG			=	config
-INC_DIRS			= 	-I./$(INC_DIR)/$(INC_CLASSES)/$(CORE_DIR) \
-						-I./$(INC_DIR)/$(INC_CLASSES)/$(CMD_DIR) \
-						-I./$(INC_DIR)/$(INC_CLASSES)/$(BOT_DIR) \
-						-I./$(INC_DIR)/$(INC_CLASSES)/$(UTILS_DIR) \
-						-I./$(INC_DIR)/$(INC_CONFIG)
+CONFIG_DIR			=	config
+INC_DIRS			= 	-I./$(INC_DIR)/$(SERVER_DIR) \
+						-I./$(INC_DIR)/$(CMD_DIR) \
+						-I./$(INC_DIR)/$(BOT_DIR) \
+						-I./$(INC_DIR)/$(UTILS_DIR) \
+						-I./$(INC_DIR)/$(CONFIG_DIR)
 
 #-----> COMPILATION FLAGS
 CXX					= 	c++

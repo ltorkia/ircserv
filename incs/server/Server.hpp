@@ -1,7 +1,7 @@
 #pragma once
 
 // === SERVER LIBRARIES ===
-#include "../../config/server_libs.hpp"
+#include "../config/server_libs.hpp"
 
 // =========================================================================================
 

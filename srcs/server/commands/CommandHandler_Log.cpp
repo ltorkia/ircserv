@@ -1,13 +1,13 @@
-#include "../../incs/classes/commands/CommandHandler.hpp"
+#include "../../../incs/server/CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../../incs/utils/Utils.hpp"
+#include "../../../incs/utils/IrcHelper.hpp"
+#include "../../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/commands.hpp"
-#include "../../incs/config/server_messages.hpp"
+#include "../../../incs/config/commands.hpp"
+#include "../../../incs/config/server_messages.hpp"
 
 using namespace commands;
 using namespace server_messages;
@@ -22,7 +22,7 @@ using namespace server_messages;
 void CommandHandler::_sendPong()
 {	
 	// Si PING recu, on envoie PONG
-	_client->sendMessage(MessageHandler::ircPong(), NULL);
+	_client->sendMessage(MessageBuilder::ircPong(), NULL);
 }
 
 /**
@@ -70,7 +70,7 @@ void CommandHandler::_handleWho()
 
 	// Si plus de un argument apres split, le format est invalide
 	if (n_arg != 1)
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(requestorNickname, WHO));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(requestorNickname, WHO));
 
 	// Si le client demande des infos sur un channel, on vérifie son existence
 	// et on affiche les infos de chaque client dans ce channel
@@ -85,11 +85,11 @@ void CommandHandler::_handleWho()
 			const Client* connected = *it;
 			std::string prefix = channel->isOperator(connected) ? "@" : "";
 			std::string connectedNickname = (prefix + connected->getNickname());
-			_client->sendMessage(MessageHandler::ircWho(requestorNickname, connectedNickname, connected->getUsername(), connected->getRealName(), connected->getClientIp(), channelName, connected->isAway()), NULL);
+			_client->sendMessage(MessageBuilder::ircWho(requestorNickname, connectedNickname, connected->getUsername(), connected->getRealName(), connected->getClientIp(), channelName, connected->isAway()), NULL);
 			if (_client->isAway())
-				_client->sendMessage(MessageHandler::ircClientIsAway(requestorNickname, connected->getNickname(), connected->getAwayMessage()), NULL);
+				_client->sendMessage(MessageBuilder::ircClientIsAway(requestorNickname, connected->getNickname(), connected->getAwayMessage()), NULL);
 		}
-		_client->sendMessage(MessageHandler::ircEndOfWho(requestorNickname, channelName), NULL);
+		_client->sendMessage(MessageBuilder::ircEndOfWho(requestorNickname, channelName), NULL);
 		return;
 	}
 
@@ -98,13 +98,13 @@ void CommandHandler::_handleWho()
 	std::string checkedClientNickname = *_itInput;
 	int checkedClientFd = _server.getClientByNickname(checkedClientNickname, NULL);
 	if (IrcHelper::clientExists(checkedClientFd) == false)
-		throw std::invalid_argument(MessageHandler::ircNoSuchNick(requestorNickname, checkedClientNickname));
+		throw std::invalid_argument(MessageBuilder::ircNoSuchNick(requestorNickname, checkedClientNickname));
 	
 	const Client* checkedClient = _clients[checkedClientFd];
-	_client->sendMessage(MessageHandler::ircWho(requestorNickname, checkedClient->getNickname(), checkedClient->getUsername(), checkedClient->getRealName(), checkedClient->getClientIp(), "*", checkedClient->isAway()), NULL);
+	_client->sendMessage(MessageBuilder::ircWho(requestorNickname, checkedClient->getNickname(), checkedClient->getUsername(), checkedClient->getRealName(), checkedClient->getClientIp(), "*", checkedClient->isAway()), NULL);
 	if (_client->isAway())
-		_client->sendMessage(MessageHandler::ircClientIsAway(requestorNickname, checkedClient->getNickname(), checkedClient->getAwayMessage()), NULL);
-	_client->sendMessage(MessageHandler::ircEndOfWho(requestorNickname, "*"), NULL);
+		_client->sendMessage(MessageBuilder::ircClientIsAway(requestorNickname, checkedClient->getNickname(), checkedClient->getAwayMessage()), NULL);
+	_client->sendMessage(MessageBuilder::ircEndOfWho(requestorNickname, "*"), NULL);
 }
 
 /**
@@ -127,17 +127,17 @@ void CommandHandler::_handleWhois()
 
 	// Si plus de un argument apres split, le format est invalide
 	if (n_arg != 1)
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(requestorNickname, WHOIS));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(requestorNickname, WHOIS));
 	
 	std::string checkedClientNickname = *_itInput;
 	int checkedClientFd = _server.getClientByNickname(checkedClientNickname, NULL);
 	if (IrcHelper::clientExists(checkedClientFd) == false)
-		throw std::invalid_argument(MessageHandler::ircNoSuchNick(requestorNickname, checkedClientNickname));
+		throw std::invalid_argument(MessageBuilder::ircNoSuchNick(requestorNickname, checkedClientNickname));
 	
 	const Client* checkedClient = _clients[checkedClientFd];
-	_client->sendMessage(MessageHandler::ircWhois(requestorNickname, checkedClient->getNickname(), checkedClient->getUsername(), checkedClient->getRealName(), checkedClient->getClientIp()), NULL);
-	_client->sendMessage(MessageHandler::ircWhoisIdle(requestorNickname, checkedClient->getNickname(), checkedClient->getIdleTime(), checkedClient->getSignonTime()), NULL);
-	_client->sendMessage(MessageHandler::ircEndOfWhois(requestorNickname, checkedClient->getNickname()), NULL);
+	_client->sendMessage(MessageBuilder::ircWhois(requestorNickname, checkedClient->getNickname(), checkedClient->getUsername(), checkedClient->getRealName(), checkedClient->getClientIp()), NULL);
+	_client->sendMessage(MessageBuilder::ircWhoisIdle(requestorNickname, checkedClient->getNickname(), checkedClient->getIdleTime(), checkedClient->getSignonTime()), NULL);
+	_client->sendMessage(MessageBuilder::ircEndOfWhois(requestorNickname, checkedClient->getNickname()), NULL);
 }
 
 /**
@@ -149,7 +149,7 @@ void CommandHandler::_handleWhois()
  */
 void CommandHandler::_handleWhowas()
 {
-	_client->sendMessage(MessageHandler::ircEndOfWhowas(_client->getNickname(), *_itInput), NULL);
+	_client->sendMessage(MessageBuilder::ircEndOfWhowas(_client->getNickname(), *_itInput), NULL);
 }
 
 /**
@@ -181,7 +181,7 @@ void CommandHandler::_setAway()
 		{
 			_client->setIsAway(false);
 			_client->setAwayMessage("");
-			_client->sendMessage(MessageHandler::ircUnAway(nickname), NULL);
+			_client->sendMessage(MessageBuilder::ircUnAway(nickname), NULL);
 		}
 		return;
 	}
@@ -201,13 +201,13 @@ void CommandHandler::_setAway()
 		{
 			_client->setIsAway(false);
 			_client->setAwayMessage("");
-			_client->sendMessage(MessageHandler::ircUnAway(nickname), NULL);
+			_client->sendMessage(MessageBuilder::ircUnAway(nickname), NULL);
 		}
 		return;
 	}
 	_client->setIsAway(true);
 	_client->setAwayMessage(awayMessage);
-	_client->sendMessage(MessageHandler::ircAway(nickname), NULL);
+	_client->sendMessage(MessageBuilder::ircAway(nickname), NULL);
 }
 
 /**

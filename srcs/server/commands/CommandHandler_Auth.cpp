@@ -1,14 +1,14 @@
-#include "../../incs/classes/commands/CommandHandler.hpp"
+#include "../../../incs/server/CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../../incs/utils/Utils.hpp"
+#include "../../../incs/utils/IrcHelper.hpp"
+#include "../../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/commands.hpp"
-#include "../../incs/config/server_messages.hpp"
-#include "../../incs/config/colors.hpp"
+#include "../../../incs/config/commands.hpp"
+#include "../../../incs/config/server_messages.hpp"
+#include "../../../incs/config/colors.hpp"
 
 using namespace commands;
 using namespace server_messages;
@@ -48,9 +48,9 @@ void CommandHandler::_authenticateCommand()
 			_preRegister(cmd, toDo);
 			return;
 		}
-		_client->sendMessage(MessageHandler::ircNotRegistered(), NULL);
+		_client->sendMessage(MessageBuilder::ircNotRegistered(), NULL);
 		if (_client->isIdentified() == false)
-			_client->sendMessage(MessageHandler::ircCommandPrompt(command_to_send, cmd, true), NULL);
+			_client->sendMessage(MessageBuilder::ircCommandPrompt(command_to_send, cmd, true), NULL);
 		return;
 	}
 	
@@ -61,7 +61,7 @@ void CommandHandler::_authenticateCommand()
 	if (toDo < auth_cmd::CMD_ALL_SET && IrcHelper::isCommandIgnored(cmd, false) && !_client->isIdentified())
 	{
 		command_to_send = IrcHelper::commandToSend(*_client);
-		_client->sendMessage(MessageHandler::ircCommandPrompt(command_to_send, "", false), NULL);
+		_client->sendMessage(MessageBuilder::ircCommandPrompt(command_to_send, "", false), NULL);
 	}
 
 	if (toDo == auth_cmd::CMD_ALL_SET && _client->isAuthenticated() == false)
@@ -69,8 +69,8 @@ void CommandHandler::_authenticateCommand()
 		_client->setUsermask();
 		_client->authenticate();
 		_server.greetClient(_client);
-		_client->sendMessage(MessageHandler::ircBasicMsg(_client->getNickname(), PROMPT_ONCE_REGISTERED, IRC_COLOR_INFO), NULL);
-		std::cout << MessageHandler::msgClientConnected(_client->getClientIp(), _client->getClientPort(), _clientFd, _client->getNickname()) << std::endl;
+		_client->sendMessage(MessageBuilder::ircBasicMsg(_client->getNickname(), PROMPT_ONCE_REGISTERED, IRC_COLOR_INFO), NULL);
+		std::cout << MessageBuilder::msgClientConnected(_client->getClientIp(), _client->getClientPort(), _clientFd, _client->getNickname()) << std::endl;
 	}
 }
 
@@ -113,17 +113,17 @@ void CommandHandler::_preRegister(const std::string& cmd, int toDo) {
 void CommandHandler::_isRightPassword()
 {
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput))
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), "PASS"));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), "PASS"));
 	if (_client->gotValidServPassword() == true)
-		throw std::invalid_argument(MessageHandler::ircAlreadyRegistered(_client->getNickname()));
+		throw std::invalid_argument(MessageBuilder::ircAlreadyRegistered(_client->getNickname()));
 
 	std::string password = *_itInput;
 	const std::string& servPassword = _server.getServerPassword();
 
 	if (password != servPassword)				
-		throw std::invalid_argument(MessageHandler::ircPasswordIncorrect());		
+		throw std::invalid_argument(MessageBuilder::ircPasswordIncorrect());		
 
-	_client->sendMessage(MessageHandler::ircBasicMsg(SERVER_PASSWORD_FOUND, IRC_COLOR_SUCCESS), NULL);
+	_client->sendMessage(MessageBuilder::ircBasicMsg(SERVER_PASSWORD_FOUND, IRC_COLOR_SUCCESS), NULL);
 	_client->setServPasswordValidity(true);
 
 	// Si le client a déjà donné un nickname via identification irssi, on le set directement
@@ -165,20 +165,20 @@ void CommandHandler::_setNicknameClient(void)
 
 	// Check si argument existe
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput))
-		throw std::invalid_argument(MessageHandler::ircNoNicknameGiven(nickname));
+		throw std::invalid_argument(MessageBuilder::ircNoNicknameGiven(nickname));
 
 	std::string enteredNickname = *_itInput;
 
 	// On check s'il y a des caractères interdits
 	if (IrcHelper::isValidName(enteredNickname, name_type::NICKNAME) == false)
-		throw std::invalid_argument(MessageHandler::ircErroneusNickname(nickname, enteredNickname));
+		throw std::invalid_argument(MessageBuilder::ircErroneusNickname(nickname, enteredNickname));
 	
 	// On check si le nickname est déjà pris
 	if (_server.getClientByNickname(enteredNickname, _client) != -1) //check si un utilisateur enregistré porte deja le meme nickname
 	{
 		if (_client->isIdentified())
-			_client->sendMessage(MessageHandler::ircChangingNickname(enteredNickname), NULL);
-		throw std::invalid_argument(MessageHandler::ircNicknameTaken(nickname, enteredNickname));
+			_client->sendMessage(MessageBuilder::ircChangingNickname(enteredNickname), NULL);
+		throw std::invalid_argument(MessageBuilder::ircNicknameTaken(nickname, enteredNickname));
 	}
 
 	// Si tout est ok, on set le nickname et on le stocke
@@ -188,8 +188,8 @@ void CommandHandler::_setNicknameClient(void)
 	// Affichage d'un message de confirmation au client si c'est le premier set du nickname
 	if (oldNickname.empty())
 	{
-		_client->sendMessage(MessageHandler::ircFirstNicknameSet(newNickname), NULL);
-		_client->sendMessage(MessageHandler::ircNicknameSet("", newNickname), NULL);
+		_client->sendMessage(MessageBuilder::ircFirstNicknameSet(newNickname), NULL);
+		_client->sendMessage(MessageBuilder::ircNicknameSet("", newNickname), NULL);
 
 		// Si le client a déjà donné un username via identification irssi, on le set directement
 		std::vector<std::string> identUserCmd = _client->getIdentUsernameCmd();
@@ -201,7 +201,7 @@ void CommandHandler::_setNicknameClient(void)
 	// Sinon, c'est un changement de nickname:
 	// on broadcast à tous les clients pour valider le changement
 	if ((!oldNickname.empty() && oldNickname != newNickname))
-		_server.broadcastToClients(MessageHandler::ircNicknameSet(oldNickname, newNickname));
+		_server.broadcastToClients(MessageBuilder::ircNicknameSet(oldNickname, newNickname));
 }
 
 /**
@@ -228,14 +228,14 @@ void CommandHandler::_setUsernameClient(void)
 
 	// Check si argument existe ou si le username a déjà été set
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput))
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), USER));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), USER));
 	if (!(_client->getUsername().empty()))
-		throw std::invalid_argument(MessageHandler::ircAlreadyRegistered(_client->getUsername()));
+		throw std::invalid_argument(MessageBuilder::ircAlreadyRegistered(_client->getUsername()));
 	
 	// Récupération des arguments
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::WORD);
 	if (args.size() < 4)
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), USER));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), USER));
 	
 	std::vector<std::string>::iterator itArg = args.begin();
 
@@ -245,7 +245,7 @@ void CommandHandler::_setUsernameClient(void)
 	_realNameSettings(itArg, args);
 
 	// Envoi d'un message de confirmation au client
-	_client->sendMessage(MessageHandler::ircUsernameSet(_client->getUsername()), NULL);
+	_client->sendMessage(MessageBuilder::ircUsernameSet(_client->getUsername()), NULL);
 }
 
 /**
@@ -263,7 +263,7 @@ void CommandHandler::_usernameSettings(const std::vector<std::string>::iterator&
 {
 	std::string username = *itArg;
 	if (IrcHelper::isValidName(username, name_type::USERNAME) == false)
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), USER));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), USER));
 
 	// La machine n'étant pas identifiée par le ident protocol (non géré sur ce serveur),
 	// on ajoute toujours ~ devant le username.
@@ -289,7 +289,7 @@ void CommandHandler::_hostnameSettings(std::vector<std::string>::iterator& itArg
 	if (IrcHelper::isValidName(hostname, name_type::HOSTNAME) == false)
 	{
 		_client->setUsername("");
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), USER));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), USER));
 	}
 
 	// Si hostname arg = "0", on le remplace par le nickname
@@ -324,14 +324,14 @@ void CommandHandler::_realNameSettings(std::vector<std::string>::iterator& itArg
 	if ((realName[0] != ':') || (realName[0] == ':' && realName.size() == 1))
 	{
 		_client->setUsername("");
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), USER));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), USER));
 	}
 	realName.erase(0, 1);
 
 	if (IrcHelper::isValidName(realName, name_type::REALNAME) == false)
 	{
 		_client->setUsername("");
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), USER));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), USER));
 	}
 	_client->setRealName(realName);
 }
@@ -361,13 +361,13 @@ void CommandHandler::_handleCapabilities()
 	std::string arg = *_itInput;
 
 	if (arg != "LS" && arg != "END")
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(nickname, CAP));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(nickname, CAP));
 
 	if (!_client->isIrssi())
 		_client->setIsIrssi(true);
 
 	if (arg == "LS") {
-		_client->sendMessage(MessageHandler::ircCapabilities(arg), NULL);
+		_client->sendMessage(MessageBuilder::ircCapabilities(arg), NULL);
 		_client->setIdentified(true);
 	}
 	if (arg == "END")

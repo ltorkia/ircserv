@@ -1,8 +1,8 @@
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../incs/utils/MessageBuilder.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/utils/Utils.hpp"
+#include "../../incs/utils/IrcHelper.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
@@ -17,10 +17,10 @@ using namespace colors;
 // =========================================================================================
 /**************************************** PRIVATE ****************************************/
 
-MessageHandler::MessageHandler() {}
-MessageHandler::MessageHandler(const MessageHandler& src) {(void) src;}
-MessageHandler& MessageHandler::operator=(const MessageHandler& src) {(void) src; return *this;}
-MessageHandler::~MessageHandler() {}
+MessageBuilder::MessageBuilder() {}
+MessageBuilder::MessageBuilder(const MessageBuilder& src) {(void) src;}
+MessageBuilder& MessageBuilder::operator=(const MessageBuilder& src) {(void) src; return *this;}
+MessageBuilder::~MessageBuilder() {}
 
 
 /**************************************** PUBLIC ****************************************/
@@ -29,7 +29,7 @@ MessageHandler::~MessageHandler() {}
 // === UTILS ===
 
 // Si le message est trop long on le coupe, et on rajoute \r\n
-std::string MessageHandler::ircFormat(const std::string& message)
+std::string MessageBuilder::ircFormat(const std::string& message)
 {
 	if (message.length() > server::BUFFER_SIZE)
 		return message.substr(0, server::BUFFER_SIZE) + eol::IRC;
@@ -39,7 +39,7 @@ std::string MessageHandler::ircFormat(const std::string& message)
 // -- Avant authentification client
 // Format utilisé pour les messages qui n'ont pas de code spécifique
 // mais qui doivent être interprétés par Irssi sans erreur.
-std::string MessageHandler::ircBasicMsg(const std::string& message, const std::string& colorCode)
+std::string MessageBuilder::ircBasicMsg(const std::string& message, const std::string& colorCode)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " NOTICE * :" << colorCode << message << IRC_RESET;
@@ -49,7 +49,7 @@ std::string MessageHandler::ircBasicMsg(const std::string& message, const std::s
 // -- Après authentification client
 // Format utilisé pour les messages qui n'ont pas de code spécifique
 // mais qui doivent être interprétés par Irssi sans erreur.
-std::string MessageHandler::ircBasicMsg(const std::string& nickname, const std::string& message, const std::string& colorCode)
+std::string MessageBuilder::ircBasicMsg(const std::string& nickname, const std::string& message, const std::string& colorCode)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " NOTICE " << nickname << " :" << colorCode << message << IRC_RESET;
@@ -59,20 +59,20 @@ std::string MessageHandler::ircBasicMsg(const std::string& nickname, const std::
 
 // === EXCEPTIONS ===
 
-std::string MessageHandler::ircClientException(const std::exception &e)
+std::string MessageBuilder::ircClientException(const std::exception &e)
 {
 	return ircBasicMsg(server::NAME, std::string(e.what()), IRC_COLOR_ERR);
 }
 
 // === PING -> PONG ===
 
-std::string MessageHandler::ircPing(void)
+std::string MessageBuilder::ircPing(void)
 {
 	std::ostringstream stream;
 	stream << PING << " :" << server::NAME;
 	return stream.str();
 }
-std::string MessageHandler::ircPong(void)
+std::string MessageBuilder::ircPong(void)
 {
 	std::ostringstream stream;
 	stream << PONG << " :" << server::NAME;
@@ -81,7 +81,7 @@ std::string MessageHandler::ircPong(void)
 
 // === HANDLE CAPABILITIES ===
 
-std::string MessageHandler::ircCapabilities(const std::string& arg)
+std::string MessageBuilder::ircCapabilities(const std::string& arg)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << CAP << " * " << arg << " :";
@@ -91,7 +91,7 @@ std::string MessageHandler::ircCapabilities(const std::string& arg)
 
 // === AUTHENTICATION PROMPT ===
 
-std::string MessageHandler::ircCommandPrompt(const std::string& commandPrompt, const std::string& prevCommand, bool error)
+std::string MessageBuilder::ircCommandPrompt(const std::string& commandPrompt, const std::string& prevCommand, bool error)
 {
 	std::ostringstream stream;
 	std::vector<std::string> commands = Utils::getTokens(commandPrompt, splitter::COMMA);
@@ -116,17 +116,17 @@ std::string MessageHandler::ircCommandPrompt(const std::string& commandPrompt, c
 	return stream.str();
 }
 
-std::string MessageHandler::ircUsernameSet(const std::string& username)
+std::string MessageBuilder::ircUsernameSet(const std::string& username)
 {
 	return ircBasicMsg(server::NAME, "Username successfully set to "  + IRC_DEFAULT + "'" + username + "'", IRC_COLOR_SUCCESS);
 }
 
-std::string MessageHandler::ircFirstNicknameSet(const std::string& nickname)
+std::string MessageBuilder::ircFirstNicknameSet(const std::string& nickname)
 {
 	return ircBasicMsg(server::NAME, "Nickname successfully set to "  + IRC_DEFAULT + "'" + nickname + "'", IRC_COLOR_SUCCESS);
 }
 
-std::string MessageHandler::ircChangingNickname(const std::string& nickname)
+std::string MessageBuilder::ircChangingNickname(const std::string& nickname)
 {
 	return ircBasicMsg(server::NAME, "Nickname " + IRC_DEFAULT + "'" + nickname + "'" + IRC_COLOR_ERR + " already registered. Renaming...", IRC_COLOR_ERR);
 }
@@ -135,7 +135,7 @@ std::string MessageHandler::ircChangingNickname(const std::string& nickname)
 // === CONNECT ===
 
 // --- 001 RPL_WELCOME : Message de bienvenue après une connexion réussie.
-std::string MessageHandler::ircWelcomeMessage(const std::string& nickname, const std::string& usermask)
+std::string MessageBuilder::ircWelcomeMessage(const std::string& nickname, const std::string& usermask)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_WELCOME << " " << nickname 
@@ -143,7 +143,7 @@ std::string MessageHandler::ircWelcomeMessage(const std::string& nickname, const
 	return stream.str();
 }
 
-std::string MessageHandler::ircMOTDMessage(const std::string& nickname)
+std::string MessageBuilder::ircMOTDMessage(const std::string& nickname)
 {
 	std::ostringstream stream;
 
@@ -163,7 +163,7 @@ std::string MessageHandler::ircMOTDMessage(const std::string& nickname)
 }
 
 // --- 002 RPL_YOURHOST : Retourne le nom et la version du serveur auquel le client est connecté.
-std::string MessageHandler::ircHostInfos(const std::string& nickname)
+std::string MessageBuilder::ircHostInfos(const std::string& nickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_YOURHOST << " " << nickname 
@@ -172,7 +172,7 @@ std::string MessageHandler::ircHostInfos(const std::string& nickname)
 }
 
 // --- 003 RPL_CREATED : Retourne la date de création du serveur.
-std::string MessageHandler::ircTimeCreation(const std::string& nickname, const std::string& serverCreationTime)
+std::string MessageBuilder::ircTimeCreation(const std::string& nickname, const std::string& serverCreationTime)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_CREATED << " " << nickname 
@@ -181,7 +181,7 @@ std::string MessageHandler::ircTimeCreation(const std::string& nickname, const s
 }
 
 // --- 004 RPL_MYINFO : Informations sur le serveur et modes disponibles.
-std::string MessageHandler::ircInfos(const std::string& nickname)
+std::string MessageBuilder::ircInfos(const std::string& nickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_MYINFO << " " << nickname 
@@ -189,7 +189,7 @@ std::string MessageHandler::ircInfos(const std::string& nickname)
 	return stream.str();
 }
 
-std::string MessageHandler::ircGlobalUserList(const std::string& nickname, int userCount, int knownCount, int unknownCount, int channelCount)
+std::string MessageBuilder::ircGlobalUserList(const std::string& nickname, int userCount, int knownCount, int unknownCount, int channelCount)
 {
 	std::ostringstream stream;
 
@@ -209,7 +209,7 @@ std::string MessageHandler::ircGlobalUserList(const std::string& nickname, int u
 }
 
 // --- 431 ERR_NONICKNAMEGIVEN : Aucun nickname fourni.
-std::string MessageHandler::ircNoNicknameGiven(const std::string& nickname)
+std::string MessageBuilder::ircNoNicknameGiven(const std::string& nickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_NONICKNAMEGIVEN << " " << nickname 
@@ -218,7 +218,7 @@ std::string MessageHandler::ircNoNicknameGiven(const std::string& nickname)
 }
 
 // --- 432 ERR_ERRONEUSNICKNAME : Le pseudonyme a des caracteres non autorisés.
-std::string MessageHandler::ircErroneusNickname(const std::string& nickname, const std::string& enteredNickname)
+std::string MessageBuilder::ircErroneusNickname(const std::string& nickname, const std::string& enteredNickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_ERRONEUSNICKNAME << " " << nickname << " " << enteredNickname
@@ -227,7 +227,7 @@ std::string MessageHandler::ircErroneusNickname(const std::string& nickname, con
 }
 
 // --- 433 ERR_NICKNAMEINUSE : Le pseudonyme choisi est déjà utilisé.
-std::string MessageHandler::ircNicknameTaken(const std::string& nickname, const std::string& enteredNickname)
+std::string MessageBuilder::ircNicknameTaken(const std::string& nickname, const std::string& enteredNickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_NICKNAMEINUSE << " " << nickname << " " << enteredNickname 
@@ -236,7 +236,7 @@ std::string MessageHandler::ircNicknameTaken(const std::string& nickname, const 
 }
 
 // --- 464 ERR_PASSWDMISMATCH : Mot de passe incorrect.
-std::string MessageHandler::ircPasswordIncorrect(void)
+std::string MessageBuilder::ircPasswordIncorrect(void)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_PASSWDMISMATCH 
@@ -245,7 +245,7 @@ std::string MessageHandler::ircPasswordIncorrect(void)
 }
 
 // 462 ERR_ALREADYREGISTRED : Le client est deja enregistre.
-std::string MessageHandler::ircAlreadyRegistered(const std::string& nickname)
+std::string MessageBuilder::ircAlreadyRegistered(const std::string& nickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_ALREADYREGISTERED << " " << nickname 
@@ -257,28 +257,28 @@ std::string MessageHandler::ircAlreadyRegistered(const std::string& nickname)
 // === RPL MESSAGES ===
 
 // Message vers channel
-std::string MessageHandler::ircMsgToChannel(const std::string& nickname, const std::string& channelName, const std::string& message)
+std::string MessageBuilder::ircMsgToChannel(const std::string& nickname, const std::string& channelName, const std::string& message)
 {
 	std::ostringstream stream;
 	stream << ":" << nickname << " " << PRIVMSG << " " << channelName << " :" << message;
 	return stream.str();
 }
 // Message privé client to client
-std::string MessageHandler::ircMsgToClient(const std::string& nickname, const std::string& receiverName, const std::string& message)
+std::string MessageBuilder::ircMsgToClient(const std::string& nickname, const std::string& receiverName, const std::string& message)
 {
 	std::ostringstream stream;	
 	stream << ":" << nickname << " " << PRIVMSG << " " << receiverName << " :" << message;
 	return stream.str();
 }
 // Message envoyé aux autres clients d'un channel quand un client join ce channel
-std::string MessageHandler::ircClientJoinChannel(const std::string& usermask, const std::string& channelName)
+std::string MessageBuilder::ircClientJoinChannel(const std::string& usermask, const std::string& channelName)
 {
 	std::ostringstream stream;	
 	stream << ":" << usermask << " " << JOIN << " :" << channelName;
 	return stream.str();
 }
 // Message envoyé aux autres clients d'un channel quand un opérateur change un mode
-std::string MessageHandler::ircOpeChangedMode(const std::string& usermask, const std::string& channelName, const std::string& changedMode, const std::string& parameter)
+std::string MessageBuilder::ircOpeChangedMode(const std::string& usermask, const std::string& channelName, const std::string& changedMode, const std::string& parameter)
 {
 	std::ostringstream stream;	
 	std::string param = !parameter.empty() ? " " + parameter : "";
@@ -286,14 +286,14 @@ std::string MessageHandler::ircOpeChangedMode(const std::string& usermask, const
 	return stream.str();
 }
 // Message envoyé aux autres clients d'un channel quand le topic est change
-std::string MessageHandler::ircTopicMessage(const std::string& usermask, const std::string& channelName, const std::string& topic)
+std::string MessageBuilder::ircTopicMessage(const std::string& usermask, const std::string& channelName, const std::string& topic)
 {
 	std::ostringstream stream;
 	stream << ":" << usermask << " " << TOPIC << " " << channelName << " :" << topic;
 	return stream.str();
 }
 // Message envoyé aux autres clients d'un channel quand un client est kick
-std::string MessageHandler::ircClientKickUser(const std::string& usermask, const std::string& channelName, const std::string& kickedUser, const std::string& reason)
+std::string MessageBuilder::ircClientKickUser(const std::string& usermask, const std::string& channelName, const std::string& kickedUser, const std::string& reason)
 {
 	std::ostringstream stream;
 	std::string givenReason = !reason.empty() ? " :" + reason : "";
@@ -301,7 +301,7 @@ std::string MessageHandler::ircClientKickUser(const std::string& usermask, const
 	return stream.str();
 }
 // Message envoyé aux autres clients d'un channel quand un client s'en va
-std::string MessageHandler::ircClientPartChannel(const std::string& usermask, const std::string& channelName, const std::string& reason)
+std::string MessageBuilder::ircClientPartChannel(const std::string& usermask, const std::string& channelName, const std::string& reason)
 {
 	std::ostringstream stream;
 	std::string givenReason = !reason.empty() ? " :" + reason : "";
@@ -309,14 +309,14 @@ std::string MessageHandler::ircClientPartChannel(const std::string& usermask, co
 	return stream.str();
 }
 // Message envoyé aux autres clients d'un channel quand un client quitte le serveur
-std::string MessageHandler::ircClientQuitServer(const std::string& usermask, const std::string& message)
+std::string MessageBuilder::ircClientQuitServer(const std::string& usermask, const std::string& message)
 {
 	std::ostringstream stream;	
 	stream << ":" << usermask << " " << QUIT << " :Quit: " << message;
 	return stream.str();
 }
 // Message d'erreur envoyé au client avant de fermer sa connexion
-std::string MessageHandler::ircErrorQuitServer(const std::string& reason)
+std::string MessageBuilder::ircErrorQuitServer(const std::string& reason)
 {
 	std::ostringstream stream;
 	stream << "ERROR :" << reason;
@@ -326,7 +326,7 @@ std::string MessageHandler::ircErrorQuitServer(const std::string& reason)
 
 // === RPL CHANNELS ===
 
-std::string MessageHandler::ircNameReply(const std::string& nickname, const std::string& channelName, const std::string& users)
+std::string MessageBuilder::ircNameReply(const std::string& nickname, const std::string& channelName, const std::string& users)
 {
 	std::ostringstream stream;
 	// --- 353 RPL_NAMREPLY : Liste des utilisateurs présents dans un canal.
@@ -337,7 +337,7 @@ std::string MessageHandler::ircNameReply(const std::string& nickname, const std:
 }
 
 // --- 331 RPL_NOTOPIC : Aucun sujet défini pour le canal.
-std::string MessageHandler::ircNoTopic(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircNoTopic(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_NOTOPIC << " " << nickname << " " << channelName
@@ -346,7 +346,7 @@ std::string MessageHandler::ircNoTopic(const std::string& nickname, const std::s
 }
 
 // --- 332 RPL_TOPIC : Sujet actuel du canal.
-std::string MessageHandler::ircTopic(const std::string& nickname, const std::string& channelName, const std::string& topic)
+std::string MessageBuilder::ircTopic(const std::string& nickname, const std::string& channelName, const std::string& topic)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_TOPIC << " " << nickname << " " << channelName
@@ -355,7 +355,7 @@ std::string MessageHandler::ircTopic(const std::string& nickname, const std::str
 }
 
 // --- 333 RPL_TOPICWHOTIME : Informations supplémentaires sur qui a défini le sujet et à quelle heure.
-std::string MessageHandler::ircTopicWhoTime(const std::string& nickname, const std::string& setterNick, const std::string& channelName, time_t topicTime)
+std::string MessageBuilder::ircTopicWhoTime(const std::string& nickname, const std::string& setterNick, const std::string& channelName, time_t topicTime)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_TOPICWHOTIME << " " << nickname << " " << channelName << " " << setterNick
@@ -364,7 +364,7 @@ std::string MessageHandler::ircTopicWhoTime(const std::string& nickname, const s
 }
 
 // --- 403 ERR_NOSUCHCHANNEL : Le canal spécifié n'existe pas.
-std::string MessageHandler::ircNoSuchChannel(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircNoSuchChannel(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_NOSUCHCHANNEL << " " << nickname << " " << channelName 
@@ -373,7 +373,7 @@ std::string MessageHandler::ircNoSuchChannel(const std::string& nickname, const 
 }
 
 // --- 404 ERR_CANNOTSENDTOCHAN : Le message n'a pas pu etre delivre au canal.
-std::string MessageHandler::ircCannotSendToChan(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircCannotSendToChan(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_CANNOTSENDTOCHAN << " " << nickname << " " << channelName 
@@ -382,7 +382,7 @@ std::string MessageHandler::ircCannotSendToChan(const std::string& nickname, con
 }
 
 // --- 411 ERR_NORECIPIENT : Pas de destinataire.
-std::string MessageHandler::ircNoRecipient(const std::string& nickname)
+std::string MessageBuilder::ircNoRecipient(const std::string& nickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_NORECIPIENT << " " << nickname 
@@ -391,7 +391,7 @@ std::string MessageHandler::ircNoRecipient(const std::string& nickname)
 }
 
 // --- 412 ERR_NOTEXTTOSEND : Aucun message à envoyer.
-std::string MessageHandler::ircNoTextToSend(const std::string& nickname)
+std::string MessageBuilder::ircNoTextToSend(const std::string& nickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_NOTEXTTOSEND << " " << nickname 
@@ -400,7 +400,7 @@ std::string MessageHandler::ircNoTextToSend(const std::string& nickname)
 }
 
 // --- 417 ERR_INPUTTOOLONG : Message trop long.
-std::string MessageHandler::ircLineTooLong(const std::string& nickname)
+std::string MessageBuilder::ircLineTooLong(const std::string& nickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_INPUTTOOLONG << " " << nickname 
@@ -409,7 +409,7 @@ std::string MessageHandler::ircLineTooLong(const std::string& nickname)
 }
 
 // --- 441 ERR_USERNOTINCHANNEL : L'utilisateur cible n'est pas dans le canal.
-std::string MessageHandler::ircNotInChannel(const std::string& nickname, const std::string& channelName, const std::string &targetNick)
+std::string MessageBuilder::ircNotInChannel(const std::string& nickname, const std::string& channelName, const std::string &targetNick)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_USERNOTINCHANNEL << " " << nickname << " " << targetNick << " " << channelName 
@@ -418,7 +418,7 @@ std::string MessageHandler::ircNotInChannel(const std::string& nickname, const s
 }
 
 // --- 442 ERR_NOTONCHANNEL : Le présent utilisateur n'est pas dans le canal.
-std::string MessageHandler::ircCurrentNotInChannel(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircCurrentNotInChannel(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_NOTONCHANNEL << " " << nickname << " " << channelName 
@@ -427,7 +427,7 @@ std::string MessageHandler::ircCurrentNotInChannel(const std::string& nickname, 
 }
 
 // --- 341 RPL_INVITING : L'utilisateur a été invité dans le canal.
-std::string MessageHandler::ircInviting(const std::string& nickname, const std::string& targetNick, const std::string& channelName)
+std::string MessageBuilder::ircInviting(const std::string& nickname, const std::string& targetNick, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_INVITING << " " << nickname << " " << targetNick << " " << channelName;
@@ -435,7 +435,7 @@ std::string MessageHandler::ircInviting(const std::string& nickname, const std::
 }
 
 // 471 ERR_CHANNELISFULL : Channel full.
-std::string MessageHandler::ircChannelFull(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircChannelFull(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_CHANNELISFULL << " " << nickname << " " << channelName
@@ -444,7 +444,7 @@ std::string MessageHandler::ircChannelFull(const std::string& nickname, const st
 }
 
 // --- 443 ERR_USERONCHANNEL : Quand un client invité au canal est déja dans le canal.
-std::string MessageHandler::ircAlreadyOnChannel(const std::string& nickname, const std::string& targetNick, const std::string& channelName)
+std::string MessageBuilder::ircAlreadyOnChannel(const std::string& nickname, const std::string& targetNick, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_USERONCHANNEL << " " << nickname << " " << targetNick << " " << channelName 
@@ -453,7 +453,7 @@ std::string MessageHandler::ircAlreadyOnChannel(const std::string& nickname, con
 }
 
 // --- 465 ERR_YOUREBANNEDCREEP : L'utilisateur est banni du serveur.
-std::string MessageHandler::ircBannedFromServer(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircBannedFromServer(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_YOUREBANNEDCREEP << " " << nickname << " " << channelName
@@ -462,7 +462,7 @@ std::string MessageHandler::ircBannedFromServer(const std::string& nickname, con
 }
 
 // --- 472 ERR_UNKNOWNMODE : Mode inconnu.
-std::string MessageHandler::ircUnknownMode(const std::string& nickname, char character)
+std::string MessageBuilder::ircUnknownMode(const std::string& nickname, char character)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_UNKNOWNMODE << " " << nickname << " " << character
@@ -471,7 +471,7 @@ std::string MessageHandler::ircUnknownMode(const std::string& nickname, char cha
 }
 
 // --- 473 ERR_INVITEONLYCHAN : Le canal est en mode invitation (+i), et l'utilisateur n'est pas invité.
-std::string MessageHandler::ircInviteOnly(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircInviteOnly(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_INVITEONLYCHAN << " " << nickname << " " << channelName
@@ -480,7 +480,7 @@ std::string MessageHandler::ircInviteOnly(const std::string& nickname, const std
 }
 
 // --- 474 ERR_BANNEDFROMCHAN : L'utilisateur est banni (+b) du canal.
-std::string MessageHandler::ircBannedFromChannel(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircBannedFromChannel(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_BANNEDFROMCHAN << " " << nickname << " " << channelName
@@ -489,7 +489,7 @@ std::string MessageHandler::ircBannedFromChannel(const std::string& nickname, co
 }
 
 // --- 475 ERR_BADCHANNELKEY : Mauvais mot de passe pour rejoindre le canal.
-std::string MessageHandler::ircWrongChannelPass(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircWrongChannelPass(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_BADCHANNELKEY << " " << nickname << " " << channelName
@@ -498,7 +498,7 @@ std::string MessageHandler::ircWrongChannelPass(const std::string& nickname, con
 }
 
 // --- 476 ERR_BADCHANMASK : Nom du channel mal formaté ou invalide (#).
-std::string MessageHandler::ircBadChannelName(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircBadChannelName(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_BADCHANMASK << " " << nickname << " " << channelName 
@@ -507,7 +507,7 @@ std::string MessageHandler::ircBadChannelName(const std::string& nickname, const
 }
 
 // --- 477 ERR_NEEDREGGEDNICK : Certains serveurs nécessitent un pseudo enregistré (+r).
-std::string MessageHandler::ircNeedNick(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircNeedNick(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_NEEDREGGEDNICK << " " << nickname << " " << channelName
@@ -516,7 +516,7 @@ std::string MessageHandler::ircNeedNick(const std::string& nickname, const std::
 }
 
 // --- 482 ERR_CHANOPRIVSNEEDED : L’utilisateur n'est pas opérateur et essaie une action nécessitant des droits d'opérateur.
-std::string MessageHandler::ircNotChanOperator(const std::string& channelName)
+std::string MessageBuilder::ircNotChanOperator(const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_CHANOPRIVSNEEDED << " " << channelName 
@@ -527,34 +527,34 @@ std::string MessageHandler::ircNotChanOperator(const std::string& channelName)
 
 // === NOTICE CHANNELS ===
 
-std::string MessageHandler::ircChannelCreated(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircChannelCreated(const std::string& nickname, const std::string& channelName)
 {
 	return ircBasicMsg(server::NAME, "Channel " + IRC_DEFAULT + channelName + IRC_COLOR_SUCCESS 
 		+ " created by " + IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS, IRC_COLOR_SUCCESS);
 }
-std::string MessageHandler::ircChannelDestroyed(const std::string& channelName)
+std::string MessageBuilder::ircChannelDestroyed(const std::string& channelName)
 {
 	return ircBasicMsg(server::NAME, "Channel " + IRC_DEFAULT + channelName + IRC_COLOR_ERR + " destroyed", IRC_COLOR_ERR);
 }
-std::string MessageHandler::ircOperatorAdded(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircOperatorAdded(const std::string& nickname, const std::string& channelName)
 {
 	return ircBasicMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS 
 		+ " is now operator in channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
 }
-std::string MessageHandler::ircOperatorRemoved(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircOperatorRemoved(const std::string& nickname, const std::string& channelName)
 {
 	return ircBasicMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS
 		+ " is no longer operator in channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
 }
-std::string MessageHandler::ircInvitedToChannel(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircInvitedToChannel(const std::string& nickname, const std::string& channelName)
 {
 	return ircBasicMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_INFO + " invited you to join channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
 }
-std::string MessageHandler::ircAlreadyInvitedToChannel(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircAlreadyInvitedToChannel(const std::string& nickname, const std::string& channelName)
 {
 	return ircBasicMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_INFO + " has already been invited to join channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
 }
-std::string MessageHandler::ircNoPassNeeded(const std::string& channelName)
+std::string MessageBuilder::ircNoPassNeeded(const std::string& channelName)
 {
 	return ircBasicMsg(server::NAME, "No pass needed to join channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
 }
@@ -562,7 +562,7 @@ std::string MessageHandler::ircNoPassNeeded(const std::string& channelName)
 
 // === CLIENTS ===
 
-std::string MessageHandler::ircNicknameSet(const std::string& oldNickname, const std::string& newNickname)
+std::string MessageBuilder::ircNicknameSet(const std::string& oldNickname, const std::string& newNickname)
 {
 	std::string oldNick = !oldNickname.empty() ? oldNickname : "unknown";
 	std::ostringstream stream;
@@ -571,7 +571,7 @@ std::string MessageHandler::ircNicknameSet(const std::string& oldNickname, const
 }
 
 // --- 401 ERR_NOSUCHNICK : Le pseudonyme spécifié n'existe pas.
-std::string MessageHandler::ircNoSuchNick(const std::string& nickname, const std::string& targetNick)
+std::string MessageBuilder::ircNoSuchNick(const std::string& nickname, const std::string& targetNick)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_NOSUCHNICK << " " << nickname << " " << targetNick 
@@ -580,7 +580,7 @@ std::string MessageHandler::ircNoSuchNick(const std::string& nickname, const std
 }
 
 // --- 301 RPL_AWAY : L'utilisateur est absent.
-std::string MessageHandler::ircClientIsAway(const std::string& nickname, const std::string& targetNick, const std::string& message)
+std::string MessageBuilder::ircClientIsAway(const std::string& nickname, const std::string& targetNick, const std::string& message)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_AWAY << " " << nickname << " "
@@ -589,7 +589,7 @@ std::string MessageHandler::ircClientIsAway(const std::string& nickname, const s
 }
 
 // --- 305 RPL_UNAWAY : L'utilisateur n'est plus absent.
-std::string MessageHandler::ircUnAway(const std::string& nickname)
+std::string MessageBuilder::ircUnAway(const std::string& nickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_UNAWAY << " " << nickname << " :" << RPL_UNAWAY_MSG;
@@ -597,14 +597,14 @@ std::string MessageHandler::ircUnAway(const std::string& nickname)
 }
 
 // --- 306 RPL_NOWAWAY : L'utilisateur est maintenant absent.
-std::string MessageHandler::ircAway(const std::string& nickname)
+std::string MessageBuilder::ircAway(const std::string& nickname)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_NOWAWAY << " " << nickname << " :" << RPL_NOWAWAY_MSG;
 	return stream.str();
 }
 
-std::string MessageHandler::ircWhois(const std::string& nickname, const std::string& targetNick, const std::string& username, 
+std::string MessageBuilder::ircWhois(const std::string& nickname, const std::string& targetNick, const std::string& username, 
 	const std::string& realname, const std::string& clientIp)
 {
 	std::ostringstream stream;
@@ -621,7 +621,7 @@ std::string MessageHandler::ircWhois(const std::string& nickname, const std::str
 }
 
 // RPL_WHOISUSER (311) : Temps d'inactivité de l'utilisateur.
-std::string MessageHandler::ircWhoisIdle(const std::string& nickname, const std::string& targetNick, time_t idleTime, time_t signonTime)
+std::string MessageBuilder::ircWhoisIdle(const std::string& nickname, const std::string& targetNick, time_t idleTime, time_t signonTime)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_WHOISIDLE << " " << nickname << " "
@@ -630,7 +630,7 @@ std::string MessageHandler::ircWhoisIdle(const std::string& nickname, const std:
 }
 
 // RPL_ENDOFWHOIS (318) : Fin du WHOIS
-std::string MessageHandler::ircEndOfWhois(const std::string& nickname, const std::string& targetNick)
+std::string MessageBuilder::ircEndOfWhois(const std::string& nickname, const std::string& targetNick)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_ENDOFWHOIS << " " << nickname << " " 
@@ -639,7 +639,7 @@ std::string MessageHandler::ircEndOfWhois(const std::string& nickname, const std
 }
 
 // RPL_WHOREPLY (352) : Liste des utilisateurs du canal
-std::string MessageHandler::ircWho(const std::string& nickname, const std::string& targetNick, const std::string& username, 
+std::string MessageBuilder::ircWho(const std::string& nickname, const std::string& targetNick, const std::string& username, 
 	const std::string& realname, const std::string& clientIp, const std::string& channelName, bool isAway)
 {
 	std::string awayChar = isAway ? "G" : "H";
@@ -651,7 +651,7 @@ std::string MessageHandler::ircWho(const std::string& nickname, const std::strin
 }
 
 // RPL_ENDOFWHO (315) : Fin de la liste
-std::string MessageHandler::ircEndOfWho(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::ircEndOfWho(const std::string& nickname, const std::string& channelName)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_ENDOFWHO << " " << nickname << " " 
@@ -660,7 +660,7 @@ std::string MessageHandler::ircEndOfWho(const std::string& nickname, const std::
 }
 
 // RPL_ENDOFWHOWAS (369) : Fin du WHOIS
-std::string MessageHandler::ircEndOfWhowas(const std::string& nickname, const std::string& targetNick)
+std::string MessageBuilder::ircEndOfWhowas(const std::string& nickname, const std::string& targetNick)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_ENDOFWHOWAS << " " << nickname << " " 
@@ -672,7 +672,7 @@ std::string MessageHandler::ircEndOfWhowas(const std::string& nickname, const st
 // === COMMAND ERRORS ===
 
 // --- 421 ERR_UNKNOWNCOMMAND : La commande n'est pas reconnue par le serveur.
-std::string MessageHandler::ircUnknownCommand(const std::string& nickname, const std::string& command)
+std::string MessageBuilder::ircUnknownCommand(const std::string& nickname, const std::string& command)
 {
 	std::string cmd = Utils::truncateStr(Utils::streamArg(command));
 	std::ostringstream stream;
@@ -682,7 +682,7 @@ std::string MessageHandler::ircUnknownCommand(const std::string& nickname, const
 }
 	
 // 461 ERR_NEEDMOREPARAMS : Il manque des paramètres pour une commande.
-std::string MessageHandler::ircNeedMoreParams(const std::string& nickname, const std::string& command)
+std::string MessageBuilder::ircNeedMoreParams(const std::string& nickname, const std::string& command)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_NEEDMOREPARAMS << " " << nickname << " " << command 
@@ -691,7 +691,7 @@ std::string MessageHandler::ircNeedMoreParams(const std::string& nickname, const
 }
 
 // 451 ERR_NOTREGISTERED : L'utilisateur doit être enregistré avant de pouvoir exécuter des commandes.
-std::string MessageHandler::ircNotRegistered(void)
+std::string MessageBuilder::ircNotRegistered(void)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_NOTREGISTERED 
@@ -704,7 +704,7 @@ std::string MessageHandler::ircNotRegistered(void)
 
 // 324 RPL_CHANNELMODEIS :Sent to a client to inform them of the currently-set modes of a channel. <channel> is the name of the channel. <modestring> and <mode arguments> 
 // are a mode string and the mode arguments (delimited as separate parameters) as defined in the MODE message description.
-std::string MessageHandler::ircChannelModeIs(const std::string& nickname, const std::string& channel, const std::string& displaymode)
+std::string MessageBuilder::ircChannelModeIs(const std::string& nickname, const std::string& channel, const std::string& displaymode)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_CHANNELMODEIS << " " << nickname << " " << channel << " " << displaymode;
@@ -713,7 +713,7 @@ std::string MessageHandler::ircChannelModeIs(const std::string& nickname, const 
 // :server 324 <nickname> <channel> <modes> <mode_params>
 
 // 329 RPL_CREATIONTIME : Sent to a client to inform them of the creation time of a channel. <creationtime> is a unix timestamp representing when the channel was created on the network.
-std::string MessageHandler::ircCreationTime(const std::string& nickname, const std::string& channel, time_t time)
+std::string MessageBuilder::ircCreationTime(const std::string& nickname, const std::string& channel, time_t time)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_CREATIONTIME << " " << nickname << " " << channel << " " << time;
@@ -721,7 +721,7 @@ std::string MessageHandler::ircCreationTime(const std::string& nickname, const s
 }
 
 // 696 ERR_INVALIDMODEPARAM : Indicates that there was a problem with a mode parameter. Replaces various implementation-specific mode-specific numerics.
-std::string MessageHandler::ircInvalidModeParams(const std::string &nickname, const std::string& channel, const std::string& mode_char, const std::string &param)
+std::string MessageBuilder::ircInvalidModeParams(const std::string &nickname, const std::string& channel, const std::string& mode_char, const std::string &param)
 {
 	std::string parameter = Utils::truncateStr(Utils::streamArg(param));
 	std::ostringstream stream;
@@ -731,7 +731,7 @@ std::string MessageHandler::ircInvalidModeParams(const std::string &nickname, co
 }
 
 // 367 RPL_BANLIST : Sent as a reply to the MODE command, when clients are viewing the current entries on a channel’s ban list. 
-std::string MessageHandler::ircBannedList(const std::string &nickname, const std::string &channel, const std::string &who, time_t time_channel) //ptet pas le bon chan
+std::string MessageBuilder::ircBannedList(const std::string &nickname, const std::string &channel, const std::string &who, time_t time_channel) //ptet pas le bon chan
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_BANLIST << " " << IRC_COLOR_INFO << nickname << " " << channel << " *!*@* " << who << " " << time_channel << IRC_RESET;
@@ -739,7 +739,7 @@ std::string MessageHandler::ircBannedList(const std::string &nickname, const std
 }
 
 // 368 RPL_ENDOFBANLIST : Sent as a reply to the MODE command, this numeric indicates the end of a channel’s ban list.
-std::string MessageHandler::ircEndOfBannedList(const std::string &nickname, const std::string &channel)
+std::string MessageBuilder::ircEndOfBannedList(const std::string &nickname, const std::string &channel)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << RPL_ENDOFBANLIST << " " << nickname << " " << channel
@@ -748,7 +748,7 @@ std::string MessageHandler::ircEndOfBannedList(const std::string &nickname, cons
 }
 
 // 525 ERR_INVALIDKEY : Indicates the value of a key channel mode change (+k) was rejected.
-std::string MessageHandler::ircInvalidPasswordFormat(const std::string &nickname, const std::string& channel)
+std::string MessageBuilder::ircInvalidPasswordFormat(const std::string &nickname, const std::string& channel)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " " << ERR_INVALIDKEY  << " " << nickname << " " << channel
@@ -768,7 +768,7 @@ std::string MessageHandler::ircInvalidPasswordFormat(const std::string &nickname
  *
  * @return A string containing the formatted message.
  */
-std::string MessageHandler::msgBuilder(const std::string& color, const std::string& message, const std::string& eol)
+std::string MessageBuilder::msgBuilder(const std::string& color, const std::string& message, const std::string& eol)
 {
 	std::ostringstream stream;
 	stream << color << message << RESET << eol;
@@ -777,7 +777,7 @@ std::string MessageHandler::msgBuilder(const std::string& color, const std::stri
 
 // === EXCEPTIONS ===
 
-std::string MessageHandler::msgServerException(const std::exception &e)
+std::string MessageBuilder::msgServerException(const std::exception &e)
 {
 	std::ostringstream stream;
 	stream << COLOR_ERR << "Error: " << RESET << e.what() << eol::UNIX;
@@ -787,7 +787,7 @@ std::string MessageHandler::msgServerException(const std::exception &e)
 
 // === DISPLAY ===
 
-void MessageHandler::displayWelcome(const std::string &serverIp, int port, const std::string &password)
+void MessageBuilder::displayWelcome(const std::string &serverIp, int port, const std::string &password)
 {
 	std::cout << std::endl << CYAN << "==================================================" << RESET << std::endl << std::endl;
 	std::cout << GREEN << "            ██╗" << RED << "     ██████╗ " << BLUE << "   ██████╗ " << RESET << std::endl;
@@ -814,7 +814,7 @@ void MessageHandler::displayWelcome(const std::string &serverIp, int port, const
  * 
  * @return std::string The formatted current local time.
  */
-std::string MessageHandler::msgTimeServerCreation()
+std::string MessageBuilder::msgTimeServerCreation()
 {
 	std::tm now;
 	IrcHelper::getCurrentTime(now);
@@ -834,7 +834,7 @@ std::string MessageHandler::msgTimeServerCreation()
 
 // === SETTINGS ===
 
-std::string MessageHandler::msgSignalCaught(const std::string& signalType)
+std::string MessageBuilder::msgSignalCaught(const std::string& signalType)
 {
 	return msgBuilder(COLOR_ERR, signalType + " signal caught, server shutting down...", eol::UNIX);
 }
@@ -842,7 +842,7 @@ std::string MessageHandler::msgSignalCaught(const std::string& signalType)
 
 // === CLIENTS ===
 
-std::string MessageHandler::msgClientConnected(const std::string& clientIp, int port, int socket, const std::string& nickname)
+std::string MessageBuilder::msgClientConnected(const std::string& clientIp, int port, int socket, const std::string& nickname)
 {
 	
 	std::string text;
@@ -859,7 +859,7 @@ std::string MessageHandler::msgClientConnected(const std::string& clientIp, int 
 	stream << text << " => " << COLOR_DISPLAY << "[" << clientIp << "][port " << port << "][socket " << socket << "]" << RESET;
 	return stream.str();
 }
-std::string MessageHandler::msgClientDisconnected(const std::string& clientIp, int port, int socket, const std::string& nickname)
+std::string MessageBuilder::msgClientDisconnected(const std::string& clientIp, int port, int socket, const std::string& nickname)
 {
 	
 	std::string text;
@@ -880,45 +880,45 @@ std::string MessageHandler::msgClientDisconnected(const std::string& clientIp, i
 
 // === CHANNELS ===
 
-std::string MessageHandler::msgClientCreatedChannel(const std::string& nickname, const std::string& channelName, const std::string& password)
+std::string MessageBuilder::msgClientCreatedChannel(const std::string& nickname, const std::string& channelName, const std::string& password)
 {
 	std::string notifPass = !password.empty() ? COLOR_SUCCESS + " with password set" : "";
 	return msgBuilder("🚀 " + COLOR_SUCCESS, DEFAULT + nickname + COLOR_SUCCESS + " created channel " + DEFAULT + channelName + notifPass, "");
 }
-std::string MessageHandler::msgIsInvitedToChannel(const std::string& nickname, const std::string& inviterNick, const std::string& channelName)
+std::string MessageBuilder::msgIsInvitedToChannel(const std::string& nickname, const std::string& inviterNick, const std::string& channelName)
 {
 	return msgBuilder("📩 " + COLOR_INFO, DEFAULT + inviterNick + COLOR_INFO + " invited " + DEFAULT + nickname + COLOR_INFO + " to join channel " + DEFAULT + channelName, "");
 }
-std::string MessageHandler::msgClientJoinedChannel(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::msgClientJoinedChannel(const std::string& nickname, const std::string& channelName)
 {
 	return msgBuilder("➡️  " + COLOR_SUCCESS, DEFAULT + nickname + COLOR_SUCCESS + " joined channel " + DEFAULT + channelName, "");
 }
-std::string MessageHandler::msgClientSetTopic(const std::string& nickname, const std::string& channelName, const std::string& topic)
+std::string MessageBuilder::msgClientSetTopic(const std::string& nickname, const std::string& channelName, const std::string& topic)
 {
 	std::string notifTopic = topic.empty() ? "NO TOPIC" : topic;
 	return msgBuilder("📢 " + COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " set topic on channel " + DEFAULT + channelName + COLOR_INFO + " to " + DEFAULT + notifTopic, "");
 }
-std::string MessageHandler::msgClientOperatorAdded(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::msgClientOperatorAdded(const std::string& nickname, const std::string& channelName)
 {
 	return msgBuilder("🛡️  " + COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " is now operator of channel " + DEFAULT + channelName, "");
 }
-std::string MessageHandler::msgClientOperatorRemoved(const std::string& nickname, const std::string& channelName)
+std::string MessageBuilder::msgClientOperatorRemoved(const std::string& nickname, const std::string& channelName)
 {
 	return msgBuilder("⚠️  " + COLOR_INFO, DEFAULT + nickname + COLOR_INFO + " doesn't operate on channel " + DEFAULT + channelName + COLOR_INFO + " anymore", "");
 }
-std::string MessageHandler::msgClientLeftChannel(const std::string& nickname, const std::string& channelName, const std::string& reason)
+std::string MessageBuilder::msgClientLeftChannel(const std::string& nickname, const std::string& channelName, const std::string& reason)
 {
 	return msgBuilder("⬅️  " + COLOR_ERR, DEFAULT + nickname + COLOR_ERR + " left channel " + DEFAULT + channelName + PURPLE + " (" + reason + ")", "");
 }
-std::string MessageHandler::msgClientKickedFromChannel(const std::string& nickname, const std::string& kickerNick, const std::string& channelName, const std::string& reason)
+std::string MessageBuilder::msgClientKickedFromChannel(const std::string& nickname, const std::string& kickerNick, const std::string& channelName, const std::string& reason)
 {
 	return msgBuilder("⛔ " + COLOR_INFO, DEFAULT + kickerNick + COLOR_INFO + " kicked " + DEFAULT + nickname + COLOR_INFO + " from channel " + DEFAULT + channelName + PURPLE + " (" + reason + ")", "");
 }
-std::string MessageHandler::msgNoClientInChannel(const std::string& channelName)
+std::string MessageBuilder::msgNoClientInChannel(const std::string& channelName)
 {
 	return msgBuilder("🏜️  " + COLOR_INFO, "No client left in channel " + DEFAULT + channelName, "");
 }
-std::string MessageHandler::msgChannelDestroyed(const std::string& channelName)
+std::string MessageBuilder::msgChannelDestroyed(const std::string& channelName)
 {
 	return msgBuilder("💥 " + COLOR_ERR, "Channel " + DEFAULT + channelName + COLOR_ERR + " destroyed.", "");
 }
@@ -927,21 +927,21 @@ std::string MessageHandler::msgChannelDestroyed(const std::string& channelName)
 // === FILES ===
 
  //+ _client->getNickname() + "souhaite vous envoyer ce fichier : " + filename + ". Pour l'accepter, merci d'utiliser la commande GET. Sinon, merci d'ignorer ce message."
-std::string MessageHandler::msgSendFile(const std::string& filename, const std::string &client, const std::string &adr, const int &port)
+std::string MessageBuilder::msgSendFile(const std::string& filename, const std::string &client, const std::string &adr, const int &port)
 {
 	std::ostringstream stream;
 	stream << "📤 " << DCC << " SEND FROM " << client << " [" << adr << " " << port << "]: " << filename;
 	return stream.str();
 }
 
-std::string MessageHandler::errorMsgSendFile(const std::string& filename)
+std::string MessageBuilder::errorMsgSendFile(const std::string& filename)
 {
 	std::ostringstream stream;
 	stream << DCC << " can't open file /home/athiebau/" << filename << ": No such file or directory";
 	return stream.str();
 }
 
-std::string MessageHandler::msgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int& port)
+std::string MessageBuilder::msgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int& port)
 {
 	std::ostringstream stream;
 	stream << DCC << " sending file " << filename << " for " << receiver << " [" << ip << " port " << port << "]";
@@ -951,7 +951,7 @@ std::string MessageHandler::msgSendingFile(const std::string& filename, const st
 
 // === BOT ===
 
-std::string MessageHandler::botGetAge(int years, int months, int days)
+std::string MessageBuilder::botGetAge(int years, int months, int days)
 {
 	std::ostringstream stream;
 	stream << "⏳ " << "You are " << years << " years, " << months << " months, and " << days << " days old !";
@@ -959,7 +959,7 @@ std::string MessageHandler::botGetAge(int years, int months, int days)
 }
 
 // Message privé bot to client
-std::string MessageHandler::botCmdPrivmsg(const std::string& targetName, const std::string& message)
+std::string MessageBuilder::botCmdPrivmsg(const std::string& targetName, const std::string& message)
 {
 	std::ostringstream stream;	
 	stream << PRIVMSG << " " << targetName << " :" << message;
@@ -967,7 +967,7 @@ std::string MessageHandler::botCmdPrivmsg(const std::string& targetName, const s
 }
 
 // Bot join channel
-std::string MessageHandler::botCmdJoinChannel(const std::string& channelName)
+std::string MessageBuilder::botCmdJoinChannel(const std::string& channelName)
 {
 	std::ostringstream stream;	
 	stream << JOIN << " " << channelName;

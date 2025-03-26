@@ -1,13 +1,12 @@
-#include "../../incs/classes/commands/CommandHandler.hpp"
+#include "../../../incs/server/CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../../incs/utils/Utils.hpp"
+#include "../../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/commands.hpp"
-#include "../../incs/config/server_messages.hpp"
+#include "../../../incs/config/commands.hpp"
+#include "../../../incs/config/server_messages.hpp"
 
 using namespace commands;
 
@@ -72,7 +71,7 @@ void CommandHandler::manageCommand(std::string input)
 
 	std::string nickname = _client->isAuthenticated() ? _client->getNickname() : "*";
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput))
-		throw std::invalid_argument(MessageHandler::ircUnknownCommand(nickname, " "));
+		throw std::invalid_argument(MessageBuilder::ircUnknownCommand(nickname, " "));
 	
 	Utils::transformingMaj(*_vectorInput.begin());
 		
@@ -86,12 +85,12 @@ void CommandHandler::manageCommand(std::string input)
 	
 	std::map<std::string, void (CommandHandler::*)()>::iterator itFunction = _fctMap.find(cmd);;
 	if (itFunction == _fctMap.end())
-		throw std::invalid_argument(MessageHandler::ircUnknownCommand(nickname, input));
+		throw std::invalid_argument(MessageBuilder::ircUnknownCommand(nickname, input));
 	
 	_itInput++;
 
 	if (Utils::paramCheckNeeded(cmd) && Utils::isEmptyOrInvalid(_itInput, _vectorInput))
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(nickname, cmd));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(nickname, cmd));
 
 	(this->*itFunction->second)();
 }

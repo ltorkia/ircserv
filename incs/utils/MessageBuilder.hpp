@@ -8,13 +8,13 @@
 // =========================================================================================
 
 class Utils;
-class MessageHandler
+class MessageBuilder
 {
 	private:
-		MessageHandler();
-		MessageHandler(const MessageHandler& src);
-		MessageHandler & operator=(const MessageHandler& src);
-		~MessageHandler();
+		MessageBuilder();
+		MessageBuilder(const MessageBuilder& src);
+		MessageBuilder & operator=(const MessageBuilder& src);
+		~MessageBuilder();
 
 	public:
 

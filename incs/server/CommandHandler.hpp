@@ -1,12 +1,12 @@
 #pragma once
 
 // === SERVER LIBRARIES ===
-#include "../../config/server_libs.hpp"
+#include "../config/server_libs.hpp"
 
 // === HIGH CLASS DEPENDENCY ===
-#include "../core/Server.hpp"
-#include "../core/Client.hpp"
-#include "../core/Channel.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
+#include "Channel.hpp"
 
 // =========================================================================================
 

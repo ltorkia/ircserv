@@ -1,18 +1,20 @@
-#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/utils/IrcHelper.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/core/Client.hpp"
-#include "../../incs/classes/core/Channel.hpp"
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../incs/server/Client.hpp"
+#include "../../incs/server/Channel.hpp"
+#include "../../incs/utils/Utils.hpp"
+#include "../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/bot_config.hpp"
 #include "../../incs/config/server_messages.hpp"
 #include "../../incs/config/commands.hpp"
 #include "../../incs/config/colors.hpp"
 
 using namespace server_messages;
+using namespace bot_config;
 using namespace name_type;
 using namespace auth_cmd;
 using namespace commands;
@@ -384,7 +386,7 @@ std::string IrcHelper::sanitizeIrcMessage(std::string msg, const std::string& cm
 	// PART, KICK PRIVMSG, TOPIC, QUIT
 	if (((cmd == PART || cmd == KICK || cmd == PRIVMSG || cmd == TOPIC || cmd == AWAY) && msg[0] != ':')
 		|| (cmd == QUIT && (msg[0] != ':' || Utils::isPrintableSentence(msg) == false)))
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(nickname, cmd));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(nickname, cmd));
 
 	return msg.erase(0, 1);
 }
@@ -420,14 +422,14 @@ int IrcHelper::isRightChannel(const Client& client, const std::string& channelNa
 	if (isValidChannelName(channelName) == false)
 	{
 		if (opt == PRINT_ERROR)
-			client.sendMessage(MessageHandler::ircBadChannelName(client.getNickname(), channelName), NULL);
+			client.sendMessage(MessageBuilder::ircBadChannelName(client.getNickname(), channelName), NULL);
 		return INVALID_FORMAT;														
 	}
 	// Check si le channel existe
 	if (channelExists(channelName, channels) == false) 
 	{
 		if (opt == PRINT_ERROR)
-			client.sendMessage(MessageHandler::ircNoSuchChannel(client.getNickname(), channelName), NULL);
+			client.sendMessage(MessageBuilder::ircNoSuchChannel(client.getNickname(), channelName), NULL);
 		return NO_FOUND ;													
 	}
 	return ALL_RIGHT;
@@ -620,7 +622,7 @@ void IrcHelper::assertNoDuplicate(std::string &str, char c, size_t i)
 	while (str[i])
 	{
 		if (str[i] == c)
-			throw std::invalid_argument(MessageHandler::ircBasicMsg("doublons", RED));
+			throw std::invalid_argument(MessageBuilder::ircBasicMsg("doublons", RED));
 		i++;
 	}
 }
@@ -676,7 +678,7 @@ bool IrcHelper::isValidLimit(std::string &limit)
  */
 size_t IrcHelper::getBotCommandStartPos(const std::string& message)
 {
-	const std::string commands[] = {bot::FUNFACT_CMD, bot::AGE_CMD, bot::TIME_CMD};
+	const std::string commands[] = {FUNFACT_CMD, AGE_CMD, TIME_CMD};
 
 	for (size_t i = 0; i < 3; ++i)
 	{
@@ -699,7 +701,7 @@ size_t IrcHelper::getBotCommandStartPos(const std::string& message)
  */
 bool IrcHelper::isInvalidBotCommand(const std::string& command)
 {
-	return command != bot::FUNFACT_CMD && command != bot::AGE_CMD && command != bot::TIME_CMD;
+	return command != FUNFACT_CMD && command != AGE_CMD && command != TIME_CMD;
 }
 
 /**

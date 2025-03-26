@@ -1,13 +1,13 @@
-#include "../../incs/classes/commands/CommandHandler.hpp"
+#include "../../../incs/server/CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../../incs/utils/Utils.hpp"
+#include "../../../incs/utils/IrcHelper.hpp"
+#include "../../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/commands.hpp"
-#include "../../incs/config/server_messages.hpp"
+#include "../../../incs/config/commands.hpp"
+#include "../../../incs/config/server_messages.hpp"
 
 using namespace commands;
 using namespace server_messages;
@@ -40,7 +40,7 @@ void CommandHandler::_inviteChannel()
 
 	// Si plus de deux arguments apres split, le format est invalide
 	if (n_arg == 0 || n_arg > 2)
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), INVITE));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), INVITE));
 	
 	std::string invitedName = *args.begin();
 
@@ -49,23 +49,23 @@ void CommandHandler::_inviteChannel()
 	std::string channelName = itChannel != args.end() ? IrcHelper::fixChannelMask(*itChannel) : "";
 
 	if (IrcHelper::channelExists(channelName, _channels) == false) 
-		throw std::invalid_argument(MessageHandler::ircNoSuchChannel(_client->getNickname(), channelName));
+		throw std::invalid_argument(MessageBuilder::ircNoSuchChannel(_client->getNickname(), channelName));
 		
 	// Verifie l'existence du client sur le serveur, si non retourne -1
 	int invitedClientFd = _server.getClientByNickname(invitedName, _client);
 	if (IrcHelper::clientExists(invitedClientFd) == false)
-		throw std::invalid_argument(MessageHandler::ircNoSuchNick(_client->getNickname(), invitedName));
+		throw std::invalid_argument(MessageBuilder::ircNoSuchNick(_client->getNickname(), invitedName));
 
 	Channel* channel = _channels[channelName];
 	Client* invitedClient = _clients[invitedClientFd];
 
 	// Verifie que le client qui fait la demande est bien dans le channel concerne
 	if (!_client->isInChannel(channelName))
-		throw std::invalid_argument(MessageHandler::ircCurrentNotInChannel(_client->getNickname(), channel->getName())); 
+		throw std::invalid_argument(MessageBuilder::ircCurrentNotInChannel(_client->getNickname(), channel->getName())); 
 	
 	// Verifie que si le mode "+i" est present, le client faisant la requete est bien operator
 	if (channel->getInvites() && channel->isOperator(_client) == false)
-		throw std::invalid_argument(MessageHandler::ircNotChanOperator(channelName));
+		throw std::invalid_argument(MessageBuilder::ircNotChanOperator(channelName));
 	
 	// La fonction isInvitedToChannel() verifie que le client est deja dans le channel avant de l'inviter
 	invitedClient->isInvitedToChannel(channel, _client);
@@ -91,7 +91,7 @@ void CommandHandler::_joinChannel()
 
 	// Si plus de deux arguments apres split, le format est invalide
 	if (args.size() > 2)
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), JOIN));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), JOIN));
 
 	// On recupere les channels a join
 	std::vector<std::string>::iterator itArg = args.begin();
@@ -141,7 +141,7 @@ void CommandHandler::_setTopic()
 	std::string channelName = itChannel != args.end() ? IrcHelper::fixChannelMask(*itChannel) : "";
 
 	if (IrcHelper::channelExists(channelName, _channels) == false) 
-		throw std::invalid_argument(MessageHandler::ircNoSuchChannel(_client->getNickname(), channelName));
+		throw std::invalid_argument(MessageBuilder::ircNoSuchChannel(_client->getNickname(), channelName));
 
 	Channel* channel = _channels[channelName];
 
@@ -149,7 +149,7 @@ void CommandHandler::_setTopic()
 	std::vector<std::string>::iterator itTopic = ++args.begin();
 	if (itTopic == args.end())
 	{
-		_client->sendMessage(MessageHandler::ircTopicMessage(_client->getUsermask(), channelName, channel->getTopic()), NULL);
+		_client->sendMessage(MessageBuilder::ircTopicMessage(_client->getUsermask(), channelName, channel->getTopic()), NULL);
 		return;
 	}
 
@@ -166,12 +166,12 @@ void CommandHandler::_setTopic()
 
 	// Protection contre les clients non autorisés à changer le topic si mode +t actif
 	if ((channel->getRightsTopic() && channel->isOperator(_client) == false))
-		throw std::invalid_argument(MessageHandler::ircNotChanOperator(channelName));
+		throw std::invalid_argument(MessageBuilder::ircNotChanOperator(channelName));
 	
 	// On set le nouveau topic et on send les RPL correspondants
 	channel->topicSettings(newTopic, _client);
-	channel->sendToAll(MessageHandler::ircTopicMessage(_client->getUsermask(), channelName, channel->getTopic()), _client, true);
-	std::cout << MessageHandler::msgClientSetTopic(_client->getNickname(), channelName, channel->getTopic()) << std::endl;
+	channel->sendToAll(MessageBuilder::ircTopicMessage(_client->getUsermask(), channelName, channel->getTopic()), _client, true);
+	std::cout << MessageBuilder::msgClientSetTopic(_client->getNickname(), channelName, channel->getTopic()) << std::endl;
 }
 
 /**
@@ -200,7 +200,7 @@ void CommandHandler::_kickChannel()
 	std::string channelName = *itArg;
 	++itArg;
 	if (itArg == args.end())
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), KICK));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), KICK));
 
 	args = Utils::getTokens(*itArg, splitter::WORD);
 	itArg = args.begin();
@@ -218,7 +218,7 @@ void CommandHandler::_kickChannel()
 	// Si le channel n'existe pas, on throw une erreur
 	channelName = IrcHelper::fixChannelMask(channelName);
 	if (IrcHelper::channelExists(channelName, _channels) == false) 
-		throw std::invalid_argument(MessageHandler::ircNoSuchChannel(_client->getNickname(), channelName));
+		throw std::invalid_argument(MessageBuilder::ircNoSuchChannel(_client->getNickname(), channelName));
 
 	Channel* channel = _channels[channelName];
 
@@ -227,7 +227,7 @@ void CommandHandler::_kickChannel()
 	{
 		// On vérifie que le client qui kick est bien operator du channel
 		if (!_client->isOperator(channel))
-			throw std::runtime_error(MessageHandler::ircNotChanOperator(channelName));
+			throw std::runtime_error(MessageBuilder::ircNotChanOperator(channelName));
 		
 		// On récupère le fd du client à kick et on vérifie s'il est dans le channel,
 		// si non erreur et on passe au client suivant
@@ -235,7 +235,7 @@ void CommandHandler::_kickChannel()
 		int clientFd = channel->getChannelClientByNickname(kickedNickname, NULL);
 		if (IrcHelper::clientExists(clientFd) == false)
 		{
-			_client->sendMessage(MessageHandler::ircNotInChannel(_client->getNickname(), channelName, kickedNickname), NULL);
+			_client->sendMessage(MessageBuilder::ircNotInChannel(_client->getNickname(), channelName, kickedNickname), NULL);
 			continue;
 		}
 
@@ -287,7 +287,7 @@ void CommandHandler::_quitChannel()
 	{
 		std::string channelNameToQuit = IrcHelper::fixChannelMask(*itChanToQuit);
 		if (IrcHelper::channelExists(channelNameToQuit, _channels) == false)
-			_client->sendMessage(MessageHandler::ircNoSuchChannel(_client->getNickname(), channelNameToQuit), NULL);
+			_client->sendMessage(MessageBuilder::ircNoSuchChannel(_client->getNickname(), channelNameToQuit), NULL);
 		else
 			_client->leaveChannel(_channels.find(channelNameToQuit), _channels, reason, leaving_code::LEFT);
 	}

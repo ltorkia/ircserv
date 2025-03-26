@@ -1,13 +1,13 @@
-#include "../../incs/classes/commands/CommandHandler.hpp"
+#include "../../../incs/server/CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../../incs/utils/Utils.hpp"
+#include "../../../incs/utils/IrcHelper.hpp"
+#include "../../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
-#include "../../incs/config/commands.hpp"
+#include "../../../incs/config/irc_config.hpp"
+#include "../../../incs/config/commands.hpp"
 
 using namespace commands;
 using namespace error_display;
@@ -24,7 +24,7 @@ using namespace error_display;
 void CommandHandler::_sendPrivateMessage()
 {
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput))
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), PRIVMSG));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), PRIVMSG));
 
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::SENTENCE);
 	std::string targetStr = *args.begin();
@@ -32,7 +32,7 @@ void CommandHandler::_sendPrivateMessage()
 	std::vector<std::string>::iterator itTarget = targets.begin();
 
 	if (itTarget == targets.end())
-		throw std::invalid_argument(MessageHandler::ircNeedMoreParams(_client->getNickname(), PRIVMSG));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), PRIVMSG));
 
 	std::vector<std::string>::iterator itMessage = ++args.begin();
 	std::string	message = itMessage != args.end() ? *itMessage : "";
@@ -62,18 +62,18 @@ void CommandHandler::_sendToChannel(std::vector<std::string>& targets, std::stri
 	for (std::vector<std::string>::iterator itTarget = targets.begin(); itTarget != targets.end(); itTarget++)
 	{
 		if (message.empty() || (message[0] == ':' && message.size() == 1) || Utils::isOnlySpace(message) == true)
-			throw std::invalid_argument(MessageHandler::ircNoTextToSend(nickname));
+			throw std::invalid_argument(MessageBuilder::ircNoTextToSend(nickname));
 
 		std::string formattedMessage = IrcHelper::sanitizeIrcMessage(message, PRIVMSG, nickname);
 		std::string targetName = *itTarget;
 
 		if (IrcHelper::channelExists(targetName, _channels) == false)
 		{
-			_client->sendMessage(MessageHandler::ircNoSuchChannel(nickname, targetName), NULL);
+			_client->sendMessage(MessageBuilder::ircNoSuchChannel(nickname, targetName), NULL);
 			continue;
 		}
 		Channel* channel = _channels[targetName];
-		channel->sendToAll(MessageHandler::ircMsgToChannel(nickname, targetName, formattedMessage), _client, false);
+		channel->sendToAll(MessageBuilder::ircMsgToChannel(nickname, targetName, formattedMessage), _client, false);
 	}
 }
 
@@ -100,16 +100,16 @@ void CommandHandler::_sendToClient(std::vector<std::string>& targets, std::strin
 		if (message.empty() || (message[0] == ':' && message.size() == 1) || Utils::isOnlySpace(message) == true)
 		{
 			if ((targetName)[0] == ':')
-				throw std::invalid_argument(MessageHandler::ircNoRecipient(nickname));
+				throw std::invalid_argument(MessageBuilder::ircNoRecipient(nickname));
 			else
-				throw std::invalid_argument(MessageHandler::ircNoTextToSend(nickname));
+				throw std::invalid_argument(MessageBuilder::ircNoTextToSend(nickname));
 		}
 
 		std::string formattedMessage = IrcHelper::sanitizeIrcMessage(message, PRIVMSG, nickname);
 		int clientFd = _server.getClientByNickname(targetName, NULL);
 		if (IrcHelper::clientExists(clientFd) == false)
 		{
-			_client->sendMessage(MessageHandler::ircNoSuchNick(nickname, targetName), NULL);
+			_client->sendMessage(MessageBuilder::ircNoSuchNick(nickname, targetName), NULL);
 			continue;
 		}
 		
@@ -117,10 +117,10 @@ void CommandHandler::_sendToClient(std::vector<std::string>& targets, std::strin
 		if (targetClient == _client)
 			continue;
 
-		targetClient->sendMessage(MessageHandler::ircMsgToClient(nickname, targetName, formattedMessage), _client);			
+		targetClient->sendMessage(MessageBuilder::ircMsgToClient(nickname, targetName, formattedMessage), _client);			
 		
 		// Si le client visé est absent, l'envoyeur reçoit sa notification d'absence
 		if (targetClient->isAway())
-			_client->sendMessage(MessageHandler::ircClientIsAway(nickname, targetName, targetClient->getAwayMessage()), NULL);
+			_client->sendMessage(MessageBuilder::ircClientIsAway(nickname, targetName, targetClient->getAwayMessage()), NULL);
 	}
 }

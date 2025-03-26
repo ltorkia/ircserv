@@ -1,16 +1,15 @@
-#include "../../incs/classes/bot/Bot.hpp"
+#include "../../incs/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../incs/utils/Utils.hpp"
+#include "../../incs/utils/IrcHelper.hpp"
+#include "../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/bot.hpp"
-#include "../../incs/config/irc_replies.hpp"
+#include "../../incs/config/bot_config.hpp"
 #include "../../incs/config/server_messages.hpp"
 
-using namespace irc_replies;
+using namespace bot_config;
 using namespace server_messages;
 
 // =========================================================================================
@@ -31,13 +30,13 @@ using namespace server_messages;
  */
 std::string Bot::_handleBotCommand()
 {
-	if (_command == bot::FUNFACT_CMD)
+	if (_command == FUNFACT_CMD)
 		return _getRandomFunfact();
-	if (_command == bot::AGE_CMD)
+	if (_command == AGE_CMD)
 		return _getAge();
-	if (_command == bot::TIME_CMD)
+	if (_command == TIME_CMD)
 		return IrcHelper::getTimeString();
-	return ERR_UNKNOWNCOMMAND_MSG;
+	return ERR_UNKNOWN_BOT_CMD;
 }
 
 
@@ -55,7 +54,7 @@ std::string Bot::_handleBotCommand()
 std::string Bot::_getRandomFunfact()
 {
 	if (_quotes.empty())
-		_quotes = _getQuotes(bot::QUOTES_PATH);
+		_quotes = _getQuotes(QUOTES_PATH);
 	std::srand(static_cast<unsigned int>(std::time(NULL)));
 	return _quotes[std::rand() % _quotes.size()];
 }
@@ -249,5 +248,5 @@ std::string Bot::_ageCalculator()
 		days += daysInPrevMonth;
 		months--;
 	}
-	return MessageHandler::botGetAge(years, months, days);
+	return MessageBuilder::botGetAge(years, months, days);
 }

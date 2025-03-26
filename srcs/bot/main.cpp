@@ -1,13 +1,14 @@
-#include "../../incs/classes/bot/Bot.hpp"
+#include "../../incs/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/IrcHelper.hpp"
+#include "../../incs/utils/IrcHelper.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/bot.hpp"
+#include "../../incs/config/bot_config.hpp"
 #include "../../incs/config/server_messages.hpp"
 #include "../../incs/config/colors.hpp"
 
+using namespace bot_config;
 using namespace server_messages;
 using namespace colors;
 
@@ -33,7 +34,7 @@ int main(void)
 		if (botFd < 0)
 			throw std::runtime_error(ERR_SOCKET_CREATION);
 
-		Bot bot(botFd, bot::NICK, bot::USER, bot::REALNAME);
+		Bot bot(botFd, BOTNICK, BOTUSER, BOTREAL);
 
 		std::string serverIp = IrcHelper::getEnvValue(env::SERVER_IP_KEY);
 		int port = atoi(IrcHelper::getEnvValue(env::SERVER_PORT_KEY).c_str());

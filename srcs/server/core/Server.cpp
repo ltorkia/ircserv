@@ -1,18 +1,18 @@
-#include "../../incs/classes/core/Server.hpp"
+#include "../../../incs/server/Server.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/core/Client.hpp"
-#include "../../incs/classes/core/Channel.hpp"
-#include "../../incs/classes/commands/CommandHandler.hpp"
-#include "../../incs/classes/commands/CommandHandler_File.hpp"
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../../incs/server/Client.hpp"
+#include "../../../incs/server/Channel.hpp"
+#include "../../../incs/server/CommandHandler.hpp"
+#include "../../../incs/server/CommandHandler_File.hpp"
+#include "../../../incs/utils/Utils.hpp"
+#include "../../../incs/utils/IrcHelper.hpp"
+#include "../../../incs/utils/MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
-#include "../../incs/config/colors.hpp"
-#include "../../incs/config/server_messages.hpp"
+#include "../../../incs/config/irc_config.hpp"
+#include "../../../incs/config/colors.hpp"
+#include "../../../incs/config/server_messages.hpp"
 
 using namespace server_messages;
 using namespace colors;
@@ -54,7 +54,7 @@ void Server::signalHandler(int signal)
 		default: signalType = "Unknown";
 	}
 
-	std::cout << MessageHandler::msgSignalCaught(signalType) << std::endl;
+	std::cout << MessageBuilder::msgSignalCaught(signalType) << std::endl;
 	signalReceived = boolean::TRUE;
 }
 
@@ -116,7 +116,7 @@ void Server::launch()
 	try {
 		_start();
 	} catch (const std::exception &e) {
-		std::cerr << MessageHandler::msgServerException(e) << std::endl;
+		std::cerr << MessageBuilder::msgServerException(e) << std::endl;
 	}
 }
 
@@ -292,18 +292,18 @@ void Server::greetClient(Client* client)
 	const std::string& nickname = client->getNickname();
 	const std::string& usermask = client->getUsermask();
 
-	client->sendMessage(MessageHandler::ircWelcomeMessage(nickname, usermask), NULL);
-	client->sendMessage(MessageHandler::ircHostInfos(nickname), NULL);
-	client->sendMessage(MessageHandler::ircTimeCreation(nickname, _timeCreationStr), NULL);
-	client->sendMessage(MessageHandler::ircInfos(nickname), NULL);
-	client->sendMessage(MessageHandler::ircMOTDMessage(nickname), NULL);
+	client->sendMessage(MessageBuilder::ircWelcomeMessage(nickname, usermask), NULL);
+	client->sendMessage(MessageBuilder::ircHostInfos(nickname), NULL);
+	client->sendMessage(MessageBuilder::ircTimeCreation(nickname, _timeCreationStr), NULL);
+	client->sendMessage(MessageBuilder::ircInfos(nickname), NULL);
+	client->sendMessage(MessageBuilder::ircMOTDMessage(nickname), NULL);
 
 	int totalClientCount = getTotalClientCount();
 	int unknownClientCount = getClientCount(false);
 	int knownClientCount = getClientCount(true);
 	int channelCount = getChannelCount();
 
-	client->sendMessage(MessageHandler::ircGlobalUserList(nickname, totalClientCount, knownClientCount, unknownClientCount, channelCount), NULL);
+	client->sendMessage(MessageBuilder::ircGlobalUserList(nickname, totalClientCount, knownClientCount, unknownClientCount, channelCount), NULL);
 }
 
 /**
@@ -546,9 +546,9 @@ void Server::_init()
 	_setLocalIp();
 	_setServerSocket();
 
-	_timeCreationStr = MessageHandler::msgTimeServerCreation();
+	_timeCreationStr = MessageBuilder::msgTimeServerCreation();
 	IrcHelper::writeEnvFile(_localIp, _port, _password);
-	MessageHandler::displayWelcome(_localIp, _port, _password);
+	MessageBuilder::displayWelcome(_localIp, _port, _password);
 }
 
 /**
@@ -569,7 +569,7 @@ void Server::_checkActivity()
 		if (!client->pingSent() && idleTime > server::PING_INTERVAL)
 		{
 			client->setPingSent(true);
-			client->sendMessage(MessageHandler::ircPing(), NULL);
+			client->sendMessage(MessageBuilder::ircPing(), NULL);
 		}
 		// Si le client est inactif depuis 5 minutes (pas de PONG ou de commande reçue), on le déconnecte
 		if (idleTime > server::PONG_TIMEOUT)
@@ -677,7 +677,7 @@ void Server::_clean()
 	}
 
 	FD_ZERO(&_readFds);
-	std::cout << MessageHandler::msgBuilder(COLOR_SUCCESS, SERVER_SHUT_DOWN, eol::UNIX) << std::endl;
+	std::cout << MessageBuilder::msgBuilder(COLOR_SUCCESS, SERVER_SHUT_DOWN, eol::UNIX) << std::endl;
 }
 
 // === MESSAGES / COMMANDS ===
@@ -848,10 +848,10 @@ void Server::_acceptNewClient()
 
 	// Prompt pour saisir les infos d'authentification
 	std::string authenticationPrompt = IrcHelper::commandToSend(*client);
-	client->sendMessage(MessageHandler::ircCommandPrompt(authenticationPrompt, "", false), NULL);
+	client->sendMessage(MessageBuilder::ircCommandPrompt(authenticationPrompt, "", false), NULL);
 
 	// Log de connexion du client
-	std::cout << MessageHandler::msgClientConnected(client->getClientIp(), client->getClientPort(), newClientFd, "") << std::endl;
+	std::cout << MessageBuilder::msgClientConnected(client->getClientIp(), client->getClientPort(), newClientFd, "") << std::endl;
 }
 
 /**
@@ -880,7 +880,7 @@ void Server::_addClient(int clientFd)
 void Server::_disconnectClient(int fd, const std::string& reason)
 {
 	if (reason == SHUTDOWN_REASON || reason == CONNECTION_TIMEOUT || reason == CONNECTION_FAILED)
-		_clients[fd]->sendMessage(MessageHandler::ircErrorQuitServer(reason), NULL);
+		_clients[fd]->sendMessage(MessageBuilder::ircErrorQuitServer(reason), NULL);
 
 	// Retirer le socket du client des descripteurs à surveiller
 	FD_CLR(fd, &_readFds);
@@ -893,7 +893,7 @@ void Server::_disconnectClient(int fd, const std::string& reason)
 	}
 
 	std::string nick = _clients[fd]->isAuthenticated() ? _clients[fd]->getNickname() : "";
-	std::cout << MessageHandler::msgClientDisconnected(_clients[fd]->getClientIp(), _clients[fd]->getClientPort(), fd, nick) << std::endl;
+	std::cout << MessageBuilder::msgClientDisconnected(_clients[fd]->getClientIp(), _clients[fd]->getClientPort(), fd, nick) << std::endl;
 }
 
 /**

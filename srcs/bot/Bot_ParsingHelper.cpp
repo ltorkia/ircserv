@@ -1,16 +1,15 @@
-#include "../../incs/classes/bot/Bot.hpp"
+#include "../../incs/bot/Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/classes/utils/Utils.hpp"
-#include "../../incs/classes/utils/IrcHelper.hpp"
-#include "../../incs/classes/utils/MessageHandler.hpp"
+#include "../../incs/utils/Utils.hpp"
+#include "../../incs/utils/IrcHelper.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/bot.hpp"
+#include "../../incs/config/bot_config.hpp"
+#include "../../incs/config/irc_config.hpp"
 #include "../../incs/config/commands.hpp"
-#include "../../incs/config/server_messages.hpp"
 
-using namespace server_messages;
+using namespace bot_config;
 
 // =========================================================================================
 
@@ -137,7 +136,7 @@ bool Bot::_parseBotCommand(std::string& message)
 		return false;
 
 	// Si la commande est AGE, un argument est attendu, on stocke le reste de la string
-	if (_command == bot::AGE_CMD && argsInput.size() > 1)
+	if (_command == AGE_CMD && argsInput.size() > 1)
 		_ageArg = argsInput[1];
 
 	return true;
