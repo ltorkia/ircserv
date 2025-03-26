@@ -67,9 +67,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 ### File Organization :
 ```
 
-├── Makefile
-├── README.md
-├── data
+├── assets
 │   └── quotes.txt
 ├── incs
 │   └── bot
@@ -93,40 +91,43 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │       ├── MessageHandler.hpp
 │       └── Utils.hpp
 └── srcs
-    ├── server
-    │   ├── channels
-    │   │   ├── Channel_Bla.cpp
-    │   │   └── Channel.cpp
-    │   ├── clients
-    │   │   ├── Client_Bla.cpp
-    │   │   └── Client.cpp
-    │   ├── commands
-    │   │   ├── CommandHandler_Auth.cpp
-    │   │   ├── CommandHandler_Channel.cpp
-    │   │   ├── CommandHandler.cpp
-    │   │   ├── CommandHandler_File.cpp
-    │   │   ├── CommandHandler_Log.cpp
-    │   │   ├── CommandHandler_Message.cpp
-    │   │   └── CommandHandler_Mode.cpp
-    │   ├── core
-    │   │   ├── Server_Signal.cpp
-    │   │   ├── Server_Init.cpp
-    │   │   ├── Server_Getter.cpp
-    │   │   ├── Server_Setter.cpp
-    │   │   ├── Server_MessageStream.cpp
-    │   └── main.cpp
-    ├── bot
-    │   ├── Bot_Authenticate.cpp
-    │   ├── Bot_CommandHandlerServer.cpp
-    │   ├── Bot_CommandHandlerUser.cpp
-    │   ├── Bot_MessageStream.cpp
-    │   ├── Bot_ParsingHelper.cpp
-    │   ├── Bot.cpp
-    │   └── main.cpp
-    └── utils
-        ├── IrcHelper.cpp
-        ├── MessageHandler.cpp
-        └── Utils.cpp
+│   ├── server
+│   │   ├── channels
+│   │   │   ├── Channel_Bla.cpp
+│   │   │   └── Channel.cpp
+│   │   ├── clients
+│   │   │   ├── Client_Bla.cpp
+│   │   │   └── Client.cpp
+│   │   ├── commands
+│   │   │   ├── CommandHandler_Auth.cpp
+│   │   │   ├── CommandHandler_Channel.cpp
+│   │   │   ├── CommandHandler.cpp
+│   │   │   ├── CommandHandler_File.cpp
+│   │   │   ├── CommandHandler_Log.cpp
+│   │   │   ├── CommandHandler_Message.cpp
+│   │   │   └── CommandHandler_Mode.cpp
+│   │   ├── core
+│   │   │   ├── Server_Signal.cpp
+│   │   │   ├── Server_Init.cpp
+│   │   │   ├── Server_Getter.cpp
+│   │   │   ├── Server_Setter.cpp
+│   │   │   └── Server_MessageStream.cpp
+│   │   └── main.cpp
+│   ├── bot
+│   │   ├── Bot_Authenticate.cpp
+│   │   ├── Bot_CommandHandlerServer.cpp
+│   │   ├── Bot_CommandHandlerUser.cpp
+│   │   ├── Bot_MessageStream.cpp
+│   │   ├── Bot_ParsingHelper.cpp
+│   │   ├── Bot.cpp
+│   │   └── main.cpp
+│   └── utils
+│       ├── IrcHelper.cpp
+│       ├── MessageHandler.cpp
+│       └── Utils.cpp
+├── Makefile
+└── README.md
+
 ```
 ---
 
