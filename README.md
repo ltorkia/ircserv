@@ -111,7 +111,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   │   │   ├── Server_Init.cpp
 │   │   │   ├── Server_Getter.cpp
 │   │   │   ├── Server_Setter.cpp
-│   │   │   ├── Server_MessageStream.cpp
+│   │   │   └── Server_MessageStream.cpp
 │   │   └── main.cpp
 │   ├── bot
 │   │   ├── Bot_Authenticate.cpp
