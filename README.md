@@ -188,23 +188,33 @@ nc 127.0.0.1 6667
 - Authentication commands:
 ```bash
 PASS pass_server
+```
+```bash
 NICK test_user
+```
+```bash
 USER test_user 0 * :Real Name
 ```
 - Packet framentation test with `CTRL+D`:
-```bash
-com^Dman^Dd
-```
+`com^Dman^Dd`
 
 ### Connecting with `irssi` :
 ```bash
 irssi -c 127.0.0.1 -p 6667 -w "my_password"
 ```
 - Test commands like:
-- `/join #test_channel`
-- `/msg user Hello!`
-- `/msg #channel Hello!`
-- `/kick user`
+```bash
+/join #test_channel
+```
+```bash
+/msg user Hello!
+```
+```bash
+/msg #channel Hello!
+```
+```bash
+/kick user
+```
 
 ---
 
