@@ -114,7 +114,7 @@ class Client
 		bool errorMsgTooLongSent() const;									// Vérifie si le message d'erreur d'un input trop long est déjà envoyé
 		bool pingSent() const;												// Dit si le serveur attend un PONG du client		
 		
-		// === RELATED CHANNEL ===
+		// === RELATED CHANNELS ===
 		std::map<std::string, Channel*>& getChannelsJoined();				// Récupère les canaux auxquels le client est connecté
 		bool isInChannel(const std::string& channelName) const;				// Vérifie si le client est membre d'un canal
 		bool isOperator(Channel* channel) const;							// Vérifie si le client est un opérateur sur un canal

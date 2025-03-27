@@ -194,7 +194,7 @@ bool Client::pingSent() const
 }
 
 
-// === RELATED CHANNEL ===
+// === RELATED CHANNELS ===
 
 std::map<std::string, Channel*>& Client::getChannelsJoined()
 {
