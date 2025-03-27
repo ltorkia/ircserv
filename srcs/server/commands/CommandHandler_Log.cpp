@@ -13,6 +13,9 @@ using namespace commands;
 using namespace server_messages;
 
 // =========================================================================================
+
+// === LOG COMMANDS ===
+
 /**
  * @brief Sends a PONG response to the client.
  * 

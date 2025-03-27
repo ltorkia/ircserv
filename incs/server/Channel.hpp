@@ -27,7 +27,7 @@ class Channel
 		Channel(const std::string &name, const std::string& password);
 		~Channel();
 
-		// === SETTERS ===
+		// === CHANNEL PROPERTIES SETTERS === Channel_Properties.cpp
 		void setPassword(const std::string &password);						// Définit le mot de passe du canal
 		void setTopic(const std::string &topic);							// Définit le sujet du canal
 		void setTopicSetterMask(const std::string& setterUsermask);			// Définit l'auteur de la dernière modification du sujet
@@ -38,7 +38,7 @@ class Channel
 		void setRightsTopic(const bool info);
 		void setLimits(const int info);
 		
-		// === GETTERS ===
+		// === CHANNEL PROPERTIES GETTERS === Channel_Properties.cpp
 		const std::string& getName() const;					// Récupère le nom du canal
 		const std::string& getPassword() const;				// Récupère le mot de passe du canal
 		const std::string& getTopic() const;				// Récupère le sujet du canal
@@ -69,7 +69,7 @@ class Channel
 		bool isOperator(const Client* client) const;		// Vérifie si un client spécifique est un operator du canal
 		bool isInvited(const Client* client) const;			// Vérifie si un client spécifique est invité sur le canal
 
-		// === UPDATE CLIENTS LIST ===
+		// === CHANNEL ACTIONS === Channel_Actions.cpp
 		void addClient(Client* client);							// Ajoute un client au canal
 		void addClientToInvitedList(const Client* invited,
 									const Client* inviter);		// Ajoute un client a la liste d'invitation
@@ -78,6 +78,5 @@ class Channel
 		void removeClient(Client* client, const Client* kicker,
 				const std::string& reason, int reasonCode);		// Retire un client du canal
 		
-		// === MESSAGES ===
 		void sendToAll(const std::string &message, Client* sender, bool includeSender);	// Envoie un message à tous les clients connectés du canal
 };

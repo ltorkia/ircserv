@@ -44,7 +44,7 @@ class Client
 		Client(int fd);
 		~Client();
 
-		// === SETTERS INFOS CLIENT ===
+		// === CLIENT INFOS SETTERS === Client_Attributes.cpp
 		void setNickname(const std::string &nickname);						// Définit le pseudo du client
 		void setUsername(const std::string &username);						// Définit le nom d'utilisateur
 		void setRealName(const std::string &realName);						// Définit le nom réel
@@ -66,10 +66,7 @@ class Client
 		void setErrorMsgTooLongSent(bool status);							// Définit si le message d'erreur d'un input trop long est déjà envoyé
 		void setPingSent(bool status);										// Définit si le serveur attend un PONG du client
 		
-		// === BUFFER ===
-		std::string& getBufferMessage();									// Récupère le buffer de message
-
-		// === GETTERS INFOS CLIENT ===
+		// === CLIENT INFOS GETTERS === Client_Attributes.cpp
 		int getFd() const;													// Récupère le descripteur de socket du client
 		const std::string& getNickname() const;								// Récupère le pseudo
 		const std::string& getUsername() const;								// Récupère le nom d'utilisateur
@@ -92,19 +89,22 @@ class Client
 		bool isAway() const;												// Vérifie si le client est absent
 		const std::string& getAwayMessage() const;							// Récupère le message d'absence
 		bool errorMsgTooLongSent() const;									// Vérifie si le message d'erreur d'un input trop long est déjà envoyé
-		bool pingSent() const;												// Dit si le serveur attend un PONG du client
+		bool pingSent() const;												// Dit si le serveur attend un PONG du client		
+		
+		// === BUFFER === Client_Message.cpp
+		std::string& getBufferMessage();									// Récupère le buffer de message
 
-		// === SEND MESSAGES ===
+		// === SEND MESSAGES === Client_Message.cpp
 		void sendMessage(const std::string &message, Client* sender) const;						// Le serveur envoie un message au client
 		void sendToAll(Channel* channel, const std::string &message, bool includeSender);		// Envoie un message formaté irc à tous les clients connectés a un channel
 
-		// === GETTERS CHANNELS ===
+		// === CHANNEL GETTERS === Client_ChannelManager.cpp
 		std::map<std::string, Channel*>& getChannelsJoined();				// Récupère les canaux auxquels le client est connecté
 		bool isInChannel(const std::string& channelName) const;				// Vérifie si le client est membre d'un canal
 		bool isOperator(Channel* channel) const;							// Vérifie si le client est un opérateur sur un canal
 		bool isInvited(const Channel* channel) const;						// Vérifie si le client est invité sur un canal
 
-		// === UPDATE CHANNELS ===
+		// === CHANNEL MANAGER === Client_ChannelManager.cpp
 		void joinChannel(const std::string& channelName, const std::string& password, std::map<std::string, Channel*>& channels);						// Rejoint un canal (creer et rejoindre ou rejoindre existant)
 		void createChannel(const std::string& channelName, const std::string& password, std::map<std::string, Channel*>& channels);						// Crée un canal
 		void addToChannel(Channel* channel, const std::string& password, const std::string& channelName, std::map<std::string, Channel*>& channels);	// Ajoute un client à un canal
@@ -113,7 +113,6 @@ class Client
 		void passwordSetting(Channel* channel, const std::string& password);																			// Définit le mot de passe du canal
 		void isKickedFromChannel(Channel *channel, Client* kicker, const std::string& reason);															// Est exclu d'un canal
 		void isInvitedToChannel(Channel *channel, const Client* inviter);
-		
 		void leaveChannel(std::map<std::string, Channel*>::iterator it, std::map<std::string, Channel*>& channels, const std::string& reason, int reasonCode);		// Quitte un canal
 		void leaveAllChannels(std::map<std::string, Channel*>& channels, const std::string& reason, int reasonCode);												// Quitte tous les canaux
 		void deleteChannel(Channel* channel, std::map<std::string, Channel*>& channels);																			// Supprime un canal

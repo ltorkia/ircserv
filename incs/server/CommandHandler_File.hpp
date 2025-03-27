@@ -25,7 +25,6 @@ class File
 
 	private:
 		std::string _name, _path, _sender, _receiver;
-
 };
 
 
@@ -45,5 +44,4 @@ class Request
 	private:
 		std::vector<std::string> _args;
 		std::string	_command;
-
 };

@@ -100,25 +100,27 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   │   └── main.cpp
 │   ├── server
 │   │   ├── channels
-│   │   │   ├── Channel_Bla.cpp
+│   │   │   ├── Channel_Actions.cpp
+│   │   │   ├── Channel_Properties.cpp
 │   │   │   └── Channel.cpp
 │   │   ├── clients
-│   │   │   ├── Client_Bla.cpp
+│   │   │   ├── Client_Attributes.cpp
+│   │   │   ├── Client_ChannelManager.cpp
+│   │   │   ├── Client_Message.cpp
 │   │   │   └── Client.cpp
 │   │   ├── commands
-│   │   │   ├── CommandHandler_Auth.cpp
 │   │   │   ├── CommandHandler_Channel.cpp
-│   │   │   ├── CommandHandler.cpp
 │   │   │   ├── CommandHandler_File.cpp
 │   │   │   ├── CommandHandler_Log.cpp
 │   │   │   ├── CommandHandler_Message.cpp
-│   │   │   └── CommandHandler_Mode.cpp
+│   │   │   ├── CommandHandler_Mode.cpp
+│   │   │   ├── CommandHandler_Register.cpp
+│   │   │   └── CommandHandler.cpp
 │   │   ├── core
-│   │   │   ├── Server_Signal.cpp
-│   │   │   ├── Server_Init.cpp
-│   │   │   ├── Server_Getter.cpp
-│   │   │   ├── Server_Setter.cpp
-│   │   │   └── Server_MessageStream.cpp
+│   │   │   ├── Server_ClientManager.cpp
+│   │   │   ├── Server_Infos.cpp
+│   │   │   ├── Server_Loop.cpp
+│   │   │   └── Server.cpp
 │   │   └── main.cpp
 │   └── utils
 │       ├── IrcHelper.cpp

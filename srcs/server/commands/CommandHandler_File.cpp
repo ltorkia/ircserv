@@ -11,7 +11,9 @@
 
 using namespace file_cmd;
 
-//---------------------------------------------------FILE METHODS---------------------------------------------------//
+// =========================================================================================
+
+// === FILE CLASS ===
 
 File::File() {}
 File::File(std::string name, std::string path, std::string sender, std::string receiver ): _name(name), _path(path), _sender(sender), _receiver(receiver) {}
@@ -29,12 +31,15 @@ File & File::operator=( const File &src )
 };
 
 // === GETTERS ===
+
 std::string File::getFileName() const {return _name;}
 std::string File::getPath() const {return _path;}
 std::string File::getSender() const {return _sender;}
 std::string File::getReceiver() const {return _receiver;}
 
-//---------------------------------------------------REQUEST METHODS---------------------------------------------------//
+// =========================================================================================
+
+// === REQUEST CLASS ===
 
 Request::Request(std::vector<std::string> arg, std::string cmd): _args(arg), _command(cmd) {};
 Request::Request(const Request& x ) {*this = x;};
@@ -49,12 +54,14 @@ Request& Request::operator=(const Request& src)
 };
 
 // === GETTERS ===
+
 size_t Request::getArgsSize() const { return _args.size(); }
 std::vector<std::string> Request::getArgs() const { return _args; }
 std::string Request::getCommand() const { return _command; }
 
+// =========================================================================================
 
-//---------------------------------------------------DISTRIBUTION METHOD---------------------------------------------------//
+// === COMMAND HANDLER : MAIN FILE COMMANDS MANAGER ===
 
 void CommandHandler::_handleFile()
 {
@@ -65,7 +72,8 @@ void CommandHandler::_handleFile()
 		_getFile(entry);
 }
 
-//---------------------------------------------------SEND FILE METHODS---------------------------------------------------//
+
+// ==== SEND FILE ===
 
 /**
  * @brief Handles the SEND command to transfer a file to another client.
@@ -121,14 +129,15 @@ void CommandHandler::_sendFile(std::vector<std::string> entry)
 		size_t pos = args[1].find_last_of('/');
 		std::string filename = args[1].substr(pos + 1);
 		File file(filename, args[1], _client->getNickname(), args[0]);
-		_server.getFiles().insert(std::pair<std::string, File>(filename, file));
+		_files.insert(std::pair<std::string, File>(filename, file));
 		_client->sendMessage("DCC SEND request sent to " + args[0] + ": " + filename + eol::IRC, NULL);
 		_clients[clientFd]->sendMessage(MessageBuilder::msgSendFile(filename, _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
 		args.erase(args.begin() +1 );
 	}
 }
 
-//---------------------------------------------------GET FILE METHODS---------------------------------------------------//
+
+// ==== GET FILE ===
 
 /**
  * @brief Handles the GET command to retrieve a file from another client.
@@ -165,7 +174,7 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD), NULL);
 		return ;
 	}
-	std::map<std::string, File> non = _server.getFiles();
+	std::map<std::string, File> files = _files;
 	while (argsSize >= 2)
 	{
 		int clientFd = _server.getClientByNickname(args[0], _client);
@@ -174,12 +183,12 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 			_client->sendMessage(MessageBuilder::ircNoSuchNick(_client->getNickname(), args[1]), NULL);
 			return ;
 		}
-		if (non.find(args[1]) == non.end())
+		if (files.find(args[1]) == files.end())
 		{
 			_client->sendMessage("DCC no file offered by " + args[0] + eol::IRC, NULL);
 			return ;
 		}
-		File file(non[args[1]]);
+		File file(files[args[1]]);
 		std::string fileName = file.getFileName();
 		std::string path = file.getPath();
 		std::string sender = file.getSender();
@@ -197,7 +206,7 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 			ofs << ifs.rdbuf();
 		_client->sendMessage("DCC received file " + fileName + " from " + sender + eol::IRC, NULL);
 		_clients[clientFd]->sendMessage("DCC sent file " + fileName + " for " + receiver + eol::IRC, _client);
-		non.erase(args[1]);
+		files.erase(args[1]);
 		args.erase(args.begin() + 1);
 	}
 }

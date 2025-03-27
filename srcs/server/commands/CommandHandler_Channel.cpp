@@ -13,7 +13,8 @@ using namespace commands;
 using namespace server_messages;
 
 // =========================================================================================
-//-------------------------------manage_command channel -----------------------------------------------------
+
+// === CHANNEL COMMANDS ===
 
 /**
  * @brief Handles the INVITE command to invite a client to a channel.

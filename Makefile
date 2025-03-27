@@ -30,14 +30,21 @@ CMD_DIR				=	commands
 #########################################################
 
 #-----> ALL SOURCES FILES
-SERVER_FILES		=	main.cpp
-CORE_FILES			=	Server.cpp
-CHANNELS_FILES		=	Channel.cpp
-CLIENTS_FILES		=	Client.cpp
-COMMON_UTILS_FILES	=	MessageBuilder.cpp		Utils.cpp
+SERVER_MAIN			=	main.cpp
+
+SERVER_FILES		=	Server.cpp			Server_ClientManager.cpp \
+						Server_Infos.cpp 	Server_Loop.cpp
+
+CHANNELS_FILES		=	Channel.cpp			Channel_Actions.cpp			Channel_Properties.cpp
+
+CLIENTS_FILES		=	Client.cpp						Client_Attributes.cpp \
+						Client_ChannelManager.cpp		Client_Message.cpp
+
+COMMON_UTILS_FILES	=	MessageBuilder.cpp				Utils.cpp
+
 SERVER_UTILS_FILES	=	IrcHelper.cpp
 
-CMD_FILES			=	CommandHandler.cpp				CommandHandler_Auth.cpp \
+CMD_FILES			=	CommandHandler.cpp				CommandHandler_Register.cpp \
 						CommandHandler_Channel.cpp 		CommandHandler_File.cpp \
 						CommandHandler_Mode.cpp 		CommandHandler_Message.cpp \
 						CommandHandler_Log.cpp
@@ -50,8 +57,8 @@ BOT_FILES			=	main.cpp						Bot.cpp							Bot_MessageHandler.cpp \
 #-----> JOIN SOURCES FOR EACH PROGRAM OR COMMON USE
 COMMON_FILES 		= 	$(addprefix $(UTILS_DIR)/, $(COMMON_UTILS_FILES))
 
-MAIN_SERVER_FILES	=	$(addprefix $(SERVER_DIR)/, $(SERVER_FILES)) \
-						$(addprefix $(SERVER_DIR)/, $(addprefix $(CORE_DIR)/, $(CORE_FILES))) \
+MAIN_SERVER_FILES	=	$(addprefix $(SERVER_DIR)/, $(SERVER_MAIN)) \
+						$(addprefix $(SERVER_DIR)/, $(addprefix $(CORE_DIR)/, $(SERVER_FILES))) \
 						$(addprefix $(SERVER_DIR)/, $(addprefix $(CHANNELS_DIR)/, $(CHANNELS_FILES))) \
 						$(addprefix $(SERVER_DIR)/, $(addprefix $(CLIENTS_DIR)/, $(CLIENTS_FILES))) \
 						$(addprefix $(SERVER_DIR)/, $(addprefix $(CMD_DIR)/, $(CMD_FILES))) \

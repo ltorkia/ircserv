@@ -15,7 +15,7 @@ using namespace colors;
 
 // =========================================================================================
 
-// === SIGNAL ===
+// === STATIC SIGNAL VARIABLE + SIGNAL HANDLER ===
 
 /**
  * @brief A static volatile variable to store the signal received status.

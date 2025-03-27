@@ -10,6 +10,7 @@
 
 // =========================================================================================
 
+class File;
 class CommandHandler
 {
 	public : 
@@ -44,7 +45,10 @@ class CommandHandler
 		char _modeSign;
 		std::string	_mode;
 
-		// === AUTHENTICATE COMMANDS : CommandHandler_Auth.cpp ===
+		// === FILES TO SEND ===
+		std::map<std::string, File>	_files;
+
+		// === AUTHENTICATE COMMANDS : CommandHandler_Register.cpp ===
 		void _authenticateCommand();
 		void _preRegister(const std::string& cmd, int toDo);
 		void _isRightPassword();

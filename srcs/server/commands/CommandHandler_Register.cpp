@@ -15,7 +15,8 @@ using namespace server_messages;
 using namespace colors;
 
 // =========================================================================================
-//----------------------------- REGISTRATION ---------------------------------
+
+// === AUTHENTICATE COMMANDS ===
 
 /**
  * @brief Authenticates and processes an IRC command.
