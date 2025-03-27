@@ -2,9 +2,13 @@
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
+#include "../../incs/config/bot_config.hpp"
 #include "../../incs/config/commands.hpp"
+#include "../../incs/config/server_messages.hpp"
 
+using namespace bot_config;
 using namespace commands;
+using namespace server_messages;
 
 // =========================================================================================
 
@@ -40,24 +44,25 @@ void Utils::getCurrentTime(std::tm &outTime)
 // === ENV ===
 
 /**
- * @brief Writes the server IP and port to the environment configuration file.
+ * @brief Writes server configuration details to an environment file.
  *
- * This function creates or truncates the environment configuration file and writes
- * the provided server IP address and port number to it. If the file cannot be created
- * or opened, an error message is printed to the standard error output.
+ * This function creates or overwrites an environment file with the provided
+ * server IP address, port, and password. The file is opened in truncation mode,
+ * meaning any existing content will be erased.
  *
- * @param serverIp The IP address of the server to be written to the environment file.
- * @param port The port number to be written to the environment file.
- * @param password The server password to be written to the environment file.
+ * @param serverIp The IP address of the server to be written to the file.
+ * @param port The port number of the server to be written to the file.
+ * @param password The password to be written to the file.
+ *
+ * @throws std::runtime_error If the file cannot be created or opened.
  */
 void Utils::writeEnvFile(const std::string& serverIp, int port, const std::string& password)
 {
-	std::ofstream file(env::PATH.c_str(), std::ios::trunc); // Ouvre en mode écriture et écrase le contenu existant
+	// Ouvre en mode écriture et écrase le contenu existant
+	std::ofstream file(env::PATH.c_str(), std::ios::trunc);
 	if (!file)
-	{
-		std::cerr << "Erreur : Impossible de créer incs/config/.env" << std::endl;
-		return;
-	}
+		throw std::runtime_error(ERR_ENV_FILE_CREATION);
+
 	file << env::SERVER_IP_KEY << "=" << serverIp << '\n';
 	file << env::SERVER_PORT_KEY << "=" << port << '\n';
 	file << env::PASS_KEY << "=" << password << '\n';
@@ -65,23 +70,23 @@ void Utils::writeEnvFile(const std::string& serverIp, int port, const std::strin
 }
 
 /**
- * @brief Retrieves the value of a specified environment variable from a configuration file.
+ * @brief Retrieves the value of an environment variable from a file.
  *
- * This function opens the configuration file specified by `server::ENV_PATH` and searches for a line
- * that contains the given key. If the key is found, the function extracts and returns the value
- * associated with the key. If the file cannot be opened or the key is not found, an empty string is returned.
+ * This function reads a file specified by `env::PATH` to find the value
+ * of the environment variable corresponding to the given key. The file
+ * is expected to contain key-value pairs in the format `KEY=VALUE`.
  *
- * @param key The environment variable key to search for in the configuration file.
- * @return The value associated with the specified key, or an empty string if the key is not found or the file cannot be opened.
+ * @param key The name of the environment variable to search for.
+ * @return The value of the environment variable if found, or an empty
+ *         string if the key is not present in the file.
+ * @throws std::runtime_error If the file specified by `env::PATH` cannot
+ *         be opened.
  */
 std::string Utils::getEnvValue(const std::string& key)
 {
 	std::ifstream file(env::PATH.c_str());
 	if (!file)
-	{
-		std::cerr << "Erreur : Impossible d'ouvrir config/.env" << std::endl;
-		return "";
-	}
+		throw std::runtime_error(ERR_ENV_VALUE);
 
 	std::string line;
 	while (std::getline(file, line))
