@@ -15,15 +15,22 @@ using namespace colors;
 // =========================================================================================
 
 /**
- * @brief Entry point of the bot application.
- * 
- * This function initializes the bot, sets up the server connection, and runs the bot.
- * It handles exceptions and prints error messages if any occur during execution.
- * 
- * @return int Returns 0 on successful execution, 1 on error.
- * 
- * @throws std::runtime_error If socket creation fails, environment variables are invalid,
- *                            or connection to the server fails.
+ * @file BotMain.cpp
+ * @brief Entry point for the bot application.
+ *
+ * This file contains the main function that initializes and runs the bot.
+ * It handles socket creation, server connection, and bot execution.
+ *
+ * @details
+ * - The bot connects to a server using the IP address and port specified
+ *   in environment variables.
+ * - It uses a `Bot` object to manage its behavior and interactions.
+ * - Errors during initialization or connection are caught and logged.
+ *
+ * @exception std::runtime_error Thrown when socket creation, environment
+ * variable retrieval, or server connection fails.
+ *
+ * @return int Returns 0 on successful execution, or 1 if an error occurs.
  */
 int main(void)
 {
