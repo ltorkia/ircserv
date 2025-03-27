@@ -1,5 +1,8 @@
 #include "../../../incs/server/Client.hpp"
 
+// === OTHER CLASSES ===
+#include "../../../incs/server/Channel.hpp"
+
 // =========================================================================================
 
 // === CLIENT INFOS
@@ -188,4 +191,32 @@ bool Client::errorMsgTooLongSent() const
 bool Client::pingSent() const
 {
 	return _pingSent;
+}
+
+
+// === RELATED CHANNEL ===
+
+std::map<std::string, Channel*>& Client::getChannelsJoined()
+{
+	return _channelsJoined;
+}
+bool Client::isInChannel(const std::string& channelName) const
+{
+	return _channelsJoined.find(channelName) != _channelsJoined.end();
+}
+bool Client::isOperator(Channel* channel) const
+{
+	return channel->isOperator(this);
+}
+bool Client::isInvited(const Channel* channel) const
+{
+	return channel->isInvited(this);
+}
+
+
+// === BUFFER ===
+
+std::string& Client::getBufferMessage()
+{
+	return _bufferMessage;
 }

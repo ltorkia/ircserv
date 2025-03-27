@@ -83,7 +83,7 @@ class Client
 		void setAwayMessage(const std::string& message); 					// Définit le message d'absence du client
 		void setErrorMsgTooLongSent(bool status);							// Définit si le message d'erreur d'un input trop long est déjà envoyé
 		void setPingSent(bool status);										// Définit si le serveur attend un PONG du client
-		
+
 		// =================================================================================
 		// === CLIENT INFOS GETTERS === Client_Attributes.cpp
 
@@ -114,24 +114,17 @@ class Client
 		bool errorMsgTooLongSent() const;									// Vérifie si le message d'erreur d'un input trop long est déjà envoyé
 		bool pingSent() const;												// Dit si le serveur attend un PONG du client		
 		
-		// =================================================================================
-		// === MESSAGES === Client_Message.cpp
-
-		// === BUFFER ===
-		std::string& getBufferMessage();														// Récupère le buffer de message
-
-		// === SEND MESSAGES ===
-		void sendMessage(const std::string &message, Client* sender) const;						// Le serveur envoie un message au client
-		void sendToAll(Channel* channel, const std::string &message, bool includeSender);		// Envoie un message formaté irc à tous les clients connectés a un channel
-
-		// =================================================================================
-		// === CHANNEL MANAGER === Client_ChannelManager.cpp
-
-		// === CHANNEL GETTERS ===
+		// === RELATED CHANNEL ===
 		std::map<std::string, Channel*>& getChannelsJoined();				// Récupère les canaux auxquels le client est connecté
 		bool isInChannel(const std::string& channelName) const;				// Vérifie si le client est membre d'un canal
 		bool isOperator(Channel* channel) const;							// Vérifie si le client est un opérateur sur un canal
 		bool isInvited(const Channel* channel) const;						// Vérifie si le client est invité sur un canal
+
+		// === BUFFER ===
+		std::string& getBufferMessage();									// Récupère le buffer de message
+
+		// =================================================================================
+		// === ACTIONS === Client_Actions.cpp
 
 		// === CHANNEL ACTIONS ===
 		void joinChannel(const std::string& channelName, const std::string& password, std::map<std::string, Channel*>& channels);									// Rejoint un canal (creer et rejoindre ou rejoindre existant)
@@ -145,4 +138,8 @@ class Client
 		void leaveChannel(std::map<std::string, Channel*>::iterator it, std::map<std::string, Channel*>& channels, const std::string& reason, int reasonCode);		// Quitte un canal
 		void leaveAllChannels(std::map<std::string, Channel*>& channels, const std::string& reason, int reasonCode);												// Quitte tous les canaux
 		void deleteChannel(Channel* channel, std::map<std::string, Channel*>& channels);																			// Supprime un canal
+				
+		// === SEND MESSAGES (TO CLIENTS OR CHANNEL) ===
+		void sendMessage(const std::string &message, Client* sender) const;						// Le serveur envoie un message au client
+		void sendToAll(Channel* channel, const std::string &message, bool includeSender);		// Envoie un message formaté irc à tous les clients connectés a un channel
 };

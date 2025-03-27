@@ -101,12 +101,11 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   ├── server
 │   │   ├── channels
 │   │   │   ├── Channel_Actions.cpp
-│   │   │   ├── Channel_Properties.cpp
+│   │   │   ├── Channel_Attributes.cpp
 │   │   │   └── Channel.cpp
 │   │   ├── clients
+│   │   │   ├── Client_Actions.cpp
 │   │   │   ├── Client_Attributes.cpp
-│   │   │   ├── Client_ChannelManager.cpp
-│   │   │   ├── Client_Message.cpp
 │   │   │   └── Client.cpp
 │   │   ├── commands
 │   │   │   ├── CommandHandler_Channel.cpp

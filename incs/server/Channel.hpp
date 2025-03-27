@@ -43,7 +43,7 @@ class Channel
 		// =================================================================================
 
 		// =================================================================================
-		// === CHANNEL PROPERTIES SETTERS === Channel_Properties.cpp
+		// === CHANNEL ATTRIBUTES SETTERS === Channel_Attributes.cpp
 
 		// === MODES SETTINGS ===
 		void setPassword(const std::string &password);						// Définit le mot de passe du canal
@@ -58,7 +58,7 @@ class Channel
 		void setTopicTimestamp();											// Définit la date de la dernière modification du sujet
 		
 		// =================================================================================
-		// === CHANNEL PROPERTIES GETTERS === Channel_Properties.cpp
+		// === CHANNEL ATTRIBUTES GETTERS === Channel_Attributes.cpp
 
 		// === CHANNEL INFOS ===
 		time_t getCreationTime() const;						// Récupère le creation time du canal
@@ -101,8 +101,9 @@ class Channel
 		bool isInvited(const Client* client) const;			// Vérifie si un client spécifique est invité sur le canal
 
 		// =================================================================================
-		// === CHANNEL ACTIONS === Channel_Actions.cpp
+		// === ACTIONS === Channel_Actions.cpp
 		
+		// === CLIENT MANAGER ===
 		void addClient(Client* client);							// Ajoute un client au canal
 		void addClientToInvitedList(const Client* invited,
 									const Client* inviter);		// Ajoute un client a la liste d'invitation
@@ -111,5 +112,6 @@ class Channel
 		void removeClient(Client* client, const Client* kicker,
 				const std::string& reason, int reasonCode);		// Retire un client du canal
 		
+		// === MESSAGES ===
 		void sendToAll(const std::string &message, Client* sender, bool includeSender);	// Envoie un message à tous les clients connectés du canal
 };

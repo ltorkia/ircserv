@@ -6,11 +6,11 @@
 
 // =========================================================================================
 
-// === CHANNEL PROPERTIES ===
+// === CHANNEL ATTRIBUTES ===
 
 // ========================================= PUBLIC ========================================
 
-// === CHANNEL PROPERTIES SETTERS ===
+// === CHANNEL ATTRIBUTES SETTERS ===
 
 // === MODES SETTINGS ===
 
@@ -73,7 +73,7 @@ void Channel::setTopicTimestamp()
 
 // =========================================================================================
 
-// === CHANNEL PROPERTIES GETTERS ===
+// === CHANNEL ATTRIBUTES GETTERS ===
 
 // === CHANNEL INFOS ===
 

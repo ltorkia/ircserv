@@ -32,13 +32,12 @@ CMD_DIR				=	commands
 #-----> ALL SOURCES FILES
 SERVER_MAIN			=	ServerMain.cpp
 
-SERVER_FILES		=	Server.cpp			Server_ClientManager.cpp \
-						Server_Infos.cpp 	Server_Loop.cpp
+SERVER_FILES		=	Server.cpp						Server_ClientManager.cpp \
+						Server_Infos.cpp 				Server_Loop.cpp
 
-CHANNELS_FILES		=	Channel.cpp			Channel_Actions.cpp			Channel_Properties.cpp
+CHANNELS_FILES		=	Channel.cpp						Channel_Attributes.cpp			Channel_Actions.cpp
 
-CLIENTS_FILES		=	Client.cpp						Client_Attributes.cpp \
-						Client_ChannelManager.cpp		Client_Message.cpp
+CLIENTS_FILES		=	Client.cpp						Client_Attributes.cpp			Client_Actions.cpp
 
 COMMON_UTILS_FILES	=	MessageBuilder.cpp				Utils.cpp
 
@@ -210,8 +209,7 @@ fclean:
 	${RM} $(COMMON_OBJS_DIR)
 	${RM} $(LIB_COMMON)
 
-re: fclean
-	@$(MAKE) all
+re: fclean all
 
 #-----> DEBUG
 debug: fclean
