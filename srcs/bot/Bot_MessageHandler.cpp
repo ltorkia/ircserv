@@ -36,10 +36,10 @@ using namespace server_messages;
  */
 void Bot::_handleMessage()
 {
-    if (_readFromServer() < 0) 
-        return;
+	if (_readFromServer() < 0) 
+		return;
 
-    std::string& bufferMessage = _buffer;
+	std::string& bufferMessage = _buffer;
 	size_t pos;
 	while (((pos = bufferMessage.find('\n')) != std::string::npos))
 	{

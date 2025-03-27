@@ -303,7 +303,7 @@ void CommandHandler::_hostnameSettings(std::vector<std::string>::iterator& itArg
 		hostname = _client->getNickname();
 	_client->setHostname(hostname);
 
-	 // Si l'IP du client est inconnue, on remplace par le hostname tout juste fourni
+	// Si l'IP du client est inconnue, on remplace par le hostname tout juste fourni
 	if (_client->getClientIp() == server::UNKNOWN_IP)
 		_client->setClientIp(hostname);
 

@@ -40,7 +40,7 @@ void Server::_init()
 	_setLocalIp();
 	_setServerSocket();
 
-	_timeCreationStr = MessageBuilder::msgTimeServerCreation();
+	_timeCreationStr = MessageBuilder::msgServerCreationTime();
 	Utils::writeEnvFile(_localIp, _port, _password);
 	MessageBuilder::displayWelcome(_localIp, _port, _password);
 }

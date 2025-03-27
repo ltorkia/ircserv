@@ -24,6 +24,8 @@ class MessageBuilder
 
 		// =========================================================================================
 
+		// ========= NOTICES / UTILS =========
+
 		// === BUILDER UTILS ===
 		static std::string ircFormat(const std::string& message);
 		static std::string ircNoticeMsg(const std::string& message, const std::string& colorCode);
@@ -31,6 +33,9 @@ class MessageBuilder
 		
 		// === FORMAT EXCEPTIONS ===
 		static std::string ircClientException(const std::exception &e);
+
+
+		// ========= RPL / IRC FORMATTED MESSAGES =========
 
 		// === PING -> PONG ===
 		static std::string ircPing(void);
@@ -45,7 +50,7 @@ class MessageBuilder
 		static std::string ircFirstNicknameSet(const std::string& nickname);
 		static std::string ircChangingNickname(const std::string& nickname);
 		
-		// === CONNECT ===
+		// === RPL CONNECT ===
 		static std::string ircWelcomeMessage(const std::string& nickname, const std::string& usermask);
 		static std::string ircMOTDMessage(const std::string& nickname);
 		static std::string ircHostInfos(const std::string& nickname);
@@ -94,15 +99,11 @@ class MessageBuilder
 		static std::string ircNotChanOperator(const std::string& channelName);
 
 		// === NOTICE CHANNELS ===
-		static std::string ircChannelCreated(const std::string& nickname, const std::string& channelName);
-		static std::string ircChannelDestroyed(const std::string& channelName);
-		static std::string ircOperatorAdded(const std::string& nickname, const std::string& channelName);
-		static std::string ircOperatorRemoved(const std::string& nickname, const std::string& channelName);
 		static std::string ircInvitedToChannel(const std::string& nickname, const std::string& channelName);
 		static std::string ircAlreadyInvitedToChannel(const std::string& nickname, const std::string& channelName);
 		static std::string ircNoPassNeeded(const std::string& channelName);
 
-		// === CLIENTS ===
+		// === RPL CLIENTS ===
 		static std::string ircNicknameSet(const std::string& oldNickname, const std::string& newNickname);
 		static std::string ircNoSuchNick(const std::string& nickname, const std::string& targetNick);
 		static std::string ircClientIsAway(const std::string& nickname, const std::string& targetNick, const std::string& message);
@@ -115,12 +116,12 @@ class MessageBuilder
 		static std::string ircEndOfWho(const std::string& nickname, const std::string& channelName);
 		static std::string ircEndOfWhowas(const std::string& nickname, const std::string& targetNick);
 
-		// === COMMAND ERRORS ===
+		// === RPL COMMAND ERRORS ===
 		static std::string ircUnknownCommand(const std::string& nickname, const std::string& command);
 		static std::string ircNeedMoreParams(const std::string& nickname, const std::string& command);
 		static std::string ircNotRegistered(void);
 
-		// === MODE ===
+		// === RPL MODES ===
 		static std::string ircChannelModeIs(const std::string& nickname, const std::string& channel, const std::string& displaymode);
 		static std::string ircCreationTime(const std::string& nickname, const std::string& channel, time_t time);
 		static std::string ircInvalidModeParams(const std::string &nickname, const std::string& channel, const std::string& mode_char, const std::string&param);
@@ -135,6 +136,7 @@ class MessageBuilder
 
 		// =========================================================================================
 
+		// === DEFAULT MESSAGE FORMAT ===
 		static std::string msgBuilder(const std::string& color, const std::string& message, const std::string& eol);
 
 		// === EXCEPTIONS ===
@@ -142,7 +144,7 @@ class MessageBuilder
 
 		// === DISPLAY ===
 		static void displayWelcome(const std::string &serverIp, int port, const std::string &password);
-		static std::string msgTimeServerCreation();
+		static std::string msgServerCreationTime();
 
 		// === SETTINGS ===
 		static std::string msgSignalCaught(const std::string& signalType);

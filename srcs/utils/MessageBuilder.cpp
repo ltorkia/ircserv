@@ -27,7 +27,7 @@ MessageBuilder::~MessageBuilder() {}
 
 // =========================================================================================
 
-// === UTILS ===
+// ========= NOTICES / UTILS =========
 
 // Si le message est trop long on le coupe, et on rajoute \r\n
 std::string MessageBuilder::ircFormat(const std::string& message)
@@ -60,6 +60,9 @@ std::string MessageBuilder::ircClientException(const std::exception &e)
 {
 	return ircNoticeMsg(server::NAME, std::string(e.what()), IRC_COLOR_ERR);
 }
+
+
+// ========= RPL / IRC FORMATTED MESSAGES =========
 
 // === PING -> PONG ===
 
@@ -129,7 +132,7 @@ std::string MessageBuilder::ircChangingNickname(const std::string& nickname)
 }
 
 
-// === CONNECT ===
+// === RPL CONNECT ===
 
 // --- 001 RPL_WELCOME : Message de bienvenue après une connexion réussie.
 std::string MessageBuilder::ircWelcomeMessage(const std::string& nickname, const std::string& usermask)
@@ -524,25 +527,6 @@ std::string MessageBuilder::ircNotChanOperator(const std::string& channelName)
 
 // === NOTICE CHANNELS ===
 
-std::string MessageBuilder::ircChannelCreated(const std::string& nickname, const std::string& channelName)
-{
-	return ircNoticeMsg(server::NAME, "Channel " + IRC_DEFAULT + channelName + IRC_COLOR_SUCCESS 
-		+ " created by " + IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS, IRC_COLOR_SUCCESS);
-}
-std::string MessageBuilder::ircChannelDestroyed(const std::string& channelName)
-{
-	return ircNoticeMsg(server::NAME, "Channel " + IRC_DEFAULT + channelName + IRC_COLOR_ERR + " destroyed", IRC_COLOR_ERR);
-}
-std::string MessageBuilder::ircOperatorAdded(const std::string& nickname, const std::string& channelName)
-{
-	return ircNoticeMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS 
-		+ " is now operator in channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
-}
-std::string MessageBuilder::ircOperatorRemoved(const std::string& nickname, const std::string& channelName)
-{
-	return ircNoticeMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS
-		+ " is no longer operator in channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
-}
 std::string MessageBuilder::ircInvitedToChannel(const std::string& nickname, const std::string& channelName)
 {
 	return ircNoticeMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_INFO + " invited you to join channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
@@ -557,7 +541,7 @@ std::string MessageBuilder::ircNoPassNeeded(const std::string& channelName)
 }
 
 
-// === CLIENTS ===
+// === RPL CLIENTS ===
 
 std::string MessageBuilder::ircNicknameSet(const std::string& oldNickname, const std::string& newNickname)
 {
@@ -666,7 +650,7 @@ std::string MessageBuilder::ircEndOfWhowas(const std::string& nickname, const st
 }
 
 
-// === COMMAND ERRORS ===
+// === RPL COMMAND ERRORS ===
 
 // --- 421 ERR_UNKNOWNCOMMAND : La commande n'est pas reconnue par le serveur.
 std::string MessageBuilder::ircUnknownCommand(const std::string& nickname, const std::string& command)
@@ -697,7 +681,7 @@ std::string MessageBuilder::ircNotRegistered(void)
 }
 
 
-// === MODE ===
+// === RPL MODES ===
 
 // 324 RPL_CHANNELMODEIS :Sent to a client to inform them of the currently-set modes of a channel. <channel> is the name of the channel. <modestring> and <mode arguments> 
 // are a mode string and the mode arguments (delimited as separate parameters) as defined in the MODE message description.
@@ -760,6 +744,8 @@ std::string MessageBuilder::ircInvalidPasswordFormat(const std::string &nickname
 
 // =========================================================================================
 
+// === DEFAULT MESSAGE FORMAT ===
+
 /**
  * @brief This function constructs a formatted message string using the provided color, message, and end-of-line (EOL) characters.
  *
@@ -815,7 +801,7 @@ void MessageBuilder::displayWelcome(const std::string &serverIp, int port, const
  * 
  * @return std::string The formatted current local time.
  */
-std::string MessageBuilder::msgTimeServerCreation()
+std::string MessageBuilder::msgServerCreationTime()
 {
 	std::tm now;
 	Utils::getCurrentTime(now);
@@ -823,7 +809,7 @@ std::string MessageBuilder::msgTimeServerCreation()
 	std::ostringstream stream;
 	stream 
 		<< (now.tm_year + 1900) << "-"		// Année
-		<< (now.tm_mon + 1) << "-"     		// Mois (de 0 à 11, donc +1)
+		<< (now.tm_mon + 1) << "-"			// Mois (de 0 à 11, donc +1)
 		<< now.tm_mday << " at "			// Jour
 		<< now.tm_hour << ":"				// Heure
 		<< now.tm_min << ":"				// Minute
@@ -927,7 +913,7 @@ std::string MessageBuilder::msgChannelDestroyed(const std::string& channelName)
 
 // === FILES ===
 
- //+ _client->getNickname() + "souhaite vous envoyer ce fichier : " + filename + ". Pour l'accepter, merci d'utiliser la commande GET. Sinon, merci d'ignorer ce message."
+//+ _client->getNickname() + "souhaite vous envoyer ce fichier : " + filename + ". Pour l'accepter, merci d'utiliser la commande GET. Sinon, merci d'ignorer ce message."
 std::string MessageBuilder::msgSendFile(const std::string& filename, const std::string &client, const std::string &adr, const int &port)
 {
 	std::ostringstream stream;
