@@ -71,11 +71,11 @@ class CommandHandler
 		void _applyChannelModes(std::string &mode, std::string &arg1, std::map<char, std::string> &arg2);
 		void _validateModeArguments(std::string &mode, const Channel *channel, unsigned int nArgs);
 		bool _validateModeCommand(std::string &channel, std::string &mode, unsigned int nArgs);
-		void _inviteOnly(Channel *channel, char modeSign);
-		void _topicRestriction(Channel *channel, char modeSign);
-		void _passwordMode(std::string args, Channel *channel, char modeSign, Client *client);
-		void _operatorPrivilege(Channel *channel, char modeSign, Client *newOp);
-		bool _channelLimit(Channel *channel, char modeSign, std::string args);
+		void _setInviteOnly(Channel *channel, char modeSign);
+		void _setTopicRestriction(Channel *channel, char modeSign);
+		void _setPasswordMode(std::string args, Channel *channel, char modeSign, Client *client);
+		void _setOperatorPrivilege(Channel *channel, char modeSign, Client *newOp);
+		bool _setChannelLimit(Channel *channel, char modeSign, std::string args);
 
 		// === MESSAGE COMMANDS : CommandHandler_Message.cpp ===
 		void _sendPrivateMessage();

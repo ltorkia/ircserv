@@ -77,10 +77,13 @@ void Client::joinChannel(const std::string& channelName, const std::string& pass
 void Client::createChannel(const std::string& channelName, const std::string& password, std::map<std::string, Channel*>& channels)
 {
 	// Si le canal n'existe pas déjà, on le crée et on l'ajoute
-	if (!IrcHelper::channelExists(channelName, channels)) {
+	if (!IrcHelper::channelExists(channelName, channels))
+	{
 		channels[channelName] = new Channel(channelName, password);
-		if (!password.empty()) {
-			if (!IrcHelper::isValidPassword(password, false)) {
+		if (!password.empty())
+		{
+			if (!IrcHelper::isValidPassword(password, false))
+			{
 				sendMessage(MessageBuilder::ircInvalidPasswordFormat(_nickname, channelName), NULL);
 				deleteChannel(channels[channelName], channels);
 				return;

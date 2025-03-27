@@ -71,18 +71,18 @@ void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelN
 
 	if (mode.find('i') != std::string::npos)
 	{
-		_modeSign = mode[IrcHelper::findCharBeforeIndex(mode, '-', '+', mode.find('i'))];	//chope le bon signe a partir de l'indice ou se trouve ik
-		_inviteOnly(channel, _modeSign);
+		_modeSign = mode[IrcHelper::findCharBeforeIndex(mode, '-', '+', mode.find('i'))];
+		_setInviteOnly(channel, _modeSign);
 	}
 	if (mode.find('t') != std::string::npos)
 	{
 		_modeSign = mode[IrcHelper::findCharBeforeIndex(mode, '-', '+', mode.find('t'))];
-		_topicRestriction(channel, _modeSign);
+		_setTopicRestriction(channel, _modeSign);
 	}
 	if (mode.find('k') != std::string::npos)
 	{
 		_modeSign = mode[IrcHelper::findCharBeforeIndex(mode, '-', '+', mode.find('k'))];
-		_passwordMode(modeArgs['k'], channel, _modeSign, _client);
+		_setPasswordMode(modeArgs['k'], channel, _modeSign, _client);
 	}
 	if (mode.find('o') != std::string::npos)
 	{
@@ -97,14 +97,14 @@ void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelN
 		else
 		{
 			Client *newOp = _clients[_server.getClientByNickname(modeArgs.at('o'), NULL)];
-			_operatorPrivilege(channel, _modeSign, newOp);
+			_setOperatorPrivilege(channel, _modeSign, newOp);
 		}
 	}
 	if (mode.find('l') != std::string::npos)
 	{
 		_modeSign = mode[IrcHelper::findCharBeforeIndex(mode, '-', '+', mode.find('l'))];
-		if (!_channelLimit(channel, _modeSign, modeArgs['l']))
-			_client->sendMessage(MessageBuilder::ircInvalidModeParams(_client->getNickname(), channelName, "l", modeArgs['l']), NULL); //erreur si l arg est pas compose de digit
+		if (!_setChannelLimit(channel, _modeSign, modeArgs['l']))
+			_client->sendMessage(MessageBuilder::ircInvalidModeParams(_client->getNickname(), channelName, "l", modeArgs['l']), NULL);
 	}
 	for (int i = 1; mode[i]; i++)
 	{
@@ -207,7 +207,7 @@ bool CommandHandler::_validateModeCommand(std::string &channelName, std::string 
  * @param modeSign Character indicating whether to set ('+') or unset ('-')
  *                 the invite-only mode.
  */
-void CommandHandler::_inviteOnly(Channel *channel, char modeSign)
+void CommandHandler::_setInviteOnly(Channel *channel, char modeSign)
 {
 	std::string sign(1, modeSign);
 	if (IrcHelper::noChangeToMake(modeSign, channel->getInvites()))
@@ -232,7 +232,7 @@ void CommandHandler::_inviteOnly(Channel *channel, char modeSign)
  * @param channel Pointer to the Channel object for which the topic restriction mode is being set.
  * @param modeSign Character representing the mode sign ('+' to enable, '-' to disable).
  */
-void CommandHandler::_topicRestriction(Channel *channel, char modeSign)
+void CommandHandler::_setTopicRestriction(Channel *channel, char modeSign)
 {
 	std::string sign(1, modeSign);
 	if (IrcHelper::noChangeToMake(modeSign, channel->getRightsTopic()))
@@ -258,7 +258,7 @@ void CommandHandler::_topicRestriction(Channel *channel, char modeSign)
  * @param modeSign The mode sign indicating whether to set ('+') or remove ('-') the password.
  * @param client The client requesting the password mode change.
  */
-void CommandHandler::_passwordMode(std::string args, Channel *channel, char modeSign, Client *client)
+void CommandHandler::_setPasswordMode(std::string args, Channel *channel, char modeSign, Client *client)
 {
 	std::string sign(1, modeSign);
 	if (!IrcHelper::isValidPassword(args, false) && modeSign == '+')
@@ -290,7 +290,7 @@ void CommandHandler::_passwordMode(std::string args, Channel *channel, char mode
  * @param modeSign Character indicating the mode change ('+' to add operator, '-' to remove operator).
  * @param newOp Pointer to the Client object representing the client whose operator status is to be changed.
  */
-void CommandHandler::_operatorPrivilege(Channel *channel, char modeSign, Client *newOp)
+void CommandHandler::_setOperatorPrivilege(Channel *channel, char modeSign, Client *newOp)
 {
 	std::string sign(1, modeSign);
 	if (IrcHelper::noChangeToMake(modeSign, channel->isOperator(newOp)))
@@ -316,7 +316,7 @@ void CommandHandler::_operatorPrivilege(Channel *channel, char modeSign, Client 
  * @param args String containing the limit value when setting the limit.
  * @return true if the mode change was successfully applied, false otherwise.
  */
-bool CommandHandler::_channelLimit(Channel *channel, char modeSign, std::string args)
+bool CommandHandler::_setChannelLimit(Channel *channel, char modeSign, std::string args)
 {
 	std::string sign(1, modeSign);
 	if (modeSign == '-' && channel->getLimits() == -1)

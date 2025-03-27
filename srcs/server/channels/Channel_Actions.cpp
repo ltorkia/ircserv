@@ -40,15 +40,15 @@ void Channel::addClient(Client* client)
  */
 void Channel::addClientToInvitedList(const Client* invited, const Client* inviter)
 {
-	if (!isInvited(invited))
+	if (isInvited(invited))
 	{
-		_invited.insert(invited);
-		inviter->sendMessage(MessageBuilder::ircInviting(inviter->getNickname(), invited->getNickname(), _name), NULL);
-		invited->sendMessage(MessageBuilder::ircInvitedToChannel(inviter->getNickname(), _name), NULL);
-		std::cout << MessageBuilder::msgIsInvitedToChannel(invited->getNickname(), inviter->getNickname(), _name) << std::endl;
-	} 
-	else
 		inviter->sendMessage(MessageBuilder::ircAlreadyInvitedToChannel(invited->getNickname(), _name), NULL);
+		return;
+	}
+	_invited.insert(invited);
+	inviter->sendMessage(MessageBuilder::ircInviting(inviter->getNickname(), invited->getNickname(), _name), NULL);
+	invited->sendMessage(MessageBuilder::ircInvitedToChannel(inviter->getNickname(), _name), NULL);
+	std::cout << MessageBuilder::msgIsInvitedToChannel(invited->getNickname(), inviter->getNickname(), _name) << std::endl;
 }
 
 /**
@@ -63,12 +63,10 @@ void Channel::addClientToInvitedList(const Client* invited, const Client* invite
  */
 void Channel::addOperator(Client* client)
 {
-	if (!isOperator(client))
-	{
-		_operators.insert(client);
-		std::cout << MessageBuilder::msgClientOperatorAdded(client->getNickname(), _name) << std::endl;
+	if (isOperator(client))
 		return;
-	}
+	_operators.insert(client);
+	std::cout << MessageBuilder::msgClientOperatorAdded(client->getNickname(), _name) << std::endl;
 }
 
 /**
@@ -82,11 +80,10 @@ void Channel::addOperator(Client* client)
  */
 void Channel::removeOperator(Client* client)
 {
-	if (isOperator(client))
-	{
-		_operators.erase(client);
-		std::cout << MessageBuilder::msgClientOperatorRemoved(client->getNickname(), _name) << std::endl;
-	}
+	if (!isOperator(client))
+		return;
+	_operators.erase(client);
+	std::cout << MessageBuilder::msgClientOperatorRemoved(client->getNickname(), _name) << std::endl;
 }
 
 /**
