@@ -84,7 +84,7 @@ class Bot
 		void _resetInfos();
 
 		// =================================================================================
-		// === READ / SEND MESSAGES : Bot_MessageHandler.cpp ===
+		// === READ / SEND MESSAGES : Bot_Message.cpp ===
 
 		void _handleMessage();
 		int _readFromServer();
@@ -92,13 +92,13 @@ class Bot
 		void _announceBotFeatures();
 
 		// =================================================================================
-		// === AUTHENTICATE : Bot_Authenticate.cpp ===
+		// === REGISTER : Bot_Register.cpp ===
 
 		void _authenticate(const std::string& message);
 		void _sendAuthInfos();
 
 		// =================================================================================
-		// === COMMAND PARSER ===
+		// === COMMAND PARSER === Bot_Parser.cpp ===
 
 		// === SERVER COMMAND PARSER ===
 		bool _parsePrivmsg(std::string& input);
@@ -115,7 +115,7 @@ class Bot
 		bool _isValidDate();
 
 		// =================================================================================
-		// === COMMAND HANDLER ===
+		// === COMMAND HANDLER === Bot_Command.cpp ===
 
 		// === SERVER COMMAND HANDLER ===
 		void _manageServerCommand(std::string& message);

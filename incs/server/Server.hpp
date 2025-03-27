@@ -58,7 +58,7 @@ class Server
 		void _clean();															// Nettoie le serveur avant fermeture
 
 		// =================================================================================
-		// === CLIENT MANAGER === Server_ClientManager.cpp
+		// === CLIENT MANAGER === Server_Clients.cpp
 
 		void _acceptNewClient();												// Accepte une nouvelle connexion client
 		void _addClient(int clientFd); 											// Ajoute un client à la liste
@@ -101,7 +101,7 @@ class Server
 		int getChannelCount() const; 																// Récupère le nombre de canaux
 
 		// =================================================================================
-		// === CLIENT MANAGER === Server_ClientManager.cpp
+		// === CLIENT MANAGER === Server_Clients.cpp
 
 		std::map<int, Client*>& getClients(); 														// Récupère la liste des clients
 		int getTotalClientCount() const; 															// Récupère le nombre total de clients

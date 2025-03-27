@@ -32,7 +32,7 @@ CMD_DIR				=	commands
 #-----> ALL SOURCES FILES
 SERVER_MAIN			=	ServerMain.cpp
 
-SERVER_FILES		=	Server.cpp						Server_ClientManager.cpp \
+SERVER_FILES		=	Server.cpp						Server_Clients.cpp \
 						Server_Infos.cpp 				Server_Loop.cpp
 
 CHANNELS_FILES		=	Channel.cpp						Channel_Attributes.cpp			Channel_Actions.cpp
@@ -48,8 +48,8 @@ CMD_FILES			=	CommandHandler.cpp				CommandHandler_Register.cpp \
 						CommandHandler_Mode.cpp 		CommandHandler_Message.cpp \
 						CommandHandler_Log.cpp
 
-BOT_FILES			=	BotMain.cpp						Bot.cpp							Bot_MessageHandler.cpp \
-						Bot_Authenticate.cpp			Bot_CommandParser.cpp			Bot_CommandHandler.cpp
+BOT_FILES			=	BotMain.cpp						Bot.cpp							Bot_Message.cpp \
+						Bot_Register.cpp				Bot_Parser.cpp					Bot_Command.cpp
 
 #########################################################
 

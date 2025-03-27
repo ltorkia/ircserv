@@ -92,10 +92,10 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │       └── Utils.hpp
 └── srcs
 │   ├── bot
-│   │   ├── Bot_Authenticate.cpp
-│   │   ├── Bot_CommandHandler.cpp
-│   │   ├── Bot_CommandParser.cpp
-│   │   ├── Bot_MessageHandler.cpp
+│   │   ├── Bot_Command.cpp
+│   │   ├── Bot_Message.cpp
+│   │   ├── Bot_Parser.cpp
+│   │   ├── Bot_Register.cpp
 │   │   ├── Bot.cpp
 │   │   └── BotMain.cpp
 │   ├── server
@@ -116,7 +116,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   │   │   ├── CommandHandler_Register.cpp
 │   │   │   └── CommandHandler.cpp
 │   │   ├── core
-│   │   │   ├── Server_ClientManager.cpp
+│   │   │   ├── Server_Clients.cpp
 │   │   │   ├── Server_Infos.cpp
 │   │   │   ├── Server_Loop.cpp
 │   │   │   └── Server.cpp
