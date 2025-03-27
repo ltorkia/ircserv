@@ -97,7 +97,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   │   ├── Bot_CommandParser.cpp
 │   │   ├── Bot_MessageHandler.cpp
 │   │   ├── Bot.cpp
-│   │   └── main.cpp
+│   │   └── BotMain.cpp
 │   ├── server
 │   │   ├── channels
 │   │   │   ├── Channel_Actions.cpp
@@ -121,7 +121,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   │   │   ├── Server_Infos.cpp
 │   │   │   ├── Server_Loop.cpp
 │   │   │   └── Server.cpp
-│   │   └── main.cpp
+│   │   └── ServerMain.cpp
 │   └── utils
 │       ├── IrcHelper.cpp
 │       ├── MessageBuilder.cpp
