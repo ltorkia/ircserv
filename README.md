@@ -160,8 +160,8 @@ fcntl(fd, F_SETFL, O_NONBLOCK);
 ```bash
 make
 ```
-- Both `ircserv` and `ircbot` share a common library for core functionalities.
-- The compilation process first builds the shared components before linking them to each executable.
+- Both `ircserv` and `ircbot` share common utility tools for handling IRC-related operations.
+- The compilation process first builds the shared library containing common utilities before linking it to each executable.
 
 ### Cleaning the Project :
 ```bash
