@@ -40,9 +40,9 @@ void CommandHandler::_authenticateCommand()
 	std::string cmd = *_itInput;
 	std::string command_to_send = IrcHelper::commandToSend(*_client);
 	int toDo = IrcHelper::getCommand(*_client);
-	std::map<std::string, void (CommandHandler::*)()>::iterator it_function = _fctMap.find(*_itInput);
+	std::map<std::string, void (CommandHandler::*)()>::iterator itFunction = _fctMap.find(*_itInput);
 
-	if (it_function == _fctMap.end() || IrcHelper::isCommandIgnored(cmd, true)
+	if (itFunction == _fctMap.end() || IrcHelper::isCommandIgnored(cmd, true)
 		|| (cmd == NICK && toDo != NICK_CMD) || (cmd == USER && toDo != USER_CMD))
 	{
 		if (_client->isIdentified() == true)
@@ -57,7 +57,7 @@ void CommandHandler::_authenticateCommand()
 	}
 	
 	_itInput++;
-	(this->*it_function->second)();
+	(this->*itFunction->second)();
 
 	toDo = IrcHelper::getCommand(*_client);
 	if (toDo < CMD_ALL_SET && IrcHelper::isCommandIgnored(cmd, false) && !_client->isIdentified())
