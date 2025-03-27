@@ -2,11 +2,9 @@
 
 // === NAMESPACES ===
 #include "../../incs/config/irc_config.hpp"
-#include "../../incs/config/bot_config.hpp"
 #include "../../incs/config/commands.hpp"
 #include "../../incs/config/server_messages.hpp"
 
-using namespace bot_config;
 using namespace commands;
 using namespace server_messages;
 
@@ -61,7 +59,7 @@ void Utils::writeEnvFile(const std::string& serverIp, int port, const std::strin
 	// Ouvre en mode écriture et écrase le contenu existant
 	std::ofstream file(env::PATH.c_str(), std::ios::trunc);
 	if (!file)
-		throw std::runtime_error(ERR_ENV_FILE_CREATION);
+		throw std::runtime_error(ERR_OPEN_ENV_FILE);
 
 	file << env::SERVER_IP_KEY << "=" << serverIp << '\n';
 	file << env::SERVER_PORT_KEY << "=" << port << '\n';
@@ -86,7 +84,7 @@ std::string Utils::getEnvValue(const std::string& key)
 {
 	std::ifstream file(env::PATH.c_str());
 	if (!file)
-		throw std::runtime_error(ERR_ENV_VALUE);
+		throw std::runtime_error(ERR_OPEN_ENV_FILE);
 
 	std::string line;
 	while (std::getline(file, line))

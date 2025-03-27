@@ -23,7 +23,7 @@ namespace server_messages
 	const std::string ERR_LISTEN_SOCKET 			= "Failed to listen on server socket";
 	const std::string ERR_ACCEPT_CLIENT 			= "Failed to accept client";
 	const std::string ERR_OPEN_FILE 				= "Failed to open file";
-	const std::string ERR_ENV_FILE_CREATION 		= "Could not create environment file";
+	const std::string ERR_OPEN_ENV_FILE 			= "Failed to open environment file";
 	
 
 	// === NOTICE MESSAGES FOR CLIENTS ===
