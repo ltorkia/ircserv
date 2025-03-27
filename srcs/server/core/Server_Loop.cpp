@@ -16,6 +16,10 @@ using namespace colors;
 
 // =========================================================================================
 
+// === SERVER SETTINGS ===
+
+// ========================================= PRIVATE =======================================
+
 // === INIT SERVER ===
 
 /**
@@ -174,7 +178,7 @@ void Server::_setServerSocket()
 }
 
 
-// === SERVER LOOP ===
+// === START LOOP ===
 
 /**
  * @brief Starts the IRC server.

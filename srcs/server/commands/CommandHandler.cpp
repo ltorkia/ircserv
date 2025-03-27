@@ -13,7 +13,11 @@ using namespace commands;
 
 // =========================================================================================
 
-// === CONSTRUCTOR (INIT COMMANDS) / DESTRUCTOR ===
+// === COMMAND HANDLER ===
+
+// ========================================= PUBLIC ========================================
+
+// === CONSTRUCTOR (INIT COMMAND HANDLERS MAP) / DESTRUCTOR ===
 
 CommandHandler::CommandHandler(Server& server, std::map<int, Client*>::iterator it)
 	: _server(server), _it(it), _clientFd(_it->first), _client(_it->second),

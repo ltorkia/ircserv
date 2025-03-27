@@ -45,7 +45,7 @@ COMMON_UTILS_FILES	=	MessageBuilder.cpp				Utils.cpp
 SERVER_UTILS_FILES	=	IrcHelper.cpp
 
 CMD_FILES			=	CommandHandler.cpp				CommandHandler_Register.cpp \
-						CommandHandler_Channel.cpp 		CommandHandler_File.cpp \
+						CommandHandler_Channel.cpp		CommandHandler_File.cpp \
 						CommandHandler_Mode.cpp 		CommandHandler_Message.cpp \
 						CommandHandler_Log.cpp
 
@@ -121,13 +121,16 @@ RESET				= \033[0m
 #############             RULES               ###########
 #########################################################
 
+#-----> MAKE ALL RULE
+all: $(LIB_COMMON) server bot
+
 #-----> SERVEUR IRC
 ${OBJS_DIR}/%.o: %.cpp
 	@mkdir -p ${dir $@}
 	@echo "\n${GREEN}--> Compiling server $<${RESET}"
 	${CXX} -MMD -c ${CXXFLAGS} $< -o $@
 
-all: $(LIB_COMMON) $(NAME_SERVER) $(NAME_BOT)
+server: $(NAME_SERVER)
 
 ${NAME_SERVER}: ${OBJS} $(LIB_COMMON)
 	@echo "\n"
@@ -219,4 +222,4 @@ debug: fclean
 #-----> INCLUDE DEPENDENCIES
 -include ${DEPS} ${DEPS_BOT} ${COMMON_DEPS}
 
-.PHONY: all clean fclean re debug bot
+.PHONY: all clean fclean re debug server bot

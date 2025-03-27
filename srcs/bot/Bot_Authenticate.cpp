@@ -13,6 +13,9 @@ using namespace bot_config;
 // =========================================================================================
 
 // === AUTHENTICATE ===
+
+// ========================================= PRIVATE =======================================
+
 /**
  * @brief Authenticates the bot based on the received message.
  *

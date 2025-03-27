@@ -17,6 +17,10 @@ using namespace colors;
 
 // =========================================================================================
 
+// === COMMAND HANDLER ===
+
+// ========================================= PRIVATE =======================================
+
 // === AUTHENTICATE COMMANDS ===
 
 /**
@@ -71,7 +75,7 @@ void CommandHandler::_authenticateCommand()
 		_client->setUsermask();
 		_client->authenticate();
 		_server.greetClient(_client);
-		_client->sendMessage(MessageBuilder::ircBasicMsg(_client->getNickname(), PROMPT_ONCE_REGISTERED, IRC_COLOR_INFO), NULL);
+		_client->sendMessage(MessageBuilder::ircNoticeMsg(_client->getNickname(), PROMPT_ONCE_REGISTERED, IRC_COLOR_INFO), NULL);
 		std::cout << MessageBuilder::msgClientConnected(_client->getClientIp(), _client->getClientPort(), _clientFd, _client->getNickname()) << std::endl;
 	}
 }
@@ -125,7 +129,7 @@ void CommandHandler::_isRightPassword()
 	if (password != servPassword)				
 		throw std::invalid_argument(MessageBuilder::ircPasswordIncorrect());		
 
-	_client->sendMessage(MessageBuilder::ircBasicMsg(SERVER_PASSWORD_FOUND, IRC_COLOR_SUCCESS), NULL);
+	_client->sendMessage(MessageBuilder::ircNoticeMsg(SERVER_PASSWORD_FOUND, IRC_COLOR_SUCCESS), NULL);
 	_client->setServPasswordValidity(true);
 
 	// Si le client a déjà donné un nickname via identification irssi, on le set directement

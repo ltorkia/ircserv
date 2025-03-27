@@ -14,13 +14,28 @@ class File;
 class CommandHandler
 {
 	public : 
+		// =================================================================================
+		// === COMMAND HANDLER === CommandHandler.cpp ===
+
+		// === CONSTRUCTOR (INIT COMMAND HANDLERS MAP) / DESTRUCTOR ===
 		CommandHandler(Server& server, std::map<int, Client*>::iterator it);
 		~CommandHandler();
 
-		// === COMMAND MANAGER : MAIN METHOD ===
+		// =================================================================================
+		
+		// === MAIN PUBLIC METHOD ===
+
+		// =================================================================================
+
+		// === COMMAND MANAGER ===
 		void manageCommand(std::string input);
 
-	private :
+	private : 
+		// =================================================================================
+		
+		// === VARIABLES ===
+
+		// =================================================================================
 
 		// === SERVER INSTANCE ===
 		Server& _server;
@@ -48,7 +63,16 @@ class CommandHandler
 		// === FILES TO SEND ===
 		std::map<std::string, File>	_files;
 
+
+		// =================================================================================
+		
+		// === PRIVATE METHODS ===
+
+		// =================================================================================
+
+		// =================================================================================
 		// === AUTHENTICATE COMMANDS : CommandHandler_Register.cpp ===
+
 		void _authenticateCommand();
 		void _preRegister(const std::string& cmd, int toDo);
 		void _isRightPassword();
@@ -59,14 +83,18 @@ class CommandHandler
 		void _realNameSettings(std::vector<std::string>::iterator& itArg, const std::vector<std::string>& args);
 		void _handleCapabilities();
 
+		// =================================================================================
 		// === CHANNEL COMMANDS : CommandHandler_Channel.cpp ===
+
 		void _inviteChannel();
 		void _joinChannel();
 		void _setTopic();
 		void _kickChannel();
 		void _quitChannel();
 
+		// =================================================================================
 		// === MODE : CommandHandler_Mode.cpp ===
+
 		void _changeMode();
 		void _applyChannelModes(std::string &mode, std::string &arg1, std::map<char, std::string> &arg2);
 		void _validateModeArguments(std::string &mode, const Channel *channel, unsigned int nArgs);
@@ -77,12 +105,16 @@ class CommandHandler
 		void _setOperatorPrivilege(Channel *channel, char modeSign, Client *newOp);
 		bool _setChannelLimit(Channel *channel, char modeSign, std::string args);
 
+		// =================================================================================
 		// === MESSAGE COMMANDS : CommandHandler_Message.cpp ===
+
 		void _sendPrivateMessage();
 		void _sendToChannel(std::vector<std::string>& targets, std::string& message);
 		void _sendToClient(std::vector<std::string>& targets, std::string& message);
 
+		// =================================================================================
 		// === LOG COMMANDS : CommandHandler_Log.cpp ===
+
 		void _sendPong();
 		void _updateActivity();
 		void _handleWhois();
@@ -91,7 +123,9 @@ class CommandHandler
 		void _setAway();
 		void _quitServer();
 
+		// =================================================================================
 		// === FILE COMMANDS : CommandHandler_File.cpp ===
+
 		void _handleFile();
 		void _sendFile(std::vector<std::string> entry);
 		void _getFile(std::vector<std::string> entry);

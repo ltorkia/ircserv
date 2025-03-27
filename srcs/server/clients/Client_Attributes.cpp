@@ -2,8 +2,18 @@
 
 // =========================================================================================
 
+// === CLIENT INFOS
+
+// =========================================================================================
+
 // === CLIENT INFOS SETTERS ===
 
+// === GENERAL INFOS ===
+
+void Client::setClientPort(int port)
+{
+	_port = port;
+}
 void Client::setNickname(const std::string &nickname)
 {
 	_nickname = nickname;
@@ -18,7 +28,7 @@ void Client::setRealName(const std::string &realName)
 }
 void Client::setHostname(const std::string &hostname)
 {
-    _hostname = hostname;
+	_hostname = hostname;
 }
 void Client::setClientIp(const std::string &clientIp)
 {
@@ -28,10 +38,9 @@ void Client::setUsermask()
 {
 	_usermask = _nickname + "!" + _username + "@" + _clientIp;
 }
-void Client::setClientPort(int port)
-{
-    _port = port;
-}
+
+
+// === AUTHENTICATION INFOS ===
 
 void Client::setIsIrssi(bool status)
 {
@@ -43,11 +52,11 @@ void Client::setIdentified(bool status)
 }
 void Client::setIdentNickCmd(std::vector<std::string> identCmd)
 {
-    _identNicknameCmd = identCmd;
+	_identNicknameCmd = identCmd;
 }
 void Client::setIdentUsernameCmd(std::vector<std::string> identCmd)
 {
-    _identUsernameCmd = identCmd;
+	_identUsernameCmd = identCmd;
 }
 void Client::setServPasswordValidity(bool status)
 {
@@ -58,13 +67,16 @@ void Client::authenticate()
 	_authenticated = true;
 }
 
+
+// === ACTIVITY INFOS ===
+
 void Client::setLastActivity()
 {
 	_lastActivity = time(NULL);
 }
 void Client::setIsAway(bool status)
 {
-    _isAway = status;
+	_isAway = status;
 }
 void Client::setAwayMessage(const std::string& message)
 {
@@ -72,19 +84,26 @@ void Client::setAwayMessage(const std::string& message)
 }
 void Client::setErrorMsgTooLongSent(bool status)
 {
-    _errorMsgTooLongSent = status;
+	_errorMsgTooLongSent = status;
 }
 void Client::setPingSent(bool status)
 {
 	_pingSent = status;
 }
 
+// =========================================================================================
 
 // === CLIENT INFOS GETTERS ===
+
+// === GENERAL INFOS ===
 
 int Client::getFd() const
 {
 	return _clientSocketFd;
+}
+int Client::getClientPort() const
+{
+	return _port;
 }
 const std::string& Client::getNickname() const
 {
@@ -100,7 +119,7 @@ const std::string& Client::getRealName() const
 }
 const std::string& Client::getHostname() const
 {
-    return _hostname;
+	return _hostname;
 }
 const std::string& Client::getClientIp() const
 {
@@ -110,10 +129,9 @@ const std::string& Client::getUsermask() const
 {
 	return _usermask;
 }
-int Client::getClientPort() const
-{
-	return _port;
-}
+
+
+// === AUTHENTICATION INFOS ===
 
 bool Client::isIrssi() const
 {
@@ -121,15 +139,15 @@ bool Client::isIrssi() const
 }
 bool Client::isIdentified() const
 {
-    return _isIdentified;
+	return _isIdentified;
 }
 std::vector<std::string> Client::getIdentNickCmd() const
 {
-    return _identNicknameCmd;
+	return _identNicknameCmd;
 }
 std::vector<std::string> Client::getIdentUsernameCmd() const
 {
-    return _identUsernameCmd;
+	return _identUsernameCmd;
 }
 bool Client::gotValidServPassword() const
 {
@@ -139,6 +157,9 @@ bool Client::isAuthenticated() const
 {
 	return _authenticated;
 }
+
+
+// === ACTIVITY INFOS ===
 
 time_t Client::getSignonTime() const
 {
@@ -154,7 +175,7 @@ time_t Client::getIdleTime() const
 }
 bool Client::isAway() const
 {
-    return _isAway;
+	return _isAway;
 }
 const std::string& Client::getAwayMessage() const
 {

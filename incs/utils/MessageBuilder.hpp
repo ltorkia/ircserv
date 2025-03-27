@@ -18,12 +18,16 @@ class MessageBuilder
 
 	public:
 
-		/**************************** CLIENT SIDE ****************************/
+		// =========================================================================================
+
+		// === CLIENT SIDE ===
+
+		// =========================================================================================
 
 		// === BUILDER UTILS ===
 		static std::string ircFormat(const std::string& message);
-		static std::string ircBasicMsg(const std::string& message, const std::string& colorCode);
-		static std::string ircBasicMsg(const std::string& nickname, const std::string& message, const std::string& colorCode);
+		static std::string ircNoticeMsg(const std::string& message, const std::string& colorCode);
+		static std::string ircNoticeMsg(const std::string& nickname, const std::string& message, const std::string& colorCode);
 		
 		// === FORMAT EXCEPTIONS ===
 		static std::string ircClientException(const std::exception &e);
@@ -35,7 +39,7 @@ class MessageBuilder
 		// === HANDLE CAPABILITIES ===
 		static std::string ircCapabilities(const std::string& arg);
 
-        // === AUTHENTICATION PROMPT ===
+		// === AUTHENTICATION PROMPT ===
 		static std::string ircCommandPrompt(const std::string& commandPrompt, const std::string& prevCommand, bool error);
 		static std::string ircUsernameSet(const std::string& username);
 		static std::string ircFirstNicknameSet(const std::string& nickname);
@@ -125,7 +129,11 @@ class MessageBuilder
 		static std::string ircEndOfBannedList(const std::string &nickname, const std::string &channel);
 
 		
-		/**************************** SERVER SIDE ****************************/
+		// =========================================================================================
+
+		// === SERVER SIDE ===
+
+		// =========================================================================================
 
 		static std::string msgBuilder(const std::string& color, const std::string& message, const std::string& eol);
 
@@ -160,7 +168,13 @@ class MessageBuilder
 		static std::string errorMsgSendFile(const std::string& filename);
 		static std::string msgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int &port);
 		
+
+		// =========================================================================================
+
 		// === BOT ===
+
+		// =========================================================================================
+
 		static std::string botGetAge(int years, int months, int days);
 		static std::string botCmdPrivmsg(const std::string& targetName, const std::string& message);
 		static std::string botCmdJoinChannel(const std::string& channelName);

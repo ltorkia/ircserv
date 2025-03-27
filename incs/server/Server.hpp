@@ -14,6 +14,12 @@ class Server
 		Server(const Server& src);
 		Server& operator=(const Server& src);
 
+		// =================================================================================
+		
+		// === VARIABLES ===
+
+		// =================================================================================
+
 		// === SERVER INFOS + SOCKETS ===
 		std::string _password, _localIp, _timeCreationStr;						// Mot de passe serveur + adresse IP locale + date et heure de création du serveur
 		int _serverSocketFd, _port, _maxFd;										// Descripteur du socket du serveur + port + descripteur maximum pour select()
@@ -24,26 +30,36 @@ class Server
 		std::vector<std::map<int, Client*>::iterator> _clientsToDelete;			// Liste des clients à supprimer (stocke les iterateurs map des clients)
 		std::map<std::string, Channel*> _channels;								// Liste des canaux
 
-// =========================================================================================
 
-		// === INIT SERVER === Server_ServerLoop.cpp
+		// =================================================================================
+		
+		// === PRIVATE METHODS ===
+
+		// =================================================================================
+
+		// =================================================================================
+		// === SERVER LOOP === Server_ServerLoop.cpp
+
+		// === INIT SERVER ===
 		void _init();	
 		void _setSignal();														// Paramétrage du signal
 		void _setLocalIp();														// Récupère l'adresse IP locale
 		void _setServerSocket();												// Paramétrage du socket serveur
 		
-		// === SERVER LOOP === Server_ServerLoop.cpp
+		// === START LOOP ===
 		void _start();															// Démarre le serveur
 		
-		// === HANDLE MESSAGES === Server_ServerLoop.cpp
+		// === HANDLE MESSAGES ===
 		void _handleMessage(std::map<int, Client*>::iterator it);				// Gère la lecture des messages d'un client
 		void _processCommand(std::map<int, Client*>::iterator it, 
 											std::string message);				// Traite l'entrée du client
 		
-		// === CLEAN === Server_ServerLoop.cpp
+		// === CLEAN ===
 		void _clean();															// Nettoie le serveur avant fermeture
 
+		// =================================================================================
 		// === CLIENT MANAGER === Server_ClientManager.cpp
+
 		void _acceptNewClient();												// Accepte une nouvelle connexion client
 		void _addClient(int clientFd); 											// Ajoute un client à la liste
 		void _checkActivity();													// Vérifie l'activité des clients
@@ -52,19 +68,29 @@ class Server
 		void _lateClientDeletion();												// Supprime les clients de la liste en différé
 	
 	public:
+		// =================================================================================
 		
-		// === STATIC SIGNAL VARIABLE + SIGNAL HANDLER === Server.cpp
+		// === PUBLIC METHODS ===
+
+		// =================================================================================
+
+		// =================================================================================
+		// === SERVER SETTINGS === Server.cpp
+
+		// === STATIC SIGNAL VARIABLE + SIGNAL HANDLER ===
 		static volatile sig_atomic_t signalReceived;							// Indique si un signal a été reçu
 		static void signalHandler(int signal);									// Gestionnaire de signaux pour le serveur
 		
-		// === CONSTUCTOR / DESTRUCTOR === Server.cpp
+		// === CONSTUCTOR / DESTRUCTOR ===
 		Server(const std::string &port, const std::string &password);
 		~Server();
 
-		// === LAUNCH SERVER === Server.cpp
+		// === LAUNCH SERVER ===
 		void launch();
 
+		// =================================================================================
 		// === SERVER INFOS GETTERS === Server_Infos.cpp
+
 		int getServerSocketFd() const; 																// Récupère le descripteur de socket du serveur
 		const std::string& getLocalIP() const; 														// Récupère l'adresse IP locale
 		int getPort() const; 																		// Récupère le port du serveur;
@@ -74,7 +100,9 @@ class Server
 		std::map<std::string, Channel*>& getChannels(); 											// Récupère la liste des canaux
 		int getChannelCount() const; 																// Récupère le nombre de canaux
 
+		// =================================================================================
 		// === CLIENT MANAGER === Server_ClientManager.cpp
+
 		std::map<int, Client*>& getClients(); 														// Récupère la liste des clients
 		int getTotalClientCount() const; 															// Récupère le nombre total de clients
 		int getClientCount(bool authenticated); 													// Récupère le nombre de clients authentifiés ou non

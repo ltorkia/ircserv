@@ -9,6 +9,10 @@
 
 // =========================================================================================
 
+// === ACTIONS ===
+
+// ========================================= PUBLIC ========================================
+
 // === CLIENT MANAGER ===
 
 /**
@@ -100,32 +104,31 @@ void Channel::removeOperator(Client* client)
  */
 void Channel::removeClient(Client* client, const Client* kicker, const std::string& reason, int reasonCode)
 {
-	if (isConnected(client))
+	if (!isConnected(client))
+		return;
+
+	if (kicker && reasonCode == leaving_code::KICKED)
 	{
-
-		if (kicker && reasonCode == leaving_code::KICKED)
-		{
-			sendToAll(MessageBuilder::ircClientKickUser(kicker->getUsermask(), _name, client->getNickname(), reason), client, true);
-			std::cout << MessageBuilder::msgClientKickedFromChannel(client->getNickname(), kicker->getNickname(), _name, reason) << std::endl;
-		}
-		if (reasonCode == leaving_code::LEFT)
-		{
-			sendToAll(MessageBuilder::ircClientPartChannel(client->getUsermask(), _name, reason), client, true);
-			client->sendMessage(MessageBuilder::ircCurrentNotInChannel(client->getNickname(), _name), NULL);
-			std::cout << MessageBuilder::msgClientLeftChannel(client->getNickname(), _name, reason) << std::endl;
-		}
-		if (reasonCode == leaving_code::QUIT_SERV)
-			sendToAll(MessageBuilder::ircClientQuitServer(client->getUsermask(), reason), client, false);
-
-		// On supprime le client des clients connectes au canal
-		_connected.erase(client);
-
-		// On l'enleve des operateurs s'il est operateur
-		removeOperator(client);
-
-		// On retire le canal des canaux du clients
-		client->getChannelsJoined().erase(_name);
+		sendToAll(MessageBuilder::ircClientKickUser(kicker->getUsermask(), _name, client->getNickname(), reason), client, true);
+		std::cout << MessageBuilder::msgClientKickedFromChannel(client->getNickname(), kicker->getNickname(), _name, reason) << std::endl;
 	}
+	if (reasonCode == leaving_code::LEFT)
+	{
+		sendToAll(MessageBuilder::ircClientPartChannel(client->getUsermask(), _name, reason), client, true);
+		client->sendMessage(MessageBuilder::ircCurrentNotInChannel(client->getNickname(), _name), NULL);
+		std::cout << MessageBuilder::msgClientLeftChannel(client->getNickname(), _name, reason) << std::endl;
+	}
+	if (reasonCode == leaving_code::QUIT_SERV)
+		sendToAll(MessageBuilder::ircClientQuitServer(client->getUsermask(), reason), client, false);
+
+	// On supprime le client des clients connectes au canal
+	_connected.erase(client);
+
+	// On l'enleve des operateurs s'il est operateur
+	removeOperator(client);
+
+	// On retire le canal des canaux du clients
+	client->getChannelsJoined().erase(_name);
 }
 
 
@@ -149,7 +152,7 @@ void Channel::sendToAll(const std::string &message, Client* sender, bool include
 {
 	if (!sender->isInChannel(_name))
 	{
-		if (_invites && isInvited(sender) == false)
+		if (_isInviteOnly && isInvited(sender) == false)
 		{
 			sender->sendMessage(MessageBuilder::ircInviteOnly(sender->getNickname(), _name), NULL);
 			return;

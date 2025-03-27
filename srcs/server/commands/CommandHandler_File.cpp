@@ -15,6 +15,8 @@ using namespace file_cmd;
 
 // === FILE CLASS ===
 
+// ========================================= PUBLIC ========================================
+
 File::File() {}
 File::File(std::string name, std::string path, std::string sender, std::string receiver ): _name(name), _path(path), _sender(sender), _receiver(receiver) {}
 File::File( const File &x ) {*this = x;}
@@ -37,9 +39,12 @@ std::string File::getPath() const {return _path;}
 std::string File::getSender() const {return _sender;}
 std::string File::getReceiver() const {return _receiver;}
 
+
 // =========================================================================================
 
 // === REQUEST CLASS ===
+
+// ========================================= PUBLIC ========================================
 
 Request::Request(std::vector<std::string> arg, std::string cmd): _args(arg), _command(cmd) {};
 Request::Request(const Request& x ) {*this = x;};
@@ -59,9 +64,12 @@ size_t Request::getArgsSize() const { return _args.size(); }
 std::vector<std::string> Request::getArgs() const { return _args; }
 std::string Request::getCommand() const { return _command; }
 
+
 // =========================================================================================
 
 // === COMMAND HANDLER : MAIN FILE COMMANDS MANAGER ===
+
+// ========================================= PRIVATE =======================================
 
 void CommandHandler::_handleFile()
 {

@@ -16,6 +16,8 @@ using namespace error_display;
 
 // === MESSAGE COMMANDS ===
 
+// ========================================= PRIVATE =======================================
+
 /**
  * @brief Sends a private message to a specified target (user or channel).
  * 

@@ -17,21 +17,34 @@
 class Bot
 {
 	public:
+		// =================================================================================
+		// === BOT SETTINGS === Bot.cpp
 
-		// === SIGNAL : Bot.cpp ===
+		// === SIGNAL ===
 		static volatile sig_atomic_t signalReceived;
 		static void signalHandler(int signal);
 		void setSignal();
 
-		// === CONSTUCTORS / DESTRUCTORS : Bot.cpp ===
+		// === CONSTUCTOR / DESTRUCTOR ===
 		Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real);
 		~Bot();
 
-		// === LISTEN ACTIVITY : Bot.cpp ===
+		// =================================================================================
+		
+		// === MAIN PUBLIC METHOD ===
+
+		// =================================================================================
+
+		// === RUN AND LISTEN ACTIVITY ===
 		void run();
 
 	
 	private:
+		// =================================================================================
+		
+		// === VARIABLES ===
+
+		// =================================================================================
 
 		// === BOT INFOS ===
 		bool _hasSentAuthInfos, _isAuthenticated;
@@ -58,42 +71,59 @@ class Bot
 		// === ACTIVE CLIENTS ===
 		std::map<std::string, bool> _activeClients;
 
-		// ================================================================================
 
+		// =================================================================================
+		
+		// === PRIVATE METHODS ===
+
+		// =================================================================================
+
+		// =================================================================================
 		// === RESET INFOS : Bot.cpp ===
+
 		void _resetInfos();
 
+		// =================================================================================
 		// === READ / SEND MESSAGES : Bot_MessageHandler.cpp ===
+
 		void _handleMessage();
 		int _readFromServer();
 		void _sendMessage(const std::string &message) const;
 		void _announceBotFeatures();
 
+		// =================================================================================
 		// === AUTHENTICATE : Bot_Authenticate.cpp ===
+
 		void _authenticate(const std::string& message);
 		void _sendAuthInfos();
 
-		// === SERVER COMMAND PARSER : Bot_CommandParser.cpp ===
+		// =================================================================================
+		// === COMMAND PARSER ===
+
+		// === SERVER COMMAND PARSER ===
 		bool _parsePrivmsg(std::string& input);
 		bool _extractSenderNick(std::string& nickname);
 		bool _isRightCommand(const std::vector<std::string>& args, const std::string& command);
 		bool _extractTarget(const std::vector<std::string>& args);
 		std::string _extractMessage(std::vector<std::string>& args);
 		
-		// === BOT COMMAND PARSER : Bot_CommandParser.cpp ===
+		// === BOT COMMAND PARSER ===
 		bool _parseBotCommand(std::string& message);
 		bool _isValidBotCommand(const std::string& command);
 		bool _parseBirthdate();
 		bool _extractDate(const std::string& dateStr);
 		bool _isValidDate();
 
-		// === SERVER COMMAND HANDLER : Bot_CommandHandler.cpp ===
+		// =================================================================================
+		// === COMMAND HANDLER ===
+
+		// === SERVER COMMAND HANDLER ===
 		void _manageServerCommand(std::string& message);
 		bool _handlePing(const std::string& input);
 		bool _handleInvite(const std::string& input);
 		bool _handleJoin(const std::string& input);
 
-		// === BOT COMMAND HANDLER : Bot_CommandHandler.cpp ===
+		// === BOT COMMAND HANDLER ===
 		std::string _handleBotCommand();
 
 		// ---> FUNFACT COMMAND
@@ -101,7 +131,7 @@ class Bot
 		std::vector<std::string> _getQuotes(std::string filename);
 
 		// ---> AGE COMMAND
-        std::string _getAge();
+		std::string _getAge();
 		std::string _ageCalculator();
 
 		// ---> TIME COMMAND

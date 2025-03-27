@@ -13,8 +13,7 @@ using namespace irc_replies;
 using namespace commands;
 using namespace colors;
 
-// =========================================================================================
-/**************************************** PRIVATE ****************************************/
+// ========================================= PRIVATE =======================================
 
 MessageBuilder::MessageBuilder() {}
 MessageBuilder::MessageBuilder(const MessageBuilder& src) {(void) src;}
@@ -22,8 +21,11 @@ MessageBuilder& MessageBuilder::operator=(const MessageBuilder& src) {(void) src
 MessageBuilder::~MessageBuilder() {}
 
 
-/**************************************** PUBLIC ****************************************/
-/************************************* CLIENT SIDE *************************************/
+// ========================================= PUBLIC ========================================
+
+// === CLIENT SIDE ===
+
+// =========================================================================================
 
 // === UTILS ===
 
@@ -35,20 +37,16 @@ std::string MessageBuilder::ircFormat(const std::string& message)
 	return message + eol::IRC;
 }
 
-// -- Avant authentification client
 // Format utilisé pour les messages qui n'ont pas de code spécifique
 // mais qui doivent être interprétés par Irssi sans erreur.
-std::string MessageBuilder::ircBasicMsg(const std::string& message, const std::string& colorCode)
+// -- Deux versions: avant et après authentification client
+std::string MessageBuilder::ircNoticeMsg(const std::string& message, const std::string& colorCode)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " NOTICE * :" << colorCode << message << IRC_RESET;
 	return stream.str();
 }
-
-// -- Après authentification client
-// Format utilisé pour les messages qui n'ont pas de code spécifique
-// mais qui doivent être interprétés par Irssi sans erreur.
-std::string MessageBuilder::ircBasicMsg(const std::string& nickname, const std::string& message, const std::string& colorCode)
+std::string MessageBuilder::ircNoticeMsg(const std::string& nickname, const std::string& message, const std::string& colorCode)
 {
 	std::ostringstream stream;
 	stream << ":" << server::NAME << " NOTICE " << nickname << " :" << colorCode << message << IRC_RESET;
@@ -60,7 +58,7 @@ std::string MessageBuilder::ircBasicMsg(const std::string& nickname, const std::
 
 std::string MessageBuilder::ircClientException(const std::exception &e)
 {
-	return ircBasicMsg(server::NAME, std::string(e.what()), IRC_COLOR_ERR);
+	return ircNoticeMsg(server::NAME, std::string(e.what()), IRC_COLOR_ERR);
 }
 
 // === PING -> PONG ===
@@ -117,17 +115,17 @@ std::string MessageBuilder::ircCommandPrompt(const std::string& commandPrompt, c
 
 std::string MessageBuilder::ircUsernameSet(const std::string& username)
 {
-	return ircBasicMsg(server::NAME, "Username successfully set to "  + IRC_DEFAULT + "'" + username + "'", IRC_COLOR_SUCCESS);
+	return ircNoticeMsg(server::NAME, "Username successfully set to "  + IRC_DEFAULT + "'" + username + "'", IRC_COLOR_SUCCESS);
 }
 
 std::string MessageBuilder::ircFirstNicknameSet(const std::string& nickname)
 {
-	return ircBasicMsg(server::NAME, "Nickname successfully set to "  + IRC_DEFAULT + "'" + nickname + "'", IRC_COLOR_SUCCESS);
+	return ircNoticeMsg(server::NAME, "Nickname successfully set to "  + IRC_DEFAULT + "'" + nickname + "'", IRC_COLOR_SUCCESS);
 }
 
 std::string MessageBuilder::ircChangingNickname(const std::string& nickname)
 {
-	return ircBasicMsg(server::NAME, "Nickname " + IRC_DEFAULT + "'" + nickname + "'" + IRC_COLOR_ERR + " already registered. Renaming...", IRC_COLOR_ERR);
+	return ircNoticeMsg(server::NAME, "Nickname " + IRC_DEFAULT + "'" + nickname + "'" + IRC_COLOR_ERR + " already registered. Renaming...", IRC_COLOR_ERR);
 }
 
 
@@ -528,34 +526,34 @@ std::string MessageBuilder::ircNotChanOperator(const std::string& channelName)
 
 std::string MessageBuilder::ircChannelCreated(const std::string& nickname, const std::string& channelName)
 {
-	return ircBasicMsg(server::NAME, "Channel " + IRC_DEFAULT + channelName + IRC_COLOR_SUCCESS 
+	return ircNoticeMsg(server::NAME, "Channel " + IRC_DEFAULT + channelName + IRC_COLOR_SUCCESS 
 		+ " created by " + IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS, IRC_COLOR_SUCCESS);
 }
 std::string MessageBuilder::ircChannelDestroyed(const std::string& channelName)
 {
-	return ircBasicMsg(server::NAME, "Channel " + IRC_DEFAULT + channelName + IRC_COLOR_ERR + " destroyed", IRC_COLOR_ERR);
+	return ircNoticeMsg(server::NAME, "Channel " + IRC_DEFAULT + channelName + IRC_COLOR_ERR + " destroyed", IRC_COLOR_ERR);
 }
 std::string MessageBuilder::ircOperatorAdded(const std::string& nickname, const std::string& channelName)
 {
-	return ircBasicMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS 
+	return ircNoticeMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS 
 		+ " is now operator in channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
 }
 std::string MessageBuilder::ircOperatorRemoved(const std::string& nickname, const std::string& channelName)
 {
-	return ircBasicMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS
+	return ircNoticeMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_SUCCESS
 		+ " is no longer operator in channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
 }
 std::string MessageBuilder::ircInvitedToChannel(const std::string& nickname, const std::string& channelName)
 {
-	return ircBasicMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_INFO + " invited you to join channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
+	return ircNoticeMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_INFO + " invited you to join channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
 }
 std::string MessageBuilder::ircAlreadyInvitedToChannel(const std::string& nickname, const std::string& channelName)
 {
-	return ircBasicMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_INFO + " has already been invited to join channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
+	return ircNoticeMsg(server::NAME, IRC_DEFAULT + nickname + IRC_COLOR_INFO + " has already been invited to join channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
 }
 std::string MessageBuilder::ircNoPassNeeded(const std::string& channelName)
 {
-	return ircBasicMsg(server::NAME, "No pass needed to join channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
+	return ircNoticeMsg(server::NAME, "No pass needed to join channel " + IRC_DEFAULT + channelName, IRC_COLOR_INFO);
 }
 
 
@@ -756,7 +754,11 @@ std::string MessageBuilder::ircInvalidPasswordFormat(const std::string &nickname
 }
 
 
-/************************************** SERVER SIDE **************************************/
+// =========================================================================================
+
+// === SERVER SIDE ===
+
+// =========================================================================================
 
 /**
  * @brief This function constructs a formatted message string using the provided color, message, and end-of-line (EOL) characters.
@@ -948,7 +950,11 @@ std::string MessageBuilder::msgSendingFile(const std::string& filename, const st
 }
 
 
+// =========================================================================================
+
 // === BOT ===
+
+// =========================================================================================
 
 std::string MessageBuilder::botGetAge(int years, int months, int days)
 {

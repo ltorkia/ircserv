@@ -16,6 +16,8 @@ using namespace server_messages;
 
 // === CHANNEL COMMANDS ===
 
+// ========================================= PRIVATE =======================================
+
 /**
  * @brief Handles the INVITE command to invite a client to a channel.
  * 
@@ -65,7 +67,7 @@ void CommandHandler::_inviteChannel()
 		throw std::invalid_argument(MessageBuilder::ircCurrentNotInChannel(_client->getNickname(), channel->getName())); 
 	
 	// Verifie que si le mode "+i" est present, le client faisant la requete est bien operator
-	if (channel->getInvites() && channel->isOperator(_client) == false)
+	if (channel->isInviteOnly() && channel->isOperator(_client) == false)
 		throw std::invalid_argument(MessageBuilder::ircNotChanOperator(channelName));
 	
 	// La fonction isInvitedToChannel() verifie que le client est deja dans le channel avant de l'inviter
@@ -166,7 +168,7 @@ void CommandHandler::_setTopic()
 		return;
 
 	// Protection contre les clients non autorisés à changer le topic si mode +t actif
-	if ((channel->getRightsTopic() && channel->isOperator(_client) == false))
+	if ((channel->isSettableTopic() && channel->isOperator(_client) == false))
 		throw std::invalid_argument(MessageBuilder::ircNotChanOperator(channelName));
 	
 	// On set le nouveau topic et on send les RPL correspondants

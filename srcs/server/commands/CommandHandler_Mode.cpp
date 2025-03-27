@@ -14,6 +14,10 @@ using namespace error_display;
 
 // =========================================================================================
 
+// === MODE ===
+
+// ========================================= PRIVATE =======================================
+
 // === MODE PARSER ===
 
 /**
@@ -133,7 +137,7 @@ void CommandHandler::_validateModeArguments(std::string &mode, const Channel *ch
 {
 	// Check si le nombre d arguments et les arguments attendus sont les bons.
 	if (mode.empty() || mode.size() < 2 || (mode[0] != '-' && mode[0] != '+'))
-		throw std::invalid_argument((MessageBuilder::ircChannelModeIs(_client->getNickname(), channel->getName(), channel->getMode())));
+		throw std::invalid_argument((MessageBuilder::ircChannelModeIs(_client->getNickname(), channel->getName(), channel->getModes())));
 	
 	for (size_t i = 0; i < mode.size(); i++)
 		if (mode[i] == 'i' || mode[i] == 't' || mode[i] == 'k' || mode[i] != 'o' || mode[i] != 'l')
@@ -170,7 +174,7 @@ bool CommandHandler::_validateModeCommand(std::string &channelName, std::string 
 
 	if (nArgs == 1)
 	{
-		_client->sendMessage((MessageBuilder::ircChannelModeIs(_client->getNickname(), channelName, channel->getMode())), NULL);	
+		_client->sendMessage((MessageBuilder::ircChannelModeIs(_client->getNickname(), channelName, channel->getModes())), NULL);	
 		return false;
 	}
 	if (mode == "b")
@@ -210,13 +214,13 @@ bool CommandHandler::_validateModeCommand(std::string &channelName, std::string 
 void CommandHandler::_setInviteOnly(Channel *channel, char modeSign)
 {
 	std::string sign(1, modeSign);
-	if (IrcHelper::noChangeToMake(modeSign, channel->getInvites()))
+	if (IrcHelper::noChangeToMake(modeSign, channel->isInviteOnly()))
 		return ;
 
-	if (modeSign == '+' && !channel->getInvites())
-		channel->setInvites(true);
+	if (modeSign == '+' && !channel->isInviteOnly())
+		channel->setInviteOnly(true);
 	else
-		channel->setInvites(false);
+		channel->setInviteOnly(false);
 
 	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "i", ""), true);
 }
@@ -235,13 +239,13 @@ void CommandHandler::_setInviteOnly(Channel *channel, char modeSign)
 void CommandHandler::_setTopicRestriction(Channel *channel, char modeSign)
 {
 	std::string sign(1, modeSign);
-	if (IrcHelper::noChangeToMake(modeSign, channel->getRightsTopic()))
+	if (IrcHelper::noChangeToMake(modeSign, channel->isSettableTopic()))
 		return ;
 
-	if (modeSign == '+' && !channel->getRightsTopic())
-		channel->setRightsTopic(true);
+	if (modeSign == '+' && !channel->isSettableTopic())
+		channel->setSettableTopic(true);
 	else
-		channel->setRightsTopic(false);
+		channel->setSettableTopic(false);
 
 	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "t", ""), true);
 }
@@ -319,7 +323,7 @@ void CommandHandler::_setOperatorPrivilege(Channel *channel, char modeSign, Clie
 bool CommandHandler::_setChannelLimit(Channel *channel, char modeSign, std::string args)
 {
 	std::string sign(1, modeSign);
-	if (modeSign == '-' && channel->getLimits() == -1)
+	if (modeSign == '-' && channel->getClientsLimit() == -1)
 		return true;
 	
 	if (modeSign == '+')
@@ -328,13 +332,13 @@ bool CommandHandler::_setChannelLimit(Channel *channel, char modeSign, std::stri
 		{
 			if (!IrcHelper::isValidLimit(args))
 				return (false);
-			if (std::atol(args.c_str()) == channel->getLimits())
+			if (std::atol(args.c_str()) == channel->getClientsLimit())
 				return (true);
-			channel->setLimits(std::atol(args.c_str()));
+			channel->setClientsLimit(std::atol(args.c_str()));
 		}
 	}
 	else
-		channel->setLimits(-1);
+		channel->setClientsLimit(-1);
 		
 	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "l", args), true);
 	return true;

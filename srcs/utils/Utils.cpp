@@ -8,9 +8,7 @@
 using namespace commands;
 using namespace server_messages;
 
-// =========================================================================================
-
-// --- PRIVATE
+// ========================================= PRIVATE =======================================
 
 Utils::Utils() {}
 Utils::Utils(const Utils& src) {(void) src;}
@@ -18,7 +16,7 @@ Utils & Utils::operator=(const Utils& src) {(void) src; return *this;}
 Utils::~Utils() {}
 
 
-// --- PUBLIC
+// ========================================= PUBLIC ========================================
 
 // === TIME ===
 

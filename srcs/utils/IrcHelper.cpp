@@ -20,9 +20,7 @@ using namespace channel_error;
 using namespace error_display;
 using namespace colors;
 
-// =========================================================================================
-
-// --- PRIVATE
+// ========================================= PRIVATE =======================================
 
 IrcHelper::IrcHelper() {}
 IrcHelper::IrcHelper(const IrcHelper& src) {(void) src;}
@@ -30,7 +28,7 @@ IrcHelper & IrcHelper::operator=(const IrcHelper& src) {(void) src; return *this
 IrcHelper::~IrcHelper() {}
 
 
-// --- PUBLIC
+// ========================================= PUBLIC ========================================
 
 // === SERVER CONNECT HELPER ===
 
@@ -537,7 +535,7 @@ void IrcHelper::assertNoDuplicate(std::string &str, char c, size_t i)
 	while (str[i])
 	{
 		if (str[i] == c)
-			throw std::invalid_argument(MessageBuilder::ircBasicMsg("doublons", RED));
+			throw std::invalid_argument(MessageBuilder::ircNoticeMsg("doublons", RED));
 		i++;
 	}
 }

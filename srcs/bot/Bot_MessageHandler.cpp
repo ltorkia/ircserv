@@ -14,9 +14,9 @@ using namespace server_messages;
 
 // =========================================================================================
 
-// --- PRIVATE
-
 // === READ / SEND MESSAGES ===
+
+// ========================================= PRIVATE =======================================
 
 /**
  * @brief Handles incoming messages from the server.

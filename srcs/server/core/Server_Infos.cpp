@@ -4,6 +4,8 @@
 
 // === SERVER INFOS GETTERS ===
 
+// ========================================= PUBLIC ========================================
+
 /**
  * @brief Retrieves the file descriptor for the server socket.
  * 

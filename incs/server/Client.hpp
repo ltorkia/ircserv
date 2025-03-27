@@ -20,7 +20,12 @@ class Channel;
 class Client
 {
 	private:
+		// =================================================================================
 		
+		// === VARIABLES ===
+
+		// =================================================================================
+
 		Client();
 		Client(const Client& src);
 		Client& operator=(const Client& src);
@@ -40,19 +45,31 @@ class Client
 		std::map<std::string, Channel*> _channelsJoined;								// Liste des canaux auxquels le client est connecté
 
 	public:
+		// =================================================================================
+		// === CLIENT CONSTRUCTOR / DESTRUCTOR === Client.cpp
 
 		Client(int fd);
 		~Client();
 
+		// =================================================================================
+		
+		// === PUBLIC METHODS ===
+
+		// =================================================================================
+
+		// =================================================================================
 		// === CLIENT INFOS SETTERS === Client_Attributes.cpp
+
+		// === GENERAL INFOS ===
+		void setClientPort(int clientPort);									// Définit le port client
 		void setNickname(const std::string &nickname);						// Définit le pseudo du client
 		void setUsername(const std::string &username);						// Définit le nom d'utilisateur
 		void setRealName(const std::string &realName);						// Définit le nom réel
 		void setHostname(const std::string &hostname);						// Définit le nom d'hôte
 		void setClientIp(const std::string &clientIp);						// Définit l'adresse IP client
 		void setUsermask();													// Définit le usermask du client pour RPL
-		void setClientPort(int clientPort);									// Définit le port client
 
+		// === AUTHENTICATION INFOS ===
 		void setIsIrssi(bool status);										// Définit si le client est un Irssi
 		void setIdentified(bool status);									// Définit si irssi fournit les nick et user par indent
 		void setIdentNickCmd(std::vector<std::string> identCmd);			// Définit la commande d'identification nickname d'Irssi
@@ -60,22 +77,27 @@ class Client
 		void setServPasswordValidity(bool status);							// Définit si le mot de passe est valide
 		void authenticate();												// Authentifie le client
 		
+		// === ACTIVITY INFOS ===
 		void setLastActivity();
 		void setIsAway(bool status); 										// Définit si le client est absent
 		void setAwayMessage(const std::string& message); 					// Définit le message d'absence du client
 		void setErrorMsgTooLongSent(bool status);							// Définit si le message d'erreur d'un input trop long est déjà envoyé
 		void setPingSent(bool status);										// Définit si le serveur attend un PONG du client
 		
+		// =================================================================================
 		// === CLIENT INFOS GETTERS === Client_Attributes.cpp
+
+		// === GENERAL INFOS ===
 		int getFd() const;													// Récupère le descripteur de socket du client
+		int getClientPort() const;											// Récupère le port client
 		const std::string& getNickname() const;								// Récupère le pseudo
 		const std::string& getUsername() const;								// Récupère le nom d'utilisateur
 		const std::string& getRealName() const;								// Récupère le nom réel
 		const std::string& getHostname() const;								// Récupère le nom d'hôte
 		const std::string& getClientIp() const;								// Récupère l'adresse IP client
 		const std::string& getUsermask() const;								// Récupère le usermask du client pour RPL
-		int getClientPort() const;											// Récupère le port client
 
+		// === AUTHENTICATION INFOS ===
 		bool isIrssi() const;												// Vérifie si le client est un Irssi
 		bool isIdentified() const;											// Vérifie si irssi fournit les nick et user par ident
 		std::vector<std::string> getIdentNickCmd() const;					// Récupère la commande d'identification nickname d'Irssi
@@ -83,6 +105,7 @@ class Client
 		bool gotValidServPassword() const;									// Vérifie si le client a donné le bon mot de passe du serveur
 		bool isAuthenticated() const;										// Vérifie si le client est authentifié
 		
+		// === ACTIVITY INFOS ===
 		time_t getSignonTime() const;										// Récupère le timestamp de connexion
 		time_t getLastActivity() const;										// Récupère le dernier moment actif du client
 		time_t getIdleTime() const; 										// Récupère le temps d'inactivité du client
@@ -91,27 +114,33 @@ class Client
 		bool errorMsgTooLongSent() const;									// Vérifie si le message d'erreur d'un input trop long est déjà envoyé
 		bool pingSent() const;												// Dit si le serveur attend un PONG du client		
 		
-		// === BUFFER === Client_Message.cpp
-		std::string& getBufferMessage();									// Récupère le buffer de message
+		// =================================================================================
+		// === MESSAGES === Client_Message.cpp
 
-		// === SEND MESSAGES === Client_Message.cpp
+		// === BUFFER ===
+		std::string& getBufferMessage();														// Récupère le buffer de message
+
+		// === SEND MESSAGES ===
 		void sendMessage(const std::string &message, Client* sender) const;						// Le serveur envoie un message au client
 		void sendToAll(Channel* channel, const std::string &message, bool includeSender);		// Envoie un message formaté irc à tous les clients connectés a un channel
 
-		// === CHANNEL GETTERS === Client_ChannelManager.cpp
+		// =================================================================================
+		// === CHANNEL MANAGER === Client_ChannelManager.cpp
+
+		// === CHANNEL GETTERS ===
 		std::map<std::string, Channel*>& getChannelsJoined();				// Récupère les canaux auxquels le client est connecté
 		bool isInChannel(const std::string& channelName) const;				// Vérifie si le client est membre d'un canal
 		bool isOperator(Channel* channel) const;							// Vérifie si le client est un opérateur sur un canal
 		bool isInvited(const Channel* channel) const;						// Vérifie si le client est invité sur un canal
 
-		// === CHANNEL MANAGER === Client_ChannelManager.cpp
-		void joinChannel(const std::string& channelName, const std::string& password, std::map<std::string, Channel*>& channels);						// Rejoint un canal (creer et rejoindre ou rejoindre existant)
-		void createChannel(const std::string& channelName, const std::string& password, std::map<std::string, Channel*>& channels);						// Crée un canal
-		void addToChannel(Channel* channel, const std::string& password, const std::string& channelName, std::map<std::string, Channel*>& channels);	// Ajoute un client à un canal
-		void msgAfterJoin(Channel* channel, const std::string& channelName); 																			// Send les bons RPL IRC après un join channel
-		bool hasRightPassword(Channel* channel, const std::string& password);																			// Vérifie le mot de passe du canal
-		void passwordSetting(Channel* channel, const std::string& password);																			// Définit le mot de passe du canal
-		void isKickedFromChannel(Channel *channel, Client* kicker, const std::string& reason);															// Est exclu d'un canal
+		// === CHANNEL ACTIONS ===
+		void joinChannel(const std::string& channelName, const std::string& password, std::map<std::string, Channel*>& channels);									// Rejoint un canal (creer et rejoindre ou rejoindre existant)
+		void createChannel(const std::string& channelName, const std::string& password, std::map<std::string, Channel*>& channels);									// Crée un canal
+		void addToChannel(Channel* channel, const std::string& password, const std::string& channelName, std::map<std::string, Channel*>& channels);				// Ajoute un client à un canal
+		void msgAfterJoin(Channel* channel, const std::string& channelName); 																						// Send les bons RPL IRC après un join channel
+		bool hasRightPassword(Channel* channel, const std::string& password);																						// Vérifie le mot de passe du canal
+		void passwordSetting(Channel* channel, const std::string& password);																						// Définit le mot de passe du canal
+		void isKickedFromChannel(Channel *channel, Client* kicker, const std::string& reason);																		// Est exclu d'un canal
 		void isInvitedToChannel(Channel *channel, const Client* inviter);
 		void leaveChannel(std::map<std::string, Channel*>::iterator it, std::map<std::string, Channel*>& channels, const std::string& reason, int reasonCode);		// Quitte un canal
 		void leaveAllChannels(std::map<std::string, Channel*>& channels, const std::string& reason, int reasonCode);												// Quitte tous les canaux

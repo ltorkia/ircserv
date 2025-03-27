@@ -11,6 +11,10 @@
 
 // =========================================================================================
 
+// === CHANNEL MANAGER ===
+
+// ========================================= PUBLIC ========================================
+
 // === CHANNEL GETTERS ===
 
 std::map<std::string, Channel*>& Client::getChannelsJoined()
@@ -30,7 +34,7 @@ bool Client::isInvited(const Channel* channel) const
 	return channel->isInvited(this);
 }
 
-// === CHANNEL MANAGER ===
+// === CHANNEL ACTIONS ===
 /**
  * @brief Joins the client to a specified channel, creating the channel if it does not exist.
  * 
@@ -118,7 +122,7 @@ void Client::addToChannel(Channel* channel, const std::string& password, const s
 
 	if (!isInChannel(channelName))
 	{
-		if (channel->getInvites() && channels[channelName]->isInvited(this) == false)
+		if (channel->isInviteOnly() && channels[channelName]->isInvited(this) == false)
 		{
 			sendMessage(MessageBuilder::ircInviteOnly(getNickname(), channelName), NULL);
 			return;
@@ -153,9 +157,8 @@ void Client::addToChannel(Channel* channel, const std::string& password, const s
  */
 void Client::msgAfterJoin(Channel* channel, const std::string& channelName)
 {
-
 	sendToAll(channel, MessageBuilder::ircClientJoinChannel(_usermask, channelName), false);
-	sendMessage((MessageBuilder::ircChannelModeIs(_nickname, channelName, channel->getMode())), NULL);
+	sendMessage((MessageBuilder::ircChannelModeIs(_nickname, channelName, channel->getModes())), NULL);
 	sendMessage(MessageBuilder::ircCreationTime(_nickname, channelName, channel->getCreationTime()), NULL);
 
 	if (channel->hasTopic())

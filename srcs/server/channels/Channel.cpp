@@ -6,15 +6,14 @@
 
 // ========================================= PUBLIC ========================================
 
-
 Channel::Channel(const std::string &name, const std::string& password) :
 	_name(name),
 	_password(password),
 	_topic(""),
 	_channelTimestamp(time(0)),
-	_invites(false),
-	_rightsTopic(false),
-	_limits(-1) {}
+	_isInviteOnly(false),
+	_isSettableTopic(false),
+	_clientsLimit(-1) {}
 
 Channel::~Channel() {}
 
