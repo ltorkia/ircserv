@@ -27,7 +27,7 @@ Utils::~Utils() {}
  *
  * @param[out] outTime A reference to a std::tm structure that will be filled with the current local time.
  */
-void Utils::getCurrentTime(std::tm &outTime)
+void Utils::getCurrentTime(std::tm& outTime)
 {
 	std::time_t now = std::time(0);
 	std::memset(&outTime, 0, sizeof(outTime));
@@ -110,7 +110,7 @@ std::string Utils::getEnvValue(const std::string& key)
  * @param cmd The command to check.
  * @return true if parameter check is needed, false otherwise.
  */
-bool Utils::paramCheckNeeded(const std::string &cmd)
+bool Utils::paramCheckNeeded(const std::string& cmd)
 {
 	if (cmd != QUIT && cmd != AWAY && cmd != NICK && cmd != PRIVMSG
 		&& cmd != WHOIS && cmd != PING && cmd != PONG)
@@ -147,7 +147,7 @@ bool Utils::isEmptyOrInvalid(const std::vector<std::string>::iterator& it, const
  * @param str The string to be checked.
  * @return true if the string contains only whitespace characters, false otherwise.
  */
-bool Utils::isOnlySpace(const std::string &str)
+bool Utils::isOnlySpace(const std::string& str)
 {
 	for (unsigned long i = 0; i < str.length(); i++)
 		if (std::iswspace(str[i]) == 0)
@@ -165,7 +165,7 @@ bool Utils::isOnlySpace(const std::string &str)
  * @param str The input string to be checked.
  * @return true if the string is a printable sentence, false otherwise.
  */
-bool Utils::isPrintableSentence(const std::string &str)
+bool Utils::isPrintableSentence(const std::string& str)
 {
 	for (unsigned long i = 0; i < str.length(); i++)
 	{
@@ -206,7 +206,7 @@ bool Utils::isNonPrintableChar(char c)
  * @param str The string to be checked. The function does not modify the input string.
  * @return true If all characters in the string are alphabetic, false otherwise.
  */
-bool Utils::isOnlyAlphaNum(const std::string &str)
+bool Utils::isOnlyAlphaNum(const std::string& str)
 {
 	for (unsigned long i = 0; i < str.length(); i++)
 		if (std::isalpha(str[i]) == 0)
@@ -225,7 +225,7 @@ bool Utils::isOnlyAlphaNum(const std::string &str)
  * @param str A reference to the string to be checked.
  * @return true If all characters in the string are digits.
  */
-bool Utils::isAllDigit(const std::string &str)
+bool Utils::isAllDigit(const std::string& str)
 {
 	int num;
 	std::stringstream(str) >> num;
@@ -352,14 +352,14 @@ std::string Utils::streamArg(const std::string& arg)
 }
 
 /**
- * @brief Transforms all printable characters in a string to uppercase.
+ * @brief Converts all printable characters in a given string to uppercase.
  * 
  * This function iterates through each character in the input string and 
  * converts it to its uppercase equivalent if it is a printable character.
  * 
- * @param str The string to be transformed. The transformation is done in place.
+ * @param str A reference to the string to be converted to uppercase.
  */
-void Utils::transformingMaj(std::string &str)
+void Utils::toUpper(std::string& str)
 {
 	for (unsigned long i = 0; i < str.length(); i++)
 		if (std::isprint(str[i]) != 0)
@@ -382,19 +382,20 @@ std::string Utils::truncateStr(const std::string& str)
 }
 
 /**
- * @brief Checks if the given string represents a number.
- * 
- * This function iterates through each character in the string and checks if it is a digit.
- * If any character is not a digit, the function returns false.
- * 
- * @param str The string to be checked.
- * @return true if the string represents a number, false otherwise.
+ * @brief Converts a string containing empty quotes ("") to an empty string ("").
+ *
+ * This function checks if the input string is exactly equal to "\"\"". If so, 
+ * it replaces it with an empty string. Otherwise, it returns the input string unchanged.
+ *
+ * @param str The input string to process.
+ * @return A string where empty quotes ("") are replaced with an empty string ("").
  */
-bool Utils::isNumber(const std::string& str)
+std::string Utils::emptyQuotesToEmptyString(const std::string& str)
 {
-	for (size_t i = 0; i < str.size(); ++i)
-		if (!std::isdigit(str[i])) return false;
-	return true;
+	std::string res = str;
+	if (res == "\"\"")
+		res = "";
+	return res;
 }
 
 

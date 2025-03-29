@@ -224,7 +224,7 @@ void Server::_acceptNewClient()
 
 	// Prompt pour saisir les infos d'authentification
 	std::string authenticationPrompt = IrcHelper::commandToSend(*client);
-	client->sendMessage(MessageBuilder::ircCommandPrompt(authenticationPrompt, "", false), NULL);
+	client->sendMessage(MessageBuilder::ircCommandPrompt(authenticationPrompt, ""), NULL);
 
 	// Log de connexion du client
 	std::cout << MessageBuilder::msgClientConnected(client->getClientIp(), client->getClientPort(), newClientFd, "") << std::endl;

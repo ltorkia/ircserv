@@ -6,7 +6,7 @@
 namespace bot_config
 {
 	// === BOT INFOS ===
-	const std::string BOTNICK 						= "BOTTY";
+	const std::string BOTNICK 						= "botty";
 	const std::string BOTUSER 						= "bot";
 	const std::string BOTREAL 						= "bot";
 
@@ -15,6 +15,9 @@ namespace bot_config
 	const std::string FUNFACT_CMD					= "!funfact";
 	const std::string AGE_CMD 						= "!age";
 	const std::string TIME_CMD 						= "!time";
+
+	// === AUTHENTICATION LIMITS ===
+	const int REQUIRED_AUTH_SERVER_REPLY_COUNT 		= 25;
 
 	// === FUN FACTS PATH ===
 	const std::string QUOTES_PATH 					= "assets/quotes.txt";
@@ -31,6 +34,9 @@ namespace bot_config
 	const std::string MSG_WELCOME_PROMPT			= "👋 Hello there! Type !funfact for a fun fact, !time to get the current time, or !age <YYYY-MM-DD> to know your precise age, including months and days.";
 	const std::string ERR_ECHEC_CONNECTION 			= "Connection failed";
 	const std::string ERR_SET_BOT_NON_BLOCKING 		= "Failed to set bot socket to non-blocking";
+	const std::string ERR_AUTHENTICATION_FAILED		= "Bot authentication failed";
+	const std::string ERR_AUTHENTICATION_INFO		= "Error found during authentication";
+	const std::string ERR_AUTHENTICATION_TIMEOUT	= "Authentication timeout";
 	const std::string ERR_WRITE_SERVER				= "Failed to send message";
 	const std::string ERR_ENV_VALUE 				= "Failed to get environment value";
 	const std::string ERR_UNKNOWN_BOT_CMD 			= "Unknown bot command";

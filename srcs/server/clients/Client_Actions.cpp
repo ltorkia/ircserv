@@ -124,17 +124,22 @@ void Client::addToChannel(Channel* channel, const std::string& password, const s
 }
 
 /**
- * @brief Sends a series of messages to the client and the channel after the client joins a channel.
+ * @brief Handles actions to be performed after a client joins a channel.
  *
- * This function performs the following actions:
- * 1. Sends a join message to all clients in the channel.
- * 2. Sends the channel mode to the client.
- * 3. Sends the channel creation time to the client.
- * 4. If the channel has a topic, sends the topic and the topic setter information to the client.
- * 5. Sends the list of nicknames in the channel to the client.
+ * This function sends various messages to the client and other members of the channel
+ * to notify them of the join event and provide relevant channel information.
  *
- * @param channel A pointer to the Channel object that the client has joined.
+ * @param channel Pointer to the Channel object that the client has joined.
  * @param channelName The name of the channel that the client has joined.
+ *
+ * The following actions are performed:
+ * - Sends a join notification to all members of the channel.
+ * - Sends the channel's mode information to the client.
+ * - Sends the channel's creation time to the client.
+ * - If the channel has a topic, sends the topic and its metadata (setter and timestamp) to the client.
+ * - Sends a list of nicknames of all members in the channel to the client.
+ * - Logs the join event to the console.
+ * - If the channel has an associated bot, sends a welcome message from the bot to the client.
  */
 void Client::msgAfterJoin(Channel* channel, const std::string& channelName)
 {

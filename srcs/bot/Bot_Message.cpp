@@ -19,20 +19,21 @@ using namespace server_messages;
 // ========================================= PRIVATE =======================================
 
 /**
- * @brief Handles incoming messages from the server.
+ * @brief Handles incoming messages from the server and processes them accordingly.
  * 
- * This function reads messages from the server and processes them. It extracts
- * each message from the buffer, cleans it, and then either authenticates the bot
- * or processes commands and private messages.
+ * This function reads messages from the server, processes them line by line, and
+ * performs actions based on the bot's authentication state and the type of server
+ * commands received.
  * 
- * The function performs the following steps:
- * 1. Reads data from the server into the buffer.
- * 2. Extracts and cleans each message from the buffer.
- * 3. Prints the received message for debugging purposes.
- * 4. Authenticates the bot if it is not already authenticated.
- * 5. Processes commands and private messages.
+ * Workflow:
+ * 1. Reads data from the server into a buffer.
+ * 2. Extracts and cleans individual messages from the buffer.
+ * 3. If the bot is not authenticated, processes authentication messages.
+ * 4. If the bot is authenticated, handles server commands such as PING, INVITE, JOIN, PRIVMSG, etc.
+ * 5. Attempts to authenticate the bot if all authentication information has been sent.
  * 
- * If reading from the server fails, the function returns immediately.
+ * @note The function assumes that messages are delimited by newline characters ('\n').
+ *       It also handles cases where messages may include carriage return characters ('\r').
  */
 void Bot::_handleMessage()
 {
@@ -51,16 +52,25 @@ void Bot::_handleMessage()
 		// Debug : affiche le message reçu
 		// std::cout << "---> bot received: " << message << std::endl;
 
-		// On authentifie le bot auprès du serveur
-		if (_isAuthenticated == false)
+		// Les infos d'authentification (PASS, NICK, USER) 
+		// ont été envoyées au serveur au lancement du programme.
+		// On stocke les réponses du serveur dans un buffer pour vérifier
+		// en sortie de boucle que le bot a bien été register
+		if (!_isAuthenticated)
 		{
-			_authenticate(message);
+			_saveServerResponses(message);
 			continue;
 		}
 
-		// Traitement des commandes server (PING, INVITE, JOIN, PRIVMSG...)
+		// Si le bot est authentifié, on traite les commandes serveur
+		// (PING, INVITE, JOIN, PRIVMSG...)
 		_manageServerCommand(message);
 	}
+
+	// On authentifie le bot si ce n'est pas déjà fait
+	// et que tout s'est bien déroulé côté serveur
+	if (!_isAuthenticated)
+		_authenticate();
 }
 
 /**

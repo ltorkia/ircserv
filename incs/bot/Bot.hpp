@@ -23,7 +23,6 @@ class Bot
 		// === SIGNAL ===
 		static volatile sig_atomic_t signalReceived;
 		static void signalHandler(int signal);
-		void setSignal();
 
 		// === CONSTUCTOR / DESTRUCTOR ===
 		Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real);
@@ -31,15 +30,18 @@ class Bot
 
 		// =================================================================================
 		
-		// === MAIN PUBLIC METHOD ===
+		// === MAIN PUBLIC METHODS ===
 
 		// =================================================================================
 
 		// === RUN AND LISTEN ACTIVITY ===
 		void run();
-
 	
 	private:
+		Bot();
+		Bot(const Bot& src);
+		Bot& operator=(const Bot& src);
+
 		// =================================================================================
 		
 		// === VARIABLES ===
@@ -47,11 +49,12 @@ class Bot
 		// =================================================================================
 
 		// === BOT INFOS ===
-		bool _hasSentAuthInfos, _isAuthenticated;
-		int _botFd;
+		int _botFd, _serverMsgCount;
+		bool _isAuthenticated;
 		std::string _botNick, _botUser, _botReal, _botMask;
 
-		// === BUFFER ===
+		// === BUFFERS ===
+		std::string _authBuffer;
 		std::string _buffer;
 
 		// === CURRENT CLIENT AND CHANNEL ===
@@ -79,9 +82,10 @@ class Bot
 		// =================================================================================
 
 		// =================================================================================
-		// === RESET INFOS : Bot.cpp ===
+		// === BASIC SETTINGS : Bot.cpp ===
 
-		void _resetInfos();
+		void _setSignal();
+		void _resetAttributes();
 
 		// =================================================================================
 		// === READ / SEND MESSAGES : Bot_Message.cpp ===
@@ -94,8 +98,11 @@ class Bot
 		// =================================================================================
 		// === REGISTER : Bot_Register.cpp ===
 
-		void _authenticate(const std::string& message);
-		void _sendAuthInfos();
+		void _sendAuthInfos() const;
+		void _saveServerResponses(const std::string& message);
+		void _authenticate();
+		bool _errorFound() const;
+		bool _foundWelcomeMessage() const;
 
 		// =================================================================================
 		// === COMMAND PARSER === Bot_Parser.cpp ===

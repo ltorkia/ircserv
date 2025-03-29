@@ -57,41 +57,32 @@ void Bot::signalHandler(int signal)
 	signalReceived = boolean::TRUE;
 }
 
-/**
- * @brief Sets the signal handler for SIGINT and SIGTSTP signals.
- *
- * This function sets the signal handler for SIGINT and SIGTSTP signals to the `signalHandler` function.
- * The signal handler function is responsible for handling the termination of the server gracefully.
- *
- * @return void
- *
- * @throws std::runtime_error If an error occurs while setting the signal handler.
- *
- * @see signalHandler
- */
-void Bot::setSignal()
-{
-	struct sigaction sa;
-	sa.sa_handler = &Bot::signalHandler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
-	if (sigaction(SIGINT, &sa, NULL) == -1 || sigaction(SIGTSTP, &sa, NULL) == -1)
-		throw std::runtime_error(ERR_SET_SIGNAL);
-}
-
 
 // === CONSTRUCTOR / DESTRUCTOR ===
 
+/**
+ * @brief Constructs a Bot object and initializes its attributes.
+ * 
+ * This constructor sets up the bot's file descriptor, nickname, username, 
+ * real name, and mask. It also initializes various flags related to the 
+ * bot's authentication state. Additionally, it sets up signal handling.
+ * 
+ * @param botFd The file descriptor associated with the bot's connection.
+ * @param nick The nickname of the bot.
+ * @param user The username of the bot.
+ * @param real The real name of the bot.
+ */
 Bot::Bot(int botFd, const std::string& nick, const std::string& user, const std::string& real)
-	: _hasSentAuthInfos(false), _isAuthenticated(false), _botFd(botFd),
-	_botNick(nick), _botUser(user), _botReal(real), _botMask(_botNick + "!" + '~' + _botUser + "@" + Utils::getEnvValue(env::SERVER_IP_KEY))
+	: _botFd(botFd), _serverMsgCount(0), _isAuthenticated(false),
+	_botNick(nick), _botUser(user), _botReal(real),
+	_botMask(_botNick + "!" + '~' + _botUser + "@" + Utils::getEnvValue(env::SERVER_IP_KEY))
 {
-	setSignal();
+	_setSignal();
 }
 Bot::~Bot()
 {
-	if (_botFd != -1)
-		close(_botFd);
+	if (close(_botFd) == -1)
+		perror("Failed to close bot socket");
 }
 
 
@@ -110,6 +101,7 @@ Bot::~Bot()
  * 
  * @details
  * - Initializes the file descriptor set.
+ * - Sends authentication information to the server.
  * - Enters an infinite loop to monitor the bot's file descriptor.
  * - Resets internal information.
  * - Breaks the loop if a termination signal is received.
@@ -121,9 +113,11 @@ void Bot::run()
 {
 	fd_set readFds;
 	FD_ZERO(&readFds);
+	_sendAuthInfos();
+
 	while (true)
 	{
-		_resetInfos();
+		_resetAttributes();
 		if (signalReceived)
 			break;
 			
@@ -137,6 +131,38 @@ void Bot::run()
 	FD_CLR(_botFd, &readFds);
 }
 
+
+// ========================================= PRIVATE =======================================
+
+Bot::Bot() {}
+Bot::Bot(const Bot& src) {(void) src;}
+Bot & Bot::operator=(const Bot& src) {(void) src; return *this;}
+
+
+// === BASIC SETTINGS ===
+
+/**
+ * @brief Sets the signal handler for SIGINT and SIGTSTP signals.
+ *
+ * This function sets the signal handler for SIGINT and SIGTSTP signals to the `signalHandler` function.
+ * The signal handler function is responsible for handling the termination of the server gracefully.
+ *
+ * @return void
+ *
+ * @throws std::runtime_error If an error occurs while setting the signal handler.
+ *
+ * @see signalHandler
+ */
+void Bot::_setSignal()
+{
+	struct sigaction sa;
+	sa.sa_handler = &Bot::signalHandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	if (sigaction(SIGINT, &sa, NULL) == -1 || sigaction(SIGTSTP, &sa, NULL) == -1)
+		throw std::runtime_error(ERR_SET_SIGNAL);
+}
+
 /**
  * @brief Resets the internal state of the Bot object.
  *
@@ -144,7 +170,7 @@ void Bot::run()
  * including target, client nickname, channel name, input, command, age argument,
  * and resets the command position and date-related members to their initial values.
  */
-void Bot::_resetInfos()
+void Bot::_resetAttributes()
 {
 	_target.clear();
 	_clientNickname.clear();

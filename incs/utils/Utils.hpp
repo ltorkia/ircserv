@@ -20,7 +20,7 @@ class Utils
 	public:
 
 		// === TIME ===
-		static void getCurrentTime(std::tm &outTime);
+		static void getCurrentTime(std::tm& outTime);
 
 		// === ENV ===
 		static void writeEnvFile(const std::string& serverIp, int port, const std::string& password);
@@ -29,20 +29,20 @@ class Utils
 		// === PARSING HELPER ===
 		static bool paramCheckNeeded(const std::string& cmd);
 		static bool isEmptyOrInvalid(const std::vector<std::string>::iterator& it, const std::vector<std::string>& vec);
-		static bool isOnlySpace(const std::string &str);
-		static bool isPrintableSentence(const std::string &str);
+		static bool isOnlySpace(const std::string& str);
+		static bool isPrintableSentence(const std::string& str);
 		static bool isNonPrintableChar(char c);
-		static bool isOnlyAlphaNum(const std::string &str);
-		static bool isAllDigit(const std::string &str);
+		static bool isOnlyAlphaNum(const std::string& str);
+		static bool isAllDigit(const std::string& str);
 		static void printVector(const std::vector<std::string>& vec);
 
 		// === STRING MANIPULATION ===
 		static std::vector<std::string> getTokens(const std::string &s, int opt);
 		static std::string stockVector(std::vector<std::string>::iterator it, const std::vector<std::string>& vec);
 		static std::string streamArg(const std::string& arg);
-		static void transformingMaj(std::string &str);
+		static void toUpper(std::string& str);
 		static std::string truncateStr(const std::string& str);
-		static bool isNumber(const std::string& str);
+		static std::string emptyQuotesToEmptyString(const std::string& str);
 
 		// === BUFFER CLEANER ===
 		static std::string extractAndCleanMessage(std::string& bufferMessage, size_t pos);

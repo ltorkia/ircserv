@@ -9,11 +9,13 @@
 #include "../../../incs/config/commands.hpp"
 #include "../../../incs/config/server_messages.hpp"
 #include "../../../incs/config/colors.hpp"
+#include "../../../incs/config/bot_config.hpp"
 
 using namespace commands;
 using namespace auth_cmd;
 using namespace server_messages;
 using namespace colors;
+using namespace bot_config;
 
 // =========================================================================================
 
@@ -39,7 +41,7 @@ using namespace colors;
  * 5. Sends a command prompt if the client is not fully authenticated.
  * 6. Authenticates the client and sends a greeting message if the client becomes fully authenticated.
  */
-void CommandHandler::_authenticateCommand()
+void CommandHandler::_authenticate()
 {
 	std::string cmd = *_itInput;
 	std::string command_to_send = IrcHelper::commandToSend(*_client);
@@ -56,7 +58,7 @@ void CommandHandler::_authenticateCommand()
 		}
 		_client->sendMessage(MessageBuilder::ircNotRegistered(), NULL);
 		if (_client->isIdentified() == false)
-			_client->sendMessage(MessageBuilder::ircCommandPrompt(command_to_send, cmd, true), NULL);
+			_client->sendMessage(MessageBuilder::ircCommandPrompt(command_to_send, cmd), NULL);
 		return;
 	}
 	
@@ -67,7 +69,7 @@ void CommandHandler::_authenticateCommand()
 	if (toDo < CMD_ALL_SET && IrcHelper::isCommandIgnored(cmd, false) && !_client->isIdentified())
 	{
 		command_to_send = IrcHelper::commandToSend(*_client);
-		_client->sendMessage(MessageBuilder::ircCommandPrompt(command_to_send, "", false), NULL);
+		_client->sendMessage(MessageBuilder::ircCommandPrompt(command_to_send, ""), NULL);
 	}
 
 	if (toDo == CMD_ALL_SET && _client->isAuthenticated() == false)
@@ -119,7 +121,7 @@ void CommandHandler::_preRegister(const std::string& cmd, int toDo) {
 void CommandHandler::_isRightPassword()
 {
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput))
-		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), "PASS"));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), PASS));
 	if (_client->gotValidServPassword() == true)
 		throw std::invalid_argument(MessageBuilder::ircAlreadyRegistered(_client->getNickname()));
 
@@ -180,7 +182,7 @@ void CommandHandler::_setNicknameClient(void)
 		throw std::invalid_argument(MessageBuilder::ircErroneusNickname(nickname, enteredNickname));
 	
 	// On check si le nickname est déjà pris
-	if (_server.getClientByNickname(enteredNickname, _client) != -1) //check si un utilisateur enregistré porte deja le meme nickname
+	if (_server.getClientByNickname(enteredNickname, _client) != -1)
 	{
 		if (_client->isIdentified())
 			_client->sendMessage(MessageBuilder::ircChangingNickname(enteredNickname), NULL);

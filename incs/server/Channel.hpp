@@ -95,7 +95,7 @@ class Channel
 		int getConnectedCount() const;						// Récupère le nombre de clients connectés au canal
 		int getChannelClientByNickname(const std::string &nickname, const Client* currClient); // Récupère le client du canal par son pseudo
 		std::string getNicknames() const;					// Récupère la liste des pseudos des clients connectés au canal
-		
+
 		bool isConnected(const Client* client) const;		// Vérifie si un client spécifique est connecté au canal
 		bool isOperator(const Client* client) const;		// Vérifie si un client spécifique est un operator du canal
 		bool isInvited(const Client* client) const;			// Vérifie si un client spécifique est invité sur le canal

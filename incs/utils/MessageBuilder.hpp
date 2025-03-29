@@ -45,7 +45,7 @@ class MessageBuilder
 		static std::string ircCapabilities(const std::string& arg);
 
 		// === AUTHENTICATION PROMPT ===
-		static std::string ircCommandPrompt(const std::string& commandPrompt, const std::string& prevCommand, bool error);
+		static std::string ircCommandPrompt(const std::string& commandPrompt, const std::string& prevCommand);
 		static std::string ircUsernameSet(const std::string& username);
 		static std::string ircFirstNicknameSet(const std::string& nickname);
 		static std::string ircChangingNickname(const std::string& nickname);

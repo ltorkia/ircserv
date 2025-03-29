@@ -159,8 +159,7 @@ void CommandHandler::_setTopic()
 	std::string newTopic = Utils::truncateStr(IrcHelper::sanitizeIrcMessage(*itTopic, TOPIC, _client->getNickname()));
 
 	// Si le nouveau topic contient juste "", on le remplace par une chaine vide pour unset le topic
-	if (newTopic == "\"\"")
-		newTopic = "";
+	newTopic = Utils::emptyQuotesToEmptyString(newTopic);
 
 	// Si le topic est le meme que l'ancien, on ne fait rien
 	if ((!channel->getTopic().empty() && newTopic == channel->getTopic())

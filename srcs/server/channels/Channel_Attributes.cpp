@@ -3,6 +3,10 @@
 // === OTHER CLASSES ===
 #include "../../../incs/server/Client.hpp"
 #include "../../../incs/utils/MessageBuilder.hpp"
+#include "../../../incs/utils/IrcHelper.hpp"
+#include "../../../incs/config/bot_config.hpp"
+
+using namespace bot_config;
 
 // =========================================================================================
 

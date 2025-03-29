@@ -60,9 +60,9 @@ Request& Request::operator=(const Request& src)
 
 // === GETTERS ===
 
-size_t Request::getArgsSize() const { return _args.size(); }
-std::vector<std::string> Request::getArgs() const { return _args; }
-std::string Request::getCommand() const { return _command; }
+size_t Request::getArgsSize() const {return _args.size();}
+std::vector<std::string> Request::getArgs() const {return _args;}
+std::string Request::getCommand() const {return _command;}
 
 
 // =========================================================================================
@@ -140,7 +140,7 @@ void CommandHandler::_sendFile(std::vector<std::string> entry)
 		_files.insert(std::pair<std::string, File>(filename, file));
 		_client->sendMessage("DCC SEND request sent to " + args[0] + ": " + filename + eol::IRC, NULL);
 		_clients[clientFd]->sendMessage(MessageBuilder::msgSendFile(filename, _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
-		args.erase(args.begin() +1 );
+		args.erase(args.begin() + 1);
 	}
 }
 
@@ -164,7 +164,8 @@ void CommandHandler::_sendFile(std::vector<std::string> entry)
  */
 void	CommandHandler::_getFile(std::vector<std::string> entry)
 {
-	if (chdir(getenv("HOME")) != 0) {
+	if (chdir(getenv("HOME")) != 0)
+	{
 		std::cerr << "Erreur : Impossible de changer de répertoire !" << std::endl;
 		return ;
 	}
@@ -174,6 +175,7 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD), NULL);
 		return ;
 	}
+
 	Request	request(req, GET_CMD);
 	size_t argsSize = request.getArgsSize();
 	std::vector<std::string> args = request.getArgs();
@@ -182,7 +184,6 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD), NULL);
 		return ;
 	}
-	std::map<std::string, File> files = _files;
 	while (argsSize >= 2)
 	{
 		int clientFd = _server.getClientByNickname(args[0], _client);
@@ -191,12 +192,12 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 			_client->sendMessage(MessageBuilder::ircNoSuchNick(_client->getNickname(), args[1]), NULL);
 			return ;
 		}
-		if (files.find(args[1]) == files.end())
+		if (_files.find(args[1]) == _files.end())
 		{
 			_client->sendMessage("DCC no file offered by " + args[0] + eol::IRC, NULL);
 			return ;
 		}
-		File file(files[args[1]]);
+		File file(_files[args[1]]);
 		std::string fileName = file.getFileName();
 		std::string path = file.getPath();
 		std::string sender = file.getSender();
@@ -208,13 +209,13 @@ void	CommandHandler::_getFile(std::vector<std::string> entry)
 			return ;
 		}
 		_clients[clientFd]->sendMessage(MessageBuilder::msgSendingFile(args[1], _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
-		std::fstream	ofs(args[1].c_str(), std::fstream::out);
-		std::fstream	ifs(path.c_str(), std::fstream::in);
+		std::fstream ofs(args[1].c_str(), std::fstream::out);
+		std::fstream ifs(path.c_str(), std::fstream::in);
 		if (ofs.is_open())
 			ofs << ifs.rdbuf();
 		_client->sendMessage("DCC received file " + fileName + " from " + sender + eol::IRC, NULL);
 		_clients[clientFd]->sendMessage("DCC sent file " + fileName + " for " + receiver + eol::IRC, _client);
-		files.erase(args[1]);
+		_files.erase(args[1]);
 		args.erase(args.begin() + 1);
 	}
 }

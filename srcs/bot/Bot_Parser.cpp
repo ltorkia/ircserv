@@ -243,7 +243,7 @@ bool Bot::_extractDate(const std::string& dateStr)
 	std::string monthStr = dateStr.substr(5, 2);
 	std::string dayStr = dateStr.substr(8, 2);
 
-	if (!Utils::isNumber(yearStr) || !Utils::isNumber(monthStr) || !Utils::isNumber(dayStr))
+	if (!Utils::isAllDigit(yearStr) || !Utils::isAllDigit(monthStr) || !Utils::isAllDigit(dayStr))
 		return false;
 
 	// Convertir en entiers

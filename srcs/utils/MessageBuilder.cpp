@@ -91,13 +91,13 @@ std::string MessageBuilder::ircCapabilities(const std::string& arg)
 
 // === AUTHENTICATION PROMPT ===
 
-std::string MessageBuilder::ircCommandPrompt(const std::string& commandPrompt, const std::string& prevCommand, bool error)
+std::string MessageBuilder::ircCommandPrompt(const std::string& commandPrompt, const std::string& prevCommand)
 {
 	std::ostringstream stream;
 	std::vector<std::string> commands = Utils::getTokens(commandPrompt, splitter::COMMA);
 	std::vector<std::string>::iterator cmd = commands.begin();
 
-	if (error)
+	if (!prevCommand.empty())
 	{
 		stream << ":" << server::NAME << " NOTICE " << server::NAME 
 		<< " :" << IRC_COLOR_ERR << prevCommand << " "

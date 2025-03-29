@@ -73,7 +73,7 @@ class CommandHandler
 		// =================================================================================
 		// === AUTHENTICATE COMMANDS : CommandHandler_Register.cpp ===
 
-		void _authenticateCommand();
+		void _authenticate();
 		void _preRegister(const std::string& cmd, int toDo);
 		void _isRightPassword();
 		void _setNicknameClient();

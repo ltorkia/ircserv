@@ -84,14 +84,15 @@ void CommandHandler::manageCommand(std::string input)
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput))
 		throw std::invalid_argument(MessageBuilder::ircUnknownCommand(nickname, " "));
 	
-	std::string cmd = *_itInput;
-	Utils::transformingMaj(cmd);
+	Utils::toUpper(*_vectorInput.begin());
 		
 	if (_client->isAuthenticated() == false)
 	{
-		_authenticateCommand();
+		_authenticate();
 		return ;
 	}
+	
+	std::string cmd = *_itInput;
 	
 	std::map<std::string, void (CommandHandler::*)()>::iterator itFunction = _fctMap.find(cmd);;
 	if (itFunction == _fctMap.end())

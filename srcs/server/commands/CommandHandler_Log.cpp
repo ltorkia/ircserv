@@ -71,10 +71,10 @@ void CommandHandler::_handleWho()
 {
 	std::string requestorNickname = _client->getNickname();
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::WORD);
-	int n_arg = args.size();
+	int nArg = args.size();
 
 	// Si plus de un argument apres split, le format est invalide
-	if (n_arg != 1)
+	if (nArg != 1)
 		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(requestorNickname, WHO));
 
 	// Si le client demande des infos sur un channel, on vérifie son existence
@@ -128,10 +128,10 @@ void CommandHandler::_handleWhois()
 		return;
 
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::WORD);
-	int n_arg = args.size();
+	int nArg = args.size();
 
 	// Si plus de un argument apres split, le format est invalide
-	if (n_arg != 1)
+	if (nArg != 1)
 		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(requestorNickname, WHOIS));
 	
 	std::string checkedClientNickname = *_itInput;
@@ -195,8 +195,7 @@ void CommandHandler::_setAway()
 	std::string awayMessage = Utils::truncateStr(IrcHelper::sanitizeIrcMessage(*_itInput, AWAY, nickname));
 
 	// Si la raison contient juste "", on le remplace par une chaine vide pour remettre en mode actif
-	if (awayMessage == "\"\"")
-		awayMessage = "";
+	awayMessage = Utils::emptyQuotesToEmptyString(awayMessage);
 
 	// Si la raison est vide et que le client est déjà en mode actif, on ignore
 	// sinon on le remet en mode actif
