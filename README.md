@@ -1,4 +1,4 @@
-# IRC Server 42 Project: [ENGLISH SUBJECT](https://github.com/ltorkia/ircserv/blob/tree/en.subject.pdf)
+# IRC Server 42 Project: [ENGLISH SUBJECT](https://github.com/ltorkia/ircserv/blob/main/en.subject.pdf)
 
 This project involves developing an **IRC server** in **C++ 98**, designed to handle multiple clients simultaneously while respecting the IRC protocol standards. The goal is to implement a lightweight, efficient, and modular server with robust error handling and non-blocking operations.
 
@@ -31,7 +31,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 
 ### Allowed External Functions 🧑‍💻:
 - `socket`, `close`, `setsockopt`, `bind`, `connect`, `listen`, `accept`...
-- Full list [here](https://github.com/ltorkia/ircserv/blob/tree/en.subject.pdf).
+- Full list [here](https://github.com/ltorkia/ircserv/blob/main/en.subject.pdf).
 
 ---
 
@@ -173,7 +173,7 @@ make re       # Cleans and recompiles everything
 
 ## **Testing & Usage** 🧪
 
-**If you have any issues, refer to [`irc.connect.help.md`](https://github.com/ltorkia/ircserv/blob/tree/ressources/irc.connect.help.md)**
+**If you have any issues, refer to [`irc.connect.help.md`](https://github.com/ltorkia/ircserv/blob/main/ressources/irc.connect.help.md)**
 
 ### Running `server` 🚀:
 ```bash
