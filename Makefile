@@ -1,7 +1,7 @@
 #-----> PROGRAM NAMES (SERVER + BOT)
 NAME_SERVER			=	ircserv
 NAME_BOT			=	ircbot
-NAME_LIB			=	libutils.a
+NAME_LIB			=	libtools.a
 
 #########################################################
 
@@ -10,7 +10,7 @@ SRCS_DIR			=	srcs
 OBJS_DIR			=	bin
 
 #-----> COMMON LIBRARY (SHARED BY SERVER + BOT)
-LIB_UTILS			=	$(OBJS_DIR)/$(NAME_LIB)
+LIB_TOOLS			=	$(OBJS_DIR)/$(NAME_LIB)
 
 #########################################################
 
@@ -119,7 +119,7 @@ RESET				= \033[0m
 #########################################################
 
 #-----> MAKE ALL RULE
-all: $(LIB_UTILS) server bot
+all: $(LIB_TOOLS) server bot
 
 #-----> SERVEUR IRC
 ${OBJS_DIR}/%.o: $(SRCS_DIR)/%.cpp
@@ -129,7 +129,7 @@ ${OBJS_DIR}/%.o: $(SRCS_DIR)/%.cpp
 
 server: $(NAME_SERVER)
 
-${NAME_SERVER}: ${OBJS} $(LIB_UTILS)
+${NAME_SERVER}: ${OBJS} $(LIB_TOOLS)
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
@@ -137,7 +137,7 @@ ${NAME_SERVER}: ${OBJS} $(LIB_UTILS)
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	@echo "${GREEN}--> ${NAME_SERVER}${RESET}\n"
-	${CXX} ${OBJS} -o ${NAME_SERVER} -L$(OBJS_DIR) -lutils
+	${CXX} ${OBJS} -o ${NAME_SERVER} -L$(OBJS_DIR) -ltools
 
 #########################################################
 
@@ -149,7 +149,7 @@ ${OBJS_DIR}/%.o: $(SRCS_DIR)/%.cpp
 
 bot: ${NAME_BOT}
 
-${NAME_BOT}: ${OBJS_BOT} $(LIB_UTILS)
+${NAME_BOT}: ${OBJS_BOT} $(LIB_TOOLS)
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
@@ -157,7 +157,7 @@ ${NAME_BOT}: ${OBJS_BOT} $(LIB_UTILS)
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	@echo "${GREEN}--> ${NAME_BOT}${RESET}\n"
-	${CXX} ${OBJS_BOT} -o ${NAME_BOT} -L$(OBJS_DIR) -lutils
+	${CXX} ${OBJS_BOT} -o ${NAME_BOT} -L$(OBJS_DIR) -ltools
 
 #########################################################
 
@@ -168,7 +168,7 @@ ${OBJS_DIR}/%.o: $(SRCS_DIR)/%.cpp
 	${CXX} -MMD -c ${CXXFLAGS} $< -o $@
 
 #-----> COMMON LIBRARY (libcommon.a)
-$(LIB_UTILS): $(COMMON_OBJS)
+$(LIB_TOOLS): $(COMMON_OBJS)
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
@@ -176,8 +176,8 @@ $(LIB_UTILS): $(COMMON_OBJS)
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
 	@echo "${GREEN}--> $(NAME_LIB)${RESET}\n"
-	@mkdir -p $(dir $(LIB_UTILS))
-	ar rcs $(LIB_UTILS) $(COMMON_OBJS) 
+	@mkdir -p $(dir $(LIB_TOOLS))
+	ar rcs $(LIB_TOOLS) $(COMMON_OBJS) 
 
 #########################################################
 
@@ -201,7 +201,7 @@ fclean:
 	${RM} ${OBJS_DIR}
 	${RM} ${NAME_SERVER}
 	${RM} ${NAME_BOT}
-	${RM} $(LIB_UTILS)
+	${RM} $(LIB_TOOLS)
 
 re: fclean all
 
