@@ -114,6 +114,9 @@ int Bot::_readFromServer()
  */
 void Bot::_sendMessage(const std::string &message) const
 {
+	if (signalReceived)
+		return;
+		
 	// On formate le message en IRC (ajout du \r\n, si trop long tronqué à 512 caractères)
 	std::string formattedMessage = MessageBuilder::ircFormat(message);
 

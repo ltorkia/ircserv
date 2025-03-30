@@ -189,21 +189,26 @@ clean:
 	@echo "${CYAN}####                  CLEANING                     ####${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
-	${RM} ${OBJS_DIR}
+	${RM} ${DEPS} ${DEPS_BOT} ${COMMON_DEPS}
+	${RM} -rf ${OBJS_DIR}
 
-fclean:
+fclean: clean
 	@echo "\n"
 	@echo "${CYAN}#######################################################${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}####                 FULL CLEAN                    ####${RESET}"
 	@echo "${CYAN}####                                               ####${RESET}"
 	@echo "${CYAN}#######################################################${RESET}\n"
-	${RM} ${OBJS_DIR}
-	${RM} ${NAME_SERVER}
-	${RM} ${NAME_BOT}
-	${RM} $(LIB_TOOLS)
+	${RM} ${NAME_SERVER} ${NAME_BOT} $(LIB_TOOLS)
 
-re: fclean all
+re: fclean
+	@echo "\n"
+	@echo "${CYAN}#######################################################${RESET}"
+	@echo "${CYAN}####                                               ####${RESET}"
+	@echo "${CYAN}####                  REBUILD                      ####${RESET}"
+	@echo "${CYAN}####                                               ####${RESET}"
+	@echo "${CYAN}#######################################################${RESET}\n"
+	$(MAKE) all
 
 #-----> DEBUG
 debug: fclean
