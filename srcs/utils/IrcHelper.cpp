@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:34:14 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 12:58:06 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,14 +85,14 @@ int IrcHelper::validatePort(const std::string& port)
  */
 int	IrcHelper::getCommand(const Client& client)
 {
-	int to_do = CMD_ALL_SET;				//renvoie 3 si tout est fait
+	int to_do = CMD_ALL_SET;
 	
 	if (client.gotValidServPassword() == false)
-		to_do = PASS_CMD;					//renvoie 0 si le password n'est pas valide
+		to_do = PASS_CMD;
 	else if (client.getNickname().empty())
-		to_do = NICK_CMD;					//renvoie 1 si le nickname n'existe pas
+		to_do = NICK_CMD;
 	else if (client.getUsername().empty())
-		to_do = USER_CMD;					//renvoie 2 si l'user n'existe pas 
+		to_do = USER_CMD;
 	
 	return to_do;
 }
@@ -177,15 +177,12 @@ bool IrcHelper::isCommandIgnored(const std::string& cmd, bool checkAuthCmds)
  */
 bool IrcHelper::isValidPassword(const std::string& password, bool isPassServer)
 {
-	if (password.empty())
-		return false;
-	if (password.length() < 3 || password.length() > 20)
+	if (password.empty() || password.length() < 3 || password.length() > 20)
 		return false;
 	for (size_t i = 0; i < password.size(); i++)
 	{
-		if (isPassServer == false && !std::isalnum(password[i]) && password[i] != '_')
-			return false;
-		if (isPassServer == true && !std::isprint(password[i]))
+		if ((isPassServer == false && !std::isalnum(password[i]) && password[i] != '_')
+			|| (isPassServer == true && !std::isprint(password[i])))
 			return false;
 	}
 	return true;
@@ -457,13 +454,13 @@ int IrcHelper::isRightMode(const std::string &mode)
 int IrcHelper::findCharBeforeIndex(const std::string& str, char target1, char target2, size_t startPos)
 {
 	if (startPos >= str.length())
-		return -1;  // Si la position de départ est en dehors de la chaîne
+		return -1;
 
 	for (int i = static_cast<int>(startPos); i >= 0; i--)
 		if (str[i] == target1 || str[i] == target2)
-			return i;  // Retourne l'index du caractère trouvé
+			return i;
 
-	return -1;  // Si le caractère n'est pas trouvé
+	return -1;
 }
 
 /**
@@ -521,8 +518,8 @@ std::map<char, std::string> IrcHelper::mapModesToArgs(std::vector<std::string> a
 		{
 			if (mode[findCharBeforeIndex(mode, '-', '+', i)] == '+')
 			{
-				mode_args.insert(std::make_pair(mode[i], *args_mode_it));//on met la nouvelle cle + arg qui nous interesse
-				args_mode_it++;											//on avance. si on decide de prendre que le 1er, juste a supprimer la conditiom
+				mode_args.insert(std::make_pair(mode[i], *args_mode_it));
+				args_mode_it++;
 			}
 		}
 	}
@@ -547,7 +544,7 @@ void IrcHelper::assertNoDuplicate(std::string &str, char c, size_t i)
 	while (str[i])
 	{
 		if (str[i] == c)
-			throw std::invalid_argument(MessageBuilder::ircNoticeMsg("doublons", RED));
+			throw std::invalid_argument(MessageBuilder::ircNoticeMsg(MODE_FOUND_DUPLICATES, RED));
 		i++;
 	}
 }

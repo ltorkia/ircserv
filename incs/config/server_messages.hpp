@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:50:47 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 12:54:40 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,17 @@ namespace server_messages
 	const std::string MSG_CONNECTION_CLOSED 		= "Connection closed by server";
 	const std::string MSG_BASIC_ERROR 				= "An error occurred. Please try again";
 
-	// --- COMMANDES PROMPT
+	// --- PROMPT COMMANDS
 	const std::string PASS_PROMPT 					= "- Server password: PASS <password>";
 	const std::string NICKNAME_PROMPT 				= "- Nickname: NICK <your_nickname> | len <= 10";
 	const std::string USERNAME_PROMPT 				= "- Username: USER <username> <hostname> <servername> :<realname>";
 
-	// --- COMMANDES REUSSIES
+	// --- COMMANDs SUCCESS
 	const std::string SERVER_PASSWORD_FOUND 		= "Server password found";
 	const std::string PROMPT_ONCE_REGISTERED 		= "You can now join a channel and start chatting!";
+
+	// --- COMMANDS FAIL ===
+	const std::string MODE_FOUND_DUPLICATES 		= "Duplicates found in mode string";
 
 	
 	// ===  QUIT REASONS TO SEND TO CLIENTS ===
