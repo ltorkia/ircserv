@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Command.cpp                                 :+:      :+:    :+:   */
+/*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 12:12:49 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/02 00:21:08 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,42 +28,80 @@ using namespace commands;
 
 // ========================================= PUBLIC ========================================
 
+// === STATIC MAP : COMMANDS -> HANDLERS ===
+
+/**
+ * @brief A static map that associates command names with member function pointers.
+ * 
+ * This map stores associations between command strings and corresponding 
+ * member functions in the Command class, with the signature `void Command::functionName()`.
+ * It is shared across all instances of the Command class.
+ */
+std::map<std::string, void (Command::*)()>Command::_fctMap;
+
+/**
+ * @brief Initializes the function map (_fctMap) with command handlers.
+ * 
+ * This method fills the _fctMap with command identifiers and their corresponding 
+ * function pointers, grouped by command type (Authenticate, Channel, Mode, 
+ * Message, Log, and File).
+ * It only initializes the map once, checking if it is empty before doing so.
+ */
+void Command::_initFctMap()
+{
+	if (_fctMap.empty())
+	{
+		// === AUTHENTICATE COMMANDS : Command_Auth.cpp ===
+		_fctMap[PASS] 			= &Command::_isRightPassword;
+		_fctMap[NICK] 			= &Command::_setNicknameClient;
+		_fctMap[USER] 			= &Command::_setUsernameClient;
+		_fctMap[CAP] 			= &Command::_handleCapabilities;
+		
+		// === CHANNEL COMMANDS : Command_Channel.cpp ===
+		_fctMap[INVITE] 		= &Command::_inviteChannel;
+		_fctMap[JOIN] 			= &Command::_joinChannel;
+		_fctMap[TOPIC] 			= &Command::_setTopic;
+		_fctMap[KICK] 			= &Command::_kickChannel;
+		_fctMap[PART] 			= &Command::_quitChannel;
+	
+		// === MODE COMMANDS : Command_Mode.cpp ===
+		_fctMap[MODE] 			= &Command::_handleMode;
+	
+		// === MESSAGE COMMANDS : Command_Message.cpp ===
+		_fctMap[PRIVMSG] 		= &Command::_sendPrivateMessage;
+	
+		// === LOG COMMANDS : Command_Log.cpp ===
+		_fctMap[PING] 			= &Command::_sendPong;
+		_fctMap[PONG] 			= &Command::_updateActivity;
+		_fctMap[WHO] 			= &Command::_handleWho;
+		_fctMap[WHOIS] 			= &Command::_handleWhois;
+		_fctMap[WHOWAS] 		= &Command::_handleWhowas;
+		_fctMap[AWAY] 			= &Command::_setAway;
+		_fctMap[QUIT] 			= &Command::_quitServer;
+	
+		// === FILE COMMANDS : Command_File.cpp ===
+		_fctMap[DCC] 			= &Command::_handleFile;
+	}
+}
+
+
 // === CONSTRUCTOR (INIT COMMAND HANDLERS MAP) / DESTRUCTOR ===
 
-Command::Command(Server& server, std::map<int, Client*>::iterator it)
-	: _server(server), _it(it), _clientFd(_it->first), _client(_it->second),
+/**
+ * @brief Constructs a Command object associated with a specific client.
+ * It also initializes the function map used for command handling.
+ * 
+ * @param server A reference to the Server object managing the IRC server.
+ * @param itClient An iterator pointing to a specific element in a map where
+ *                 the key is an integer (e.g., client ID) and the value is a
+ *                 pointer to a Client object. This iterator is used to
+ *                 identify and interact with the corresponding client.
+ */
+Command::Command(Server& server, std::map<int, Client*>::iterator itClient)
+	: _server(server), _it(itClient), _clientFd(_it->first), _client(_it->second),
 	_clients(_server.getClients()), _channels(_server.getChannels())
 {
-	// === AUTHENTICATE COMMANDS : Command_Auth.cpp ===
-	_fctMap[PASS] 			= &Command::_isRightPassword;
-	_fctMap[NICK] 			= &Command::_setNicknameClient;
-	_fctMap[USER] 			= &Command::_setUsernameClient;
-	_fctMap[CAP] 			= &Command::_handleCapabilities;
-	
-	// === CHANNEL COMMANDS : Command_Channel.cpp ===
-	_fctMap[INVITE] 		= &Command::_inviteChannel;
-	_fctMap[JOIN] 			= &Command::_joinChannel;
-	_fctMap[TOPIC] 			= &Command::_setTopic;
-	_fctMap[KICK] 			= &Command::_kickChannel;
-	_fctMap[PART] 			= &Command::_quitChannel;
-
-	// === MODE COMMANDS : Command_Mode.cpp ===
-	_fctMap[MODE] 			= &Command::_handleMode;
-
-	// === MESSAGE COMMANDS : Command_Message.cpp ===
-	_fctMap[PRIVMSG] 		= &Command::_sendPrivateMessage;
-
-	// === LOG COMMANDS : Command_Log.cpp ===
-	_fctMap[PING] 			= &Command::_sendPong;
-	_fctMap[PONG] 			= &Command::_updateActivity;
-	_fctMap[WHO] 			= &Command::_handleWho;
-	_fctMap[WHOIS] 			= &Command::_handleWhois;
-	_fctMap[WHOWAS] 		= &Command::_handleWhowas;
-	_fctMap[AWAY] 			= &Command::_setAway;
-	_fctMap[QUIT] 			= &Command::_quitServer;
-
-	// === FILE COMMANDS : Command_File.cpp ===
-	_fctMap[DCC] 			= &Command::_handleFile;
+	_initFctMap();
 }
 
 Command::~Command() {}

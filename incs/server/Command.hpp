@@ -29,7 +29,7 @@ class Command
 		// === COMMAND HANDLER === Command.cpp ===
 
 		// === CONSTRUCTOR (INIT COMMAND HANDLERS MAP) / DESTRUCTOR ===
-		Command(Server& server, std::map<int, Client*>::iterator it);
+		Command(Server& server, std::map<int, Client*>::iterator itClient);
 		~Command();
 
 		// =================================================================================
@@ -48,6 +48,10 @@ class Command
 
 		// =================================================================================
 
+		// === STATIC MAP : COMMANDS -> HANDLERS ===
+		static std::map<std::string, void (Command::*)()> _fctMap;
+		static void _initFctMap();
+
 		// === SERVER INSTANCE ===
 		Server& _server;
 
@@ -59,9 +63,6 @@ class Command
 		// === REFERENCE TO ALL CLIENTS + ALL CHANNELS ===
 		std::map<int, Client*>& _clients;
 		std::map<std::string, Channel*>& _channels;
-
-		// === MAP : COMMANDS -> HANDLERS ===
-		std::map<std::string, void (Command::*)()> _fctMap;
 
 		// === CURRENT INPUT TO VECTOR + ITERATOR ===
 		std::vector<std::string> _vectorInput;
