@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/02 00:21:08 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/02 00:55:06 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ using namespace commands;
 
 // === COMMAND HANDLER ===
 
-// ========================================= PUBLIC ========================================
+// ========================================= PRIVATE =======================================
 
 // === STATIC MAP : COMMANDS -> HANDLERS ===
 
@@ -85,6 +85,8 @@ void Command::_initFctMap()
 }
 
 
+// ========================================= PUBLIC ========================================
+
 // === CONSTRUCTOR (INIT COMMAND HANDLERS MAP) / DESTRUCTOR ===
 
 /**
@@ -106,7 +108,6 @@ Command::Command(Server& server, std::map<int, Client*>::iterator itClient)
 
 Command::~Command() {}
 
-// =========================================================================================
 
 // === COMMAND MANAGER : MAIN METHOD ===
 
