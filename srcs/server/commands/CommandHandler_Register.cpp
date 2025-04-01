@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:33:43 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 10:14:31 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -386,7 +386,8 @@ void CommandHandler::_handleCapabilities()
 	if (!_client->isIrssi())
 		_client->setIsIrssi(true);
 
-	if (arg == "LS") {
+	if (arg == "LS")
+	{
 		_client->sendMessage(MessageBuilder::ircCapabilities(arg), NULL);
 		_client->setIdentified(true);
 	}
