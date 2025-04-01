@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:34:20 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 09:58:58 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -361,6 +361,22 @@ std::string Utils::streamArg(const std::string& arg)
 	std::string streamedArg;
 	stream >> streamedArg;
 	return streamedArg;
+}
+
+/**
+ * @brief Converts an integer to its string representation.
+ * 
+ * This function takes an integer value as input and returns its
+ * corresponding string representation using a stringstream.
+ * 
+ * @param value The integer value to be converted to a string.
+ * @return A string representation of the input integer.
+ */
+std::string Utils::intToString(int value)
+{
+	std::stringstream ss;
+	ss << value;
+	return ss.str();
 }
 
 /**

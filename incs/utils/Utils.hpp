@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:37:25 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 09:59:16 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ class Utils
 		static std::vector<std::string> getTokens(const std::string &s, int opt);
 		static std::string stockVector(std::vector<std::string>::iterator it, const std::vector<std::string>& vec);
 		static std::string streamArg(const std::string& arg);
+		static std::string intToString(int value);
 		static void toUpper(std::string& str);
 		static std::string truncateStr(const std::string& str);
 		static std::string emptyQuotesToEmptyString(const std::string& str);
