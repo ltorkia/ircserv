@@ -96,7 +96,7 @@ void CommandHandler::_sendFile(std::vector<std::string> args)
 {
 	size_t argsSize = args.size();
 	if (argsSize < 2)
-		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD));
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), SEND_CMD));
 	
 	std::string receiver = args[0];
 	int clientFd = _server.getClientByNickname(receiver, _client);
@@ -165,7 +165,7 @@ void CommandHandler::_getFile(std::vector<std::string> args)
 	std::string sender = args[0];
 	int clientFd = _server.getClientByNickname(sender, _client);
 	if (IrcHelper::clientExists(clientFd) == false)
-		throw std::invalid_argument(MessageBuilder::ircNoSuchNick(_client->getNickname(), args[1]));
+		throw std::invalid_argument(MessageBuilder::ircNoSuchNick(_client->getNickname(), sender));
 
 	while (argsSize >= 2)
 	{
