@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 09:18:54 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 09:25:46 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void CommandHandler::_handleFile()
  *         - The specified receiver does not exist.
  * 
  * The function performs the following steps:
- * 1. Validates the number of arguments and the existence of the receiver.
+ * 1. Validates the existence of the receiver.
  * 2. Iterates through the list of file paths:
  *    - If a file cannot be opened, an error message is sent to the sender, and the file is skipped.
  *    - If the file is valid, it is added to the server's file list, and a DCC SEND request is sent
@@ -105,9 +105,6 @@ void CommandHandler::_handleFile()
 void CommandHandler::_sendFile(std::vector<std::string> args)
 {
 	size_t argsSize = args.size();
-	if (argsSize < 2)
-		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), SEND_CMD));
-	
 	std::string receiver = args[0];
 	int clientFd = _server.getClientByNickname(receiver, _client);
 	if (IrcHelper::clientExists(clientFd) == false)
@@ -156,9 +153,9 @@ void CommandHandler::_sendFile(std::vector<std::string> args)
  *                                conditions (e.g., incorrect sender/receiver).
  * 
  * The function performs the following steps:
- * - Validates the number of arguments.
  * - Retrieves the sender's client file descriptor and checks if the sender exists.
  * - Iterates through the list of requested files:
+ *   - Checks if the sender exists.
  *   - Checks if the file exists and is offered by the correct sender to the correct receiver.
  *   - Opens the file for reading and creates a new file for writing.
  *   - Copies the file content line by line.
@@ -169,9 +166,6 @@ void CommandHandler::_sendFile(std::vector<std::string> args)
 void CommandHandler::_getFile(std::vector<std::string> args)
 {
 	size_t argsSize = args.size();
-	if (argsSize < 2)
-		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD));
-
 	std::string sender = args[0];
 	int clientFd = _server.getClientByNickname(sender, _client);
 	if (IrcHelper::clientExists(clientFd) == false)
