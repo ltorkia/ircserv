@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 12:58:06 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 13:11:04 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -415,30 +415,6 @@ bool IrcHelper::clientExists(int clientFd)
 // === MODE HELPER ===
 
 /**
- * @brief Checks if the given mode string is in the correct format.
- *
- * The mode string is considered to be in the correct format if:
- * - It is not empty.
- * - It has at least two characters.
- * - The first character is either '+' or '-'.
- * - All subsequent characters are one of the following: 'i', 't', 'k', 'o', 'l', '-', '+'.
- *
- * @param mode The mode string to be checked.
- * @return Returns 0 if the mode string is in the correct format.
- *         Returns -1 if the mode string is empty, has less than two characters, or the first character is not '+' or '-'.
- *         Returns the index of the first invalid character if the mode string contains invalid characters.
- */
-int IrcHelper::isRightMode(const std::string &mode)
-{
-	if (mode.empty() || mode.size() < 2 || (mode[0] != '-' && mode[0] != '+'))
-		return -1;
-	for (int i = 1; mode[i]; i++)
-		if (mode[i] != 'i' && mode[i] != 't' && mode[i] != 'k' && mode[i] != 'o' && mode[i] != 'l' && mode[i] != '-' && mode[i] != '+')
-			return i;
-	return 0;
-}
-
-/**
  * @brief Finds the index of the first occurrence of either target1 or target2 in a string, starting from a given position.
  *
  * This function searches for the first occurrence of either target1 or target2 in the given string, starting from the specified position.
@@ -502,28 +478,27 @@ size_t IrcHelper::getExpectedArgCount(std::string mode)
 std::map<char, std::string> IrcHelper::mapModesToArgs(std::vector<std::string> args)
 {
 	std::string mode = *++args.begin();
-	std::map<char, std::string> mode_args;
-	std::vector<std::string>::iterator args_mode_it = ++args.begin();
-	args_mode_it++;
-	std::map<char, std::string>::iterator it_mode;
+	std::map<char, std::string> modeArgs;
+	std::vector<std::string>::iterator itArgsMode = ++args.begin();
+	itArgsMode++;
 
 	for (size_t i = 0; i < mode.size(); i++)
 	{
 		if (mode[i] == 'o' || mode[i] == 'k')
 		{
-			mode_args.insert(std::make_pair(mode[i], *args_mode_it));
-			args_mode_it++;
+			modeArgs.insert(std::make_pair(mode[i], *itArgsMode));
+			itArgsMode++;
 		}
 		else if (mode[i] == 'l')
 		{
 			if (mode[findCharBeforeIndex(mode, '-', '+', i)] == '+')
 			{
-				mode_args.insert(std::make_pair(mode[i], *args_mode_it));
-				args_mode_it++;
+				modeArgs.insert(std::make_pair(mode[i], *itArgsMode));
+				itArgsMode++;
 			}
 		}
 	}
-	return (mode_args);
+	return (modeArgs);
 }
 
 /**

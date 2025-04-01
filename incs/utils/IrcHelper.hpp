@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:37:33 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 13:11:41 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ class IrcHelper
 		static bool clientExists(int clientFd);
 		
 		// === MODE HELPER ===
-		static int isRightMode(const std::string &mode);
 		static int findCharBeforeIndex(const std::string& str, char target1, char target2, size_t startPos);
 		static size_t getExpectedArgCount(std::string mode);
 		static std::map<char, std::string> mapModesToArgs(std::vector<std::string> args);
