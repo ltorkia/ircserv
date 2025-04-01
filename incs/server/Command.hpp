@@ -50,7 +50,6 @@ class Command
 
 		// === STATIC MAP : COMMANDS -> HANDLERS ===
 		static std::map<std::string, void (Command::*)()> _fctMap;
-		static void _initFctMap();
 
 		// === SERVER INSTANCE ===
 		Server& _server;
@@ -79,6 +78,11 @@ class Command
 		// === PRIVATE METHODS ===
 
 		// =================================================================================
+
+		// =================================================================================
+		// === INIT STATIC COMMAND MAP === Command.cpp ===
+
+		static void _initFctMap();
 
 		// =================================================================================
 		// === AUTHENTICATE COMMANDS : Command_Register.cpp ===
