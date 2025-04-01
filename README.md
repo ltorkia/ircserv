@@ -161,7 +161,7 @@ fcntl(fd, F_SETFL, O_NONBLOCK);
 ```
 The **bot** operates **independently from the server** and is treated like a **standard IRC client**. Upon execution, it automatically connects to the server by retrieving necessary information from the `.env` file, such as the **server password**. This ensures that the bot connects seamlessly to the server without needing manual configuration each time.
 
-**Interactive commands**: Available both in channels and private messages with the bot.
+**Interactive commands** available both in channels and private messages with the bot:
 - `!funfact`: Returns a random tech-related fun fact.
 - `!age <YYYY-MM-DD>`: Calculates and displays the user's exact age in years, months, and days.
 - `!time`: Displays the current time.
