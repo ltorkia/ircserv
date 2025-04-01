@@ -43,10 +43,10 @@ void CommandHandler::_changeMode()
 	if (args.size() > 1)
 		mode = *++args.begin();
 	if (_validateModeCommand(cible, mode, args.size()) == false)
-		return ;	
+		return;	
 	
 	std::map<char, std::string> modeArgs = IrcHelper::mapModesToArgs(args);
-	_applyChannelModes(mode, cible, modeArgs);			//fonction qui traite les modes et dirige vers les bonnes fonctions	
+	_applyChannelModes(mode, cible, modeArgs);
 }
 
 /**
@@ -68,9 +68,6 @@ void CommandHandler::_changeMode()
  */
 void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelName, std::map<char, std::string> &modeArgs)
 {
-	// une fois les elements parses, execute les fonctions correspondantes
-	// a chaque mode en fonction du signe correspondant
-
 	Channel* channel = _channels[channelName];
 
 	if (mode.find('i') != std::string::npos)
@@ -113,9 +110,7 @@ void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelN
 	for (int i = 1; mode[i]; i++)
 	{
 		if (mode[i] != 'i' && mode[i] != 't' && mode[i] != 'k' && mode[i] != 'o' && mode[i] != 'l' && mode[i] != '-' && mode[i] != '+')
-		{
 			_client->sendMessage(MessageBuilder::ircUnknownMode(_client->getNickname(), mode[i]), NULL);
-		}
 	}
 }
 
@@ -135,7 +130,6 @@ void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelN
  */
 void CommandHandler::_validateModeArguments(std::string &mode, const Channel *channel, unsigned int nArgs)
 {
-	// Check si le nombre d arguments et les arguments attendus sont les bons.
 	if (mode.empty() || mode.size() < 2 || (mode[0] != '-' && mode[0] != '+'))
 		throw std::invalid_argument((MessageBuilder::ircChannelModeIs(_client->getNickname(), channel->getName(), channel->getModes())));
 	
@@ -163,9 +157,6 @@ void CommandHandler::_validateModeArguments(std::string &mode, const Channel *ch
  */
 bool CommandHandler::_validateModeCommand(std::string &channelName, std::string &mode, unsigned int nArgs)
 {
-	// fonction appellee lorsque la commande /mode est envoyee : 
-	// fait un premier check d erreurs potentiolles et parse les bons elements avant de lancer checkargandexecute
-
 	if ((channelName == _client->getNickname() && mode == "+i")
 		|| (IrcHelper::isRightChannel(*_client, channelName, _channels, PRINT_ERROR) != channel_error::ALL_RIGHT))
 		return false;
@@ -215,7 +206,7 @@ void CommandHandler::_setInviteOnly(Channel *channel, char modeSign)
 {
 	std::string sign(1, modeSign);
 	if (IrcHelper::noChangeToMake(modeSign, channel->isInviteOnly()))
-		return ;
+		return;
 
 	if (modeSign == '+' && !channel->isInviteOnly())
 		channel->setInviteOnly(true);
@@ -240,7 +231,7 @@ void CommandHandler::_setTopicRestriction(Channel *channel, char modeSign)
 {
 	std::string sign(1, modeSign);
 	if (IrcHelper::noChangeToMake(modeSign, channel->isSettableTopic()))
-		return ;
+		return;
 
 	if (modeSign == '+' && !channel->isSettableTopic())
 		channel->setSettableTopic(true);
@@ -269,11 +260,11 @@ void CommandHandler::_setPasswordMode(std::string args, Channel *channel, char m
 	{
 		_client->sendMessage(MessageBuilder::ircInvalidPasswordFormat(client->getNickname(), channel->getName()), NULL);
 		_client->sendMessage(MessageBuilder::ircCurrentNotInChannel(_client->getNickname(), channel->getName()), NULL);
-		return ;
+		return;
 	}
 
 	if (modeSign == '-' && channel->getPassword().empty())
-		return ;
+		return;
 
 	if (modeSign == '+')
 		channel->setPassword(args);
@@ -298,7 +289,7 @@ void CommandHandler::_setOperatorPrivilege(Channel *channel, char modeSign, Clie
 {
 	std::string sign(1, modeSign);
 	if (IrcHelper::noChangeToMake(modeSign, channel->isOperator(newOp)))
-		return ;
+		return;
 
 	if (modeSign == '+' && !channel->isOperator(newOp))
 		channel->addOperator(newOp);
