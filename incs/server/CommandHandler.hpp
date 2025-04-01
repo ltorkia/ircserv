@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:37:41 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 12:28:40 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ class CommandHandler
 		// === MODE TOOLS ===
 		char _modeSign;
 		std::string	_mode;
+		std::map<char, std::string> _modeArgs;
 
 
 		// =================================================================================
@@ -103,15 +104,20 @@ class CommandHandler
 		// =================================================================================
 		// === MODE : CommandHandler_Mode.cpp ===
 
-		void _changeMode();
-		void _applyChannelModes(std::string &mode, std::string &arg1, std::map<char, std::string> &arg2);
-		void _validateModeArguments(std::string &mode, const Channel *channel, unsigned int nArgs);
-		bool _validateModeCommand(std::string &channel, std::string &mode, unsigned int nArgs);
-		void _setInviteOnly(Channel *channel, char modeSign);
-		void _setTopicRestriction(Channel *channel, char modeSign);
-		void _setPasswordMode(std::string args, Channel *channel, char modeSign, Client *client);
-		void _setOperatorPrivilege(Channel *channel, char modeSign, Client *newOp);
-		bool _setChannelLimit(Channel *channel, char modeSign, std::string args);
+		// === MODE PARSER ===
+		void _handleMode();
+		bool _validateModeCommand(const std::string& channelName, unsigned int nArgs);
+		void _validateModeArguments(const Channel *channel, unsigned int nArgs);
+		void _applyChangeMode(const std::string& target);
+		void _setOperatorPrivilegeWrapper(Channel *channel);
+		void _setChannelLimitWrapper(Channel *channel);
+		
+		// === MODE HANDLER ===
+		void _setInviteOnly(Channel *channel);
+		void _setTopicRestriction(Channel *channel);
+		void _setPasswordMode(Channel *channel);
+		void _setOperatorPrivilege(Channel *channel, Client *newOp);
+		bool _setChannelLimit(Channel *channel);
 
 		// =================================================================================
 		// === MESSAGE COMMANDS : CommandHandler_Message.cpp ===

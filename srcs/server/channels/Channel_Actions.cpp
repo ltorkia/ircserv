@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:33:00 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 12:37:44 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,10 @@ void Channel::removeClient(Client* client, const Client* kicker, const std::stri
 		std::cout << MessageBuilder::msgClientLeftChannel(client->getNickname(), _name, reason) << std::endl;
 	}
 	if (reasonCode == leaving_code::QUIT_SERV)
+	{
 		sendToAll(MessageBuilder::ircClientQuitServer(client->getUsermask(), reason), client, false);
+		std::cout << MessageBuilder::msgClientLeftChannel(client->getNickname(), _name, reason) << std::endl;
+	}
 
 	// On supprime le client des clients connectes au canal
 	_connected.erase(client);

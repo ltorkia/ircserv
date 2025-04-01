@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:33:48 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 12:12:49 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ CommandHandler::CommandHandler(Server& server, std::map<int, Client*>::iterator 
 	_fctMap[PART] 			= &CommandHandler::_quitChannel;
 
 	// === MODE COMMANDS : CommandHandler_Mode.cpp ===
-	_fctMap[MODE] 			= &CommandHandler::_changeMode;
+	_fctMap[MODE] 			= &CommandHandler::_handleMode;
 
 	// === MESSAGE COMMANDS : CommandHandler_Message.cpp ===
 	_fctMap[PRIVMSG] 		= &CommandHandler::_sendPrivateMessage;
