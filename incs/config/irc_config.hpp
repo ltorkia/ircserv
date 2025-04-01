@@ -72,7 +72,7 @@ namespace channel_error
 }
 
 // === FILE COMMAND TYPES ===
-namespace file_cmd
+namespace file
 {
 	const std::string SEND_CMD 				= "SEND";
 	const std::string GET_CMD 				= "GET";

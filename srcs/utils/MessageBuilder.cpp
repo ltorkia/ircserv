@@ -935,6 +935,13 @@ std::string MessageBuilder::msgSendingFile(const std::string& filename, const st
 	return stream.str();
 }
 
+std::string MessageBuilder::msgFileUsage(const std::string& subCommand)
+{
+	std::string clientType = subCommand == file::SEND_CMD ? "receiver" : "sender";
+	std::ostringstream stream;
+	stream << "Usage: DCC " << subCommand << " <" << clientType << "> <file_path>";
+	return stream.str();
+}
 
 // =========================================================================================
 

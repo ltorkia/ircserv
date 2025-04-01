@@ -17,6 +17,8 @@ using namespace server_messages;
 
 // ========================================= PUBLIC ========================================
 
+// === GETTERS ===
+
 /**
  * @brief Returns the list of clients.
  *
@@ -81,6 +83,8 @@ int Server::getClientByNickname(const std::string &nickname, Client* currClient)
 	}
 	return -1;
 }
+
+// === ACTIONS ===
 
 /**
  * @brief Sends a greeting message to a newly connected client.
@@ -148,6 +152,52 @@ void Server::prepareClientToLeave(std::map<int, Client*>::iterator it, const std
 	client->leaveAllChannels(_channels, reason, leaving_code::QUIT_SERV);
 	_disconnectClient(clientFd, reason);
 	_clientsToDelete.push_back(it);
+}
+
+
+// === FILES TO SEND ===
+
+/**
+ * @brief Retrieves the map of files managed by the server.
+ * 
+ * This function provides access to the internal map of files (_files) 
+ * stored in the server. The map associates a string key with a File object.
+ * 
+ * @return A reference to the map of files.
+ */
+std::map<std::string, FileData>& Server::getFiles()
+{
+	return _files;
+}
+
+/**
+ * @brief Adds a file to the server's file storage.
+ * 
+ * This function associates a file with its metadata, including the file's path,
+ * the sender, and the receiver, and stores it in the server's internal file map.
+ * 
+ * @param filename The name of the file to be added.
+ * @param path The file system path where the file is located.
+ * @param sender The name or identifier of the sender of the file.
+ * @param receiver The name or identifier of the receiver of the file.
+ */
+void Server::addFile(const std::string& filename, const std::string& path, const std::string& sender, const std::string& receiver)
+{
+	_files[filename] = FileData(path, sender, receiver);
+}
+
+/**
+ * @brief Removes a file from the server's internal file tracking system.
+ * 
+ * This function deletes the specified file from the `_files` container,
+ * effectively removing it from the server's management. If the file does
+ * not exist in the container, no action is taken.
+ * 
+ * @param filename The name of the file to be removed.
+ */
+void Server::removeFile(const std::string& filename)
+{
+	_files.erase(filename);
 }
 
 

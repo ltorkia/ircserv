@@ -169,7 +169,8 @@ class MessageBuilder
 		static std::string msgSendFile(const std::string& filename, const std::string &client, const std::string &adr, const int &port);
 		static std::string errorMsgSendFile(const std::string& filename);
 		static std::string msgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int &port);
-		
+		static std::string msgFileUsage(const std::string& subCommand);
+
 
 		// =========================================================================================
 

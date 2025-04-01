@@ -1,7 +1,6 @@
 #include "../../../incs/server/CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../../incs/server/CommandHandler_File.hpp"
 #include "../../../incs/utils/Utils.hpp"
 #include "../../../incs/utils/MessageBuilder.hpp"
 

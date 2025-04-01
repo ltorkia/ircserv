@@ -3,6 +3,9 @@
 // === SERVER LIBRARIES ===
 #include "../config/server_libs.hpp"
 
+// === FILES STRUCT ===
+#include "FileData.hpp"
+
 // =========================================================================================
 
 class Client;
@@ -29,6 +32,9 @@ class Server
 		std::map<int, Client*> _clients;										// Liste des clients connectés
 		std::vector<std::map<int, Client*>::iterator> _clientsToDelete;			// Liste des clients à supprimer (stocke les iterateurs map des clients)
 		std::map<std::string, Channel*> _channels;								// Liste des canaux
+
+		// === FILES TO SEND ===
+		std::map<std::string, FileData>	_files; 								// Liste des fichiers à envoyer avec DCC SEND
 
 
 		// =================================================================================
@@ -103,11 +109,20 @@ class Server
 		// =================================================================================
 		// === CLIENT MANAGER === Server_Clients.cpp
 
+		// === GETTERS ===
 		std::map<int, Client*>& getClients(); 														// Récupère la liste des clients
 		int getTotalClientCount() const; 															// Récupère le nombre total de clients
 		int getClientCount(bool authenticated); 													// Récupère le nombre de clients authentifiés ou non
 		int getClientByNickname(const std::string& nickname, Client* currClient);					// Récupère le client par son pseudo
+		
+		// === ACTIONS ===
 		void greetClient(Client* client); 															// Accueille un client
 		void broadcastToClients(const std::string &message); 										// Envoie un message à tous les clients connectés
 		void prepareClientToLeave(std::map<int, Client*>::iterator it, const std::string& reason);	// Prépare un client à quitter le serveur
+		
+		// === FILES TO SEND ===
+		std::map<std::string, FileData>& getFiles(); 													// Récupère la liste des fichiers à envoyer
+		void addFile(const std::string& filename, const std::string& path, const std::string& sender,
+																		const std::string& receiver); 	// Ajoute un fichier à la liste
+		void removeFile(const std::string& filename); 													// Supprime un fichier de la liste
 };

@@ -10,7 +10,6 @@
 
 // =========================================================================================
 
-class File;
 class CommandHandler
 {
 	public : 
@@ -59,9 +58,6 @@ class CommandHandler
 		// === MODE TOOLS ===
 		char _modeSign;
 		std::string	_mode;
-
-		// === FILES TO SEND ===
-		std::map<std::string, File>	_files;
 
 
 		// =================================================================================
@@ -130,5 +126,4 @@ class CommandHandler
 		void _sendFile(std::vector<std::string> args);
 		void _getFile(std::vector<std::string> args);
 		std::string _getFilename(const std::string& path) const;
-		size_t _getArgsSize() const;
 };

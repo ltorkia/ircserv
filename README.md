@@ -83,8 +83,8 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   ├── server
 │   │   ├── Channel.hpp
 │   │   ├── Client.hpp
-│   │   ├── CommandHandler_File.hpp
 │   │   ├── CommandHandler.hpp
+│   │   ├── FileData.hpp
 │   │   └── Server.hpp
 │   └── utils
 │       ├── IrcHelper.hpp
