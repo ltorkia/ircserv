@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 12:40:14 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 13:03:01 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,7 +227,7 @@ void CommandHandler::_setOperatorPrivilegeWrapper(Channel *channel)
 		!IrcHelper::clientExists(serverClientFd) ? _client->sendMessage(msgNoNick, NULL) : _client->sendMessage(msgNotInChan, NULL);
 		return;
 	}
-	Client *newOp = _clients[_server.getClientByNickname(_modeArgs.at('o'), NULL)];
+	Client *newOp = _clients[serverClientFd];
 	_setOperatorPrivilege(channel, newOp);
 }
 
