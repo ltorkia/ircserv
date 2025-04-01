@@ -83,7 +83,7 @@ Command::~Command() {}
  *
  * @throws std::invalid_argument if the command is unknown or if there are insufficient parameters.
  */
-void Command::manageCommand(std::string input)
+void Command::manageCommand(std::string& input)
 {
 	if (input.empty())
 		return;

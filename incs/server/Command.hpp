@@ -39,7 +39,7 @@ class Command
 		// =================================================================================
 
 		// === COMMAND MANAGER ===
-		void manageCommand(std::string input);
+		void manageCommand(std::string& input);
 
 	private : 
 		// =================================================================================
