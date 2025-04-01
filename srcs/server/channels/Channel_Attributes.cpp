@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:33:03 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 10:00:35 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 #include "Client.hpp"
 #include "MessageBuilder.hpp"
 #include "IrcHelper.hpp"
+#include "Utils.hpp"
+
+// === NAMESPACES ===
 #include "bot_config.hpp"
 
 using namespace bot_config;
@@ -119,10 +122,7 @@ std::string Channel::getModes() const
 	stream << (isInviteOnly() ? "+i" : "-i");
 	stream << (isSettableTopic() ? " +t" : " -t");
 	stream << (hasPassword() ? " +k" : " -k");
-	if (hasClientsLimit())
-		stream << " +l " << getClientsLimit();
-	else
-		stream << " -l";
+	stream << (hasClientsLimit() ? " +l " + Utils::intToString(getClientsLimit()) : " -l");
 	return stream.str();
 }
 
