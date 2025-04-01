@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:33:39 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 10:15:44 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,9 +334,9 @@ bool CommandHandler::_setChannelLimit(Channel *channel, char modeSign, std::stri
 		if (args.size() > 0)
 		{
 			if (!IrcHelper::isValidLimit(args))
-				return (false);
+				return false;
 			if (std::atol(args.c_str()) == channel->getClientsLimit())
-				return (true);
+				return true;
 			channel->setClientsLimit(std::atol(args.c_str()));
 		}
 	}
