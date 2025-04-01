@@ -31,19 +31,15 @@ FileData::FileData(const std::string& path, const std::string& sender, const std
 /**
  * @brief Handles file-related commands such as sending or receiving files.
  * 
- * This function processes input commands to either send or retrieve files.
- * It validates the command format, extracts arguments, and performs the 
- * appropriate action based on the command type.
+ * This function processes input commands to either send or receive files.
+ * It validates the command format, ensures the required arguments are present,
+ * and changes the working directory to the user's home directory before
+ * delegating the operation to the appropriate handler.
  * 
- * @throws std::runtime_error If the command is invalid, arguments are insufficient,
- *         or the HOME directory cannot be accessed.
- * 
- * The function performs the following steps:
- * - Tokenizes the input command and converts the command to uppercase.
- * - Validates the command type (must be SEND_CMD or GET_CMD).
- * - Extracts and validates the arguments from the command.
- * - Changes the current working directory to the user's HOME directory.
- * - Executes the appropriate file operation (_sendFile or _getFile) based on the command.
+ * @throws std::invalid_argument If the command is not SEND_CMD or GET_CMD,
+ *                                or if the arguments are missing or insufficient.
+ * @throws std::runtime_error If the HOME environment variable is not found or
+ *                            the directory change fails.
  */
 void CommandHandler::_handleFile()
 {
@@ -51,11 +47,11 @@ void CommandHandler::_handleFile()
 	Utils::toUpper(entry.front());
 
 	if (entry.front() != SEND_CMD && entry.front() != GET_CMD)
-		throw std::runtime_error(MessageBuilder::msgFileUsage(entry.front()));
+		throw std::invalid_argument(MessageBuilder::msgFileUsage(entry.front()));
 	
 	std::vector<std::string> args = Utils::getTokens(entry.back(), splitter::WORD);
 	if (args.empty() || args.size() < 2)
-		throw std::runtime_error(MessageBuilder::msgFileUsage(entry.front()));
+		throw std::invalid_argument(MessageBuilder::msgFileUsage(entry.front()));
 	
 	if (chdir(getenv("HOME")) != 0)
 		throw std::runtime_error("HOME not found");
