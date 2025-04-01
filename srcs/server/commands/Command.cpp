@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CommandHandler.cpp                                 :+:      :+:    :+:   */
+/*   Command.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "CommandHandler.hpp"
+#include "Command.hpp"
 
 // === OTHER CLASSES ===
 #include "Utils.hpp"
@@ -30,43 +30,43 @@ using namespace commands;
 
 // === CONSTRUCTOR (INIT COMMAND HANDLERS MAP) / DESTRUCTOR ===
 
-CommandHandler::CommandHandler(Server& server, std::map<int, Client*>::iterator it)
+Command::Command(Server& server, std::map<int, Client*>::iterator it)
 	: _server(server), _it(it), _clientFd(_it->first), _client(_it->second),
 	_clients(_server.getClients()), _channels(_server.getChannels())
 {
-	// === AUTHENTICATE COMMANDS : CommandHandler_Auth.cpp ===
-	_fctMap[PASS] 			= &CommandHandler::_isRightPassword;
-	_fctMap[NICK] 			= &CommandHandler::_setNicknameClient;
-	_fctMap[USER] 			= &CommandHandler::_setUsernameClient;
-	_fctMap[CAP] 			= &CommandHandler::_handleCapabilities;
+	// === AUTHENTICATE COMMANDS : Command_Auth.cpp ===
+	_fctMap[PASS] 			= &Command::_isRightPassword;
+	_fctMap[NICK] 			= &Command::_setNicknameClient;
+	_fctMap[USER] 			= &Command::_setUsernameClient;
+	_fctMap[CAP] 			= &Command::_handleCapabilities;
 	
-	// === CHANNEL COMMANDS : CommandHandler_Channel.cpp ===
-	_fctMap[INVITE] 		= &CommandHandler::_inviteChannel;
-	_fctMap[JOIN] 			= &CommandHandler::_joinChannel;
-	_fctMap[TOPIC] 			= &CommandHandler::_setTopic;
-	_fctMap[KICK] 			= &CommandHandler::_kickChannel;
-	_fctMap[PART] 			= &CommandHandler::_quitChannel;
+	// === CHANNEL COMMANDS : Command_Channel.cpp ===
+	_fctMap[INVITE] 		= &Command::_inviteChannel;
+	_fctMap[JOIN] 			= &Command::_joinChannel;
+	_fctMap[TOPIC] 			= &Command::_setTopic;
+	_fctMap[KICK] 			= &Command::_kickChannel;
+	_fctMap[PART] 			= &Command::_quitChannel;
 
-	// === MODE COMMANDS : CommandHandler_Mode.cpp ===
-	_fctMap[MODE] 			= &CommandHandler::_handleMode;
+	// === MODE COMMANDS : Command_Mode.cpp ===
+	_fctMap[MODE] 			= &Command::_handleMode;
 
-	// === MESSAGE COMMANDS : CommandHandler_Message.cpp ===
-	_fctMap[PRIVMSG] 		= &CommandHandler::_sendPrivateMessage;
+	// === MESSAGE COMMANDS : Command_Message.cpp ===
+	_fctMap[PRIVMSG] 		= &Command::_sendPrivateMessage;
 
-	// === LOG COMMANDS : CommandHandler_Log.cpp ===
-	_fctMap[PING] 			= &CommandHandler::_sendPong;
-	_fctMap[PONG] 			= &CommandHandler::_updateActivity;
-	_fctMap[WHO] 			= &CommandHandler::_handleWho;
-	_fctMap[WHOIS] 			= &CommandHandler::_handleWhois;
-	_fctMap[WHOWAS] 		= &CommandHandler::_handleWhowas;
-	_fctMap[AWAY] 			= &CommandHandler::_setAway;
-	_fctMap[QUIT] 			= &CommandHandler::_quitServer;
+	// === LOG COMMANDS : Command_Log.cpp ===
+	_fctMap[PING] 			= &Command::_sendPong;
+	_fctMap[PONG] 			= &Command::_updateActivity;
+	_fctMap[WHO] 			= &Command::_handleWho;
+	_fctMap[WHOIS] 			= &Command::_handleWhois;
+	_fctMap[WHOWAS] 		= &Command::_handleWhowas;
+	_fctMap[AWAY] 			= &Command::_setAway;
+	_fctMap[QUIT] 			= &Command::_quitServer;
 
-	// === FILE COMMANDS : CommandHandler_File.cpp ===
-	_fctMap[DCC] 			= &CommandHandler::_handleFile;
+	// === FILE COMMANDS : Command_File.cpp ===
+	_fctMap[DCC] 			= &Command::_handleFile;
 }
 
-CommandHandler::~CommandHandler() {}
+Command::~Command() {}
 
 // =========================================================================================
 
@@ -83,7 +83,7 @@ CommandHandler::~CommandHandler() {}
  *
  * @throws std::invalid_argument if the command is unknown or if there are insufficient parameters.
  */
-void CommandHandler::manageCommand(std::string input)
+void Command::manageCommand(std::string input)
 {
 	if (input.empty())
 		return;
@@ -105,7 +105,7 @@ void CommandHandler::manageCommand(std::string input)
 	
 	std::string cmd = *_itInput;
 	
-	std::map<std::string, void (CommandHandler::*)()>::iterator itFunction = _fctMap.find(cmd);;
+	std::map<std::string, void (Command::*)()>::iterator itFunction = _fctMap.find(cmd);;
 	if (itFunction == _fctMap.end())
 		throw std::invalid_argument(MessageBuilder::ircUnknownCommand(nickname, input));
 	

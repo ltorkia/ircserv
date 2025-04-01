@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CommandHandler_Channel.cpp                         :+:      :+:    :+:   */
+/*   Command_Channel.cpp                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "CommandHandler.hpp"
+#include "Command.hpp"
 
 // === OTHER CLASSES ===
 #include "Utils.hpp"
@@ -48,7 +48,7 @@ using namespace server_messages;
  * @throws std::invalid_argument if the requesting client is not in the specified channel.
  * @throws std::invalid_argument if the requesting client is not an operator in an invite-only channel.
  */
-void CommandHandler::_inviteChannel()
+void Command::_inviteChannel()
 {
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::WORD);
 	int n_arg = args.size();
@@ -100,7 +100,7 @@ void CommandHandler::_inviteChannel()
  * 
  * @note The function assumes that the input tokens are separated by spaces and commas.
  */
-void CommandHandler::_joinChannel()
+void Command::_joinChannel()
 {	
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::WORD);
 
@@ -149,7 +149,7 @@ void CommandHandler::_joinChannel()
  * 8. Sets the new topic, updates the topic setter information and timestamp.
  * 9. Sends the new topic to the client and broadcasts it to all channel members.
  */
-void CommandHandler::_setTopic()
+void Command::_setTopic()
 {
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::SENTENCE);
 	std::vector<std::string>::iterator itChannel = args.begin();
@@ -205,7 +205,7 @@ void CommandHandler::_setTopic()
  * 4. If the user to be kicked is an operator, they are not kicked.
  * 5. Kicks the user from the channel and sends the appropriate messages.
  */
-void CommandHandler::_kickChannel()
+void Command::_kickChannel()
 {
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::SENTENCE);
 	std::vector<std::string>::iterator itArg = args.begin();
@@ -279,7 +279,7 @@ void CommandHandler::_kickChannel()
  * - If the channel exists, the client is removed from the channel with the specified reason.
  * - If the channel does not exist, an error message is sent to the client.
  */
-void CommandHandler::_quitChannel()
+void Command::_quitChannel()
 {
 	// On récupère les channels à quitter
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::SENTENCE);

@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CommandHandler_Message.cpp                         :+:      :+:    :+:   */
+/*   Command_Message.cpp                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "CommandHandler.hpp"
+#include "Command.hpp"
 
 // === OTHER CLASSES ===
 #include "Utils.hpp"
@@ -38,7 +38,7 @@ using namespace error_display;
  * 
  * @throws std::invalid_argument if the parameters are invalid or if there is no text to send.
  */
-void CommandHandler::_sendPrivateMessage()
+void Command::_sendPrivateMessage()
 {
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput))
 		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), PRIVMSG));
@@ -72,7 +72,7 @@ void CommandHandler::_sendPrivateMessage()
  *
  * @throws std::invalid_argument if the message is empty, contains only a colon, or consists solely of whitespace.
  */
-void CommandHandler::_sendToChannel(std::vector<std::string>& targets, std::string& message)
+void Command::_sendToChannel(std::vector<std::string>& targets, std::string& message)
 {
 	std::string nickname = _client->getNickname();
 
@@ -107,7 +107,7 @@ void CommandHandler::_sendToChannel(std::vector<std::string>& targets, std::stri
  * @param message The message to be sent to the target clients.
  * @throws std::invalid_argument If the message is empty or invalid.
  */
-void CommandHandler::_sendToClient(std::vector<std::string>& targets, std::string& message)
+void Command::_sendToClient(std::vector<std::string>& targets, std::string& message)
 {
 	std::string nickname = _client->getNickname();
 

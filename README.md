@@ -10,7 +10,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 - Develop an **IRC server** running on **TCP/IP**.
 - Support **multiple simultaneous clients** without blocking.
 - Provide essential **IRC functionalities**, such as authentication, private messaging, and channel management.
-- Ensure compliance with a **reference IRC client** like `irssi`.
+- Ensure compliance with a **reference IRC client** (`irssi` here)
 
 **Execution :**
 ```bash
@@ -26,7 +26,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 ### Constraints ⚙️:
 - **C++ 98 standard only** (no C++11 or later features).
 - **Non-blocking I/O operations**.
-- **Only one call to `poll()` or equivalent** (we used `select()`).
+- **Only one call to `poll()` or equivalent** (`select()` here).
 - **No forking or multi-threading**.
 
 ### Allowed External Functions 🧑‍💻:
@@ -83,7 +83,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   ├── server
 │   │   ├── Channel.hpp
 │   │   ├── Client.hpp
-│   │   ├── CommandHandler.hpp
+│   │   ├── Command.hpp
 │   │   ├── FileData.hpp
 │   │   └── Server.hpp
 │   └── utils
@@ -108,13 +108,13 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 │   │   │   ├── Client_Attributes.cpp
 │   │   │   └── Client.cpp
 │   │   ├── commands
-│   │   │   ├── CommandHandler_Channel.cpp
-│   │   │   ├── CommandHandler_File.cpp
-│   │   │   ├── CommandHandler_Log.cpp
-│   │   │   ├── CommandHandler_Message.cpp
-│   │   │   ├── CommandHandler_Mode.cpp
-│   │   │   ├── CommandHandler_Register.cpp
-│   │   │   └── CommandHandler.cpp
+│   │   │   ├── Command_Channel.cpp
+│   │   │   ├── Command_File.cpp
+│   │   │   ├── Command_Log.cpp
+│   │   │   ├── Command_Message.cpp
+│   │   │   ├── Command_Mode.cpp
+│   │   │   ├── Command_Register.cpp
+│   │   │   └── Command.cpp
 │   │   ├── core
 │   │   │   ├── Server_Clients.cpp
 │   │   │   ├── Server_Infos.cpp
@@ -137,7 +137,7 @@ This project involves developing an **IRC server** in **C++ 98**, designed to ha
 - **`Server` Class**: Manages network connections and client sessions.
 - **`Client` Class**: Represents an IRC user with its state and actions.
 - **`Channel` Class**: Handles channel-specific logic and member management.
-- **`CommandHandler` Class**: Parses and executes IRC commands.
+- **`Command` Class**: Parses and executes IRC commands.
 - **`Bot` Class (Bonus)**: Implements additional interactive features.
 
 **2. Non-Blocking Event Handling** 🔄
@@ -149,18 +149,55 @@ fcntl(fd, F_SETFL, O_NONBLOCK);
 
 **3. Error Handling & Debugging** ⚠️
 - **Try-catch blocks** to prevent crashes.
-- **Logging mechanisms** for debugging unexpected behaviors.
+
+---
+
+## **Bonus Features** 🎉
+
+### IRC Bot 🤖:
+**Bot execution :**
+```bash
+./ircbot
+```
+
+**Interactive commands**:
+- `!funfact`: Returns a random tech-related fun fact.
+- `!age <YYYY-MM-DD>`: Calculates and displays the user's exact age in years, months, and days.
+- `!time`: Displays the current time.
+
+### File Transfer Support (`DCC Protocol`) 📁:
+- **Direct peer-to-peer file sharing** between users is implemented correctly for `Irssi`, as required by the assignment, using the DCC SEND protocol.
+- For `Netcat`, we opted for a local file transfer approach using environment variables instead of a full DCC implementation. This allows basic file transmission but does not strictly follow the DCC protocol as defined for IRC clients.
+
+### Advanced Logging System 📑:
+- **Detailed event logs** for debugging and server management.
+- **Real-time monitoring** of connections and messages.
 
 ---
 
 ## **Installation & Compilation** 🛠️
 
 ### Compiling the Server and the Bot :
+To compile both `ircserv` and `ircbot`, simply run:
 ```bash
 make
 ```
-- Both `ircserv` and `ircbot` share common utility tools for handling IRC-related operations.
 - The compilation process first builds the shared library containing common utilities before linking it to each executable.
+
+You can also compile the server and bot separately using:
+```bash
+make server  
+make bot  
+```
+To speed up compilation on multi-core systems, you can use:
+```bash
+make -j
+```
+For debugging purposes, use:
+```bash
+make debug
+```
+- This compiles the project with `-g3 -DDEBUG` flags for enhanced debugging capabilities.
 
 ### Cleaning the Project :
 ```bash
@@ -218,25 +255,4 @@ irssi -c 127.0.0.1 -p 6667 -w "my_password"
 /kick user
 ```
 
----
-
-## **Bonus Features** 🎉
-
-### IRC Bot 🤖:
-**Bot execution :**
-```bash
-./ircbot
-```
-
-**Interactive commands**:
-- `!funfact`: Returns a random tech-related fun fact.
-- `!age <YYYY-MM-DD>`: Calculates and displays the user's exact age in years, months, and days.
-- `!time`: Displays the current time.
-
-### File Transfer Support (`DCC Protocol`) 📁:
-- **Direct peer-to-peer file sharing** between users.
-
-### Advanced Logging System 📑:
-- **Detailed event logs** for debugging and server management.
-- **Real-time monitoring** of connections and messages.
 ---

@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CommandHandler_File.cpp                            :+:      :+:    :+:   */
+/*   Command_File.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "FileData.hpp"
-#include "CommandHandler.hpp"
+#include "Command.hpp"
 
 // === OTHER CLASSES ===
 #include "Utils.hpp"
@@ -55,7 +55,7 @@ FileData::FileData(const std::string& path, const std::string& sender, const std
  * @throws std::runtime_error If the HOME environment variable is not found or
  *                            the directory change fails.
  */
-void CommandHandler::_handleFile()
+void Command::_handleFile()
 {
 	std::vector<std::string> entry = Utils::getTokens(*_itInput, splitter::SENTENCE);
 	Utils::toUpper(entry.front());
@@ -102,7 +102,7 @@ void CommandHandler::_handleFile()
  * @note This function assumes that the server and client objects are properly initialized and that
  *       the `_server` and `_client` members are valid.
  */
-void CommandHandler::_sendFile(std::vector<std::string> args)
+void Command::_sendFile(std::vector<std::string> args)
 {
 	size_t argsSize = args.size();
 	std::string receiver = args[0];
@@ -163,7 +163,7 @@ void CommandHandler::_sendFile(std::vector<std::string> args)
  *   - Removes the file from the server's file list after successful transfer.
  *   - Handles errors such as file not found, inability to open the file, or write errors.
  */
-void CommandHandler::_getFile(std::vector<std::string> args)
+void Command::_getFile(std::vector<std::string> args)
 {
 	size_t argsSize = args.size();
 	std::string sender = args[0];
@@ -237,7 +237,7 @@ void CommandHandler::_getFile(std::vector<std::string> args)
  * @param path The full file path as a string.
  * @return A string containing the filename extracted from the path.
  */
-std::string CommandHandler::_getFilename(const std::string& path) const
+std::string Command::_getFilename(const std::string& path) const
 {
 	size_t pos = path.find_last_of('/');
 	return path.substr(pos + 1);

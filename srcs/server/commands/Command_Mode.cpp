@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CommandHandler_Mode.cpp                            :+:      :+:    :+:   */
+/*   Command_Mode.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 13:03:01 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 17:49:55 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "CommandHandler.hpp"
+#include "Command.hpp"
 
 // === OTHER CLASSES ===
 #include "Utils.hpp"
@@ -49,7 +49,7 @@ using namespace error_display;
  *
  * @return void
  */
-void CommandHandler::_handleMode()
+void Command::_handleMode()
 {
 	std::string mode;
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::WORD);
@@ -88,7 +88,7 @@ void CommandHandler::_handleMode()
  * - If the client is not in the channel or is not an operator, an exception is thrown.
  * - The function validates the mode arguments if all checks pass.
  */
-bool CommandHandler::_validateModeCommand(const std::string& channelName, unsigned int nArgs)
+bool Command::_validateModeCommand(const std::string& channelName, unsigned int nArgs)
 {
 	if ((channelName == _client->getNickname() && _mode == "+i")
 		|| (IrcHelper::isRightChannel(*_client, channelName, _channels, PRINT_ERROR) != channel_error::ALL_RIGHT))
@@ -126,7 +126,7 @@ bool CommandHandler::_validateModeCommand(const std::string& channelName, unsign
  * @throws std::invalid_argument If the mode string is invalid, contains duplicates,
  *         or the number of arguments does not match the expected count.
  */
-void CommandHandler::_validateModeArguments(const Channel *channel, unsigned int nArgs)
+void Command::_validateModeArguments(const Channel *channel, unsigned int nArgs)
 {
 	if (_mode.empty() || _mode.size() < 2 || (_mode[0] != '-' && _mode[0] != '+'))
 		throw std::invalid_argument((MessageBuilder::ircChannelModeIs(_client->getNickname(), channel->getName(), channel->getModes())));
@@ -167,18 +167,18 @@ void CommandHandler::_validateModeArguments(const Channel *channel, unsigned int
  * - If an unknown mode character is encountered, an error message is sent to the client
  *   using the MessageBuilder::ircUnknownMode function.
  */
-void CommandHandler::_applyChangeMode(const std::string& channelName)
+void Command::_applyChangeMode(const std::string& channelName)
 {
 	Channel* channel = _channels[channelName];
 
-	typedef void (CommandHandler::*ModeHandler)(Channel*);
+	typedef void (Command::*ModeHandler)(Channel*);
 	std::map<char, ModeHandler> modeHandlers;
 	
-	modeHandlers['i'] = &CommandHandler::_setInviteOnly;
-	modeHandlers['t'] = &CommandHandler::_setTopicRestriction;
-	modeHandlers['k'] = &CommandHandler::_setPasswordMode;
-	modeHandlers['o'] = &CommandHandler::_setOperatorPrivilegeWrapper;
-	modeHandlers['l'] = &CommandHandler::_setChannelLimitWrapper;
+	modeHandlers['i'] = &Command::_setInviteOnly;
+	modeHandlers['t'] = &Command::_setTopicRestriction;
+	modeHandlers['k'] = &Command::_setPasswordMode;
+	modeHandlers['o'] = &Command::_setOperatorPrivilegeWrapper;
+	modeHandlers['l'] = &Command::_setChannelLimitWrapper;
 
 	for (std::string::size_type i = 0; i < _mode.size(); ++i)
 	{
@@ -215,7 +215,7 @@ void CommandHandler::_applyChangeMode(const std::string& channelName)
  *   retrieves the client object and delegates the privilege assignment to
  *   `_setOperatorPrivilege`.
  */
-void CommandHandler::_setOperatorPrivilegeWrapper(Channel *channel)
+void Command::_setOperatorPrivilegeWrapper(Channel *channel)
 {
 	int serverClientFd = _server.getClientByNickname(_modeArgs.at('o'), NULL);
 	int channelClientFd = channel->getChannelClientByNickname(_modeArgs.at('o'), NULL);
@@ -240,7 +240,7 @@ void CommandHandler::_setOperatorPrivilegeWrapper(Channel *channel)
  *
  * @param channel Pointer to the Channel object for which the limit is to be set.
  */
-void CommandHandler::_setChannelLimitWrapper(Channel *channel)
+void Command::_setChannelLimitWrapper(Channel *channel)
 {
 	if (!_setChannelLimit(channel))
 		_client->sendMessage(MessageBuilder::ircInvalidModeParams(_client->getNickname(), channel->getName(), "l", _modeArgs['l']), NULL);
@@ -260,12 +260,12 @@ void CommandHandler::_setChannelLimitWrapper(Channel *channel)
  *
  * @param channel A pointer to the Channel object whose invite-only mode is to be modified.
  */
-void CommandHandler::_setInviteOnly(Channel *channel)
+void Command::_setInviteOnly(Channel *channel)
 {
 	if (IrcHelper::noChangeToMake(_modeSign, channel->isInviteOnly()))
 		return;
-	_modeSign == '+' && !channel->isInviteOnly() ? channel->setInviteOnly(true) : channel->setInviteOnly(false);
 
+	_modeSign == '+' && !channel->isInviteOnly() ? channel->setInviteOnly(true) : channel->setInviteOnly(false);
 	std::string sign(1, _modeSign);
 	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "i", ""), true);
 }
@@ -286,12 +286,12 @@ void CommandHandler::_setInviteOnly(Channel *channel)
  * @param channel A pointer to the Channel object whose topic restriction mode
  *                is to be updated.
  */
-void CommandHandler::_setTopicRestriction(Channel *channel)
+void Command::_setTopicRestriction(Channel *channel)
 {
 	if (IrcHelper::noChangeToMake(_modeSign, channel->isSettableTopic()))
 		return;
+	
 	_modeSign == '+' && !channel->isSettableTopic() ? channel->setSettableTopic(true) : channel->setSettableTopic(false);
-
 	std::string sign(1, _modeSign);
 	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "t", ""), true);
 }
@@ -305,7 +305,7 @@ void CommandHandler::_setTopicRestriction(Channel *channel)
  *
  * @param channel A pointer to the Channel object whose password mode is to be modified.
  */
-void CommandHandler::_setPasswordMode(Channel *channel)
+void Command::_setPasswordMode(Channel *channel)
 {
 	std::string password = _modeArgs['k'];
 	if (!IrcHelper::isValidPassword(password, false) && _modeSign == '+')
@@ -316,8 +316,8 @@ void CommandHandler::_setPasswordMode(Channel *channel)
 	}
 	if (_modeSign == '-' && channel->getPassword().empty())
 		return;
-	_modeSign == '+' ? channel->setPassword(password) : channel->setPassword("");
 
+	_modeSign == '+' ? channel->setPassword(password) : channel->setPassword("");
 	std::string sign(1, _modeSign);
 	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "k", ""), true);
 }
@@ -336,12 +336,12 @@ void CommandHandler::_setPasswordMode(Channel *channel)
  * @param newOp A pointer to the Client object whose operator privilege is to
  *              be adjusted.
  */
-void CommandHandler::_setOperatorPrivilege(Channel *channel, Client *newOp)
+void Command::_setOperatorPrivilege(Channel *channel, Client *newOp)
 {
 	if (IrcHelper::noChangeToMake(_modeSign, channel->isOperator(newOp)))
 		return;
-	_modeSign == '+' && !channel->isOperator(newOp) ? channel->addOperator(newOp) : channel->removeOperator(newOp);
 
+	_modeSign == '+' && !channel->isOperator(newOp) ? channel->addOperator(newOp) : channel->removeOperator(newOp);
 	std::string sign(1, _modeSign);		
 	_client->sendToAll(channel, MessageBuilder::ircOpeChangedMode(_client->getUsermask(), channel->getName(), sign + "o", newOp->getNickname()), true);
 }
@@ -366,7 +366,7 @@ void CommandHandler::_setOperatorPrivilege(Channel *channel, Client *newOp)
  * @note The function relies on `IrcHelper::isValidLimit` to validate the new limit string.
  * @note The function sends a message to all clients in the channel using `MessageBuilder::ircOpeChangedMode`.
  */
-bool CommandHandler::_setChannelLimit(Channel *channel)
+bool Command::_setChannelLimit(Channel *channel)
 {
 	std::string newLimitStr = _modeArgs['l'];
 	int newLimit = std::atol(newLimitStr.c_str());

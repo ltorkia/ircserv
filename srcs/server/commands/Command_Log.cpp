@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CommandHandler_Log.cpp                             :+:      :+:    :+:   */
+/*   Command_Log.cpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "CommandHandler.hpp"
+#include "Command.hpp"
 
 // === OTHER CLASSES ===
 #include "Utils.hpp"
@@ -36,7 +36,7 @@ using namespace server_messages;
  * This function is called when a PING message is received from the client.
  * It sends a PONG message back to the client to acknowledge the PING.
  */
-void CommandHandler::_sendPong()
+void Command::_sendPong()
 {	
 	// Si PING recu, on envoie PONG
 	_client->sendMessage(MessageBuilder::ircPong(), NULL);
@@ -51,7 +51,7 @@ void CommandHandler::_sendPong()
  * 
  * @throws std::invalid_argument if the PONG message is malformed or missing parameters.
  */
-void CommandHandler::_updateActivity()
+void Command::_updateActivity()
 {	
 	// Si PONG recu, on set PingSent() à false pour le prochain check d'inactivité du client
 	// (l'activite du client a été mise à jour à la réception de cette commande dans handleMessage())
@@ -79,7 +79,7 @@ void CommandHandler::_updateActivity()
  * 
  * @throws std::invalid_argument if the number of arguments is invalid or if the requested user/channel does not exist.
  */
-void CommandHandler::_handleWho()
+void Command::_handleWho()
 {
 	std::string requestorNickname = _client->getNickname();
 	std::vector<std::string> args = Utils::getTokens(*_itInput, splitter::WORD);
@@ -133,7 +133,7 @@ void CommandHandler::_handleWho()
  * 
  * @throws if the requested nickname does not exist.
  */
-void CommandHandler::_handleWhois()
+void Command::_handleWhois()
 {
 	std::string requestorNickname = _client->getNickname();
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput))
@@ -164,7 +164,7 @@ void CommandHandler::_handleWhois()
  * It uses the client's nickname and the current iterator value (_itInput)
  * to construct the message.
  */
-void CommandHandler::_handleWhowas()
+void Command::_handleWhowas()
 {
 	_client->sendMessage(MessageBuilder::ircEndOfWhowas(_client->getNickname(), *_itInput), NULL);
 }
@@ -186,7 +186,7 @@ void CommandHandler::_handleWhowas()
  * 5. If the away message is valid, the client is set to away mode with the specified message.
  * 6. Sends the appropriate away or un-away message to the client.
  */
-void CommandHandler::_setAway()
+void Command::_setAway()
 {
 	std::string nickname = _client->getNickname();
 
@@ -237,7 +237,7 @@ void CommandHandler::_setAway()
  *
  * @note The default reason is defined by the constant DEFAULT_REASON.
  */
-void CommandHandler::_quitServer(void)
+void Command::_quitServer(void)
 {
 	// Si aucune raison n'est fournie, on utilise la raison par défaut
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput) || ((*_itInput)[0] == ':' && (*_itInput).size() == 1)) {

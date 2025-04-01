@@ -43,10 +43,10 @@ COMMON_UTILS_FILES	=	MessageBuilder.cpp				Utils.cpp
 
 SERVER_UTILS_FILES	=	IrcHelper.cpp
 
-CMD_FILES			=	CommandHandler.cpp				CommandHandler_Register.cpp \
-						CommandHandler_Channel.cpp		CommandHandler_File.cpp \
-						CommandHandler_Mode.cpp 		CommandHandler_Message.cpp \
-						CommandHandler_Log.cpp
+CMD_FILES			=	Command.cpp						Command_Register.cpp \
+						Command_Channel.cpp				Command_File.cpp \
+						Command_Mode.cpp 				Command_Message.cpp \
+						Command_Log.cpp
 
 BOT_FILES			=	BotMain.cpp						Bot.cpp \
 						Bot_Message.cpp					Bot_Register.cpp \

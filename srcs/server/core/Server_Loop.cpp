@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:34:02 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 18:11:40 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 // === OTHER CLASSES ===
 #include "Client.hpp"
-#include "CommandHandler.hpp"
+#include "Command.hpp"
 #include "Utils.hpp"
 #include "MessageBuilder.hpp"
 
@@ -335,7 +335,7 @@ void Server::_handleMessage(std::map<int, Client*>::iterator it)
  *
  * This function takes an iterator to a map of clients and a message string,
  * and processes the input message from the client associated with the iterator.
- * It creates a CommandHandler object to manage the command contained in the message.
+ * It creates a Command object to manage the command contained in the message.
  * If an exception is thrown during command management, the exception message is sent
  * back to the client.
  *
@@ -350,7 +350,7 @@ void Server::_processCommand(std::map<int, Client*>::iterator it, std::string me
 
 	try
 	{
-		CommandHandler handler(*this, it);
+		Command handler(*this, it);
 		handler.manageCommand(message);
 	}
 	catch (const std::exception &e)

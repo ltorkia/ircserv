@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:41:36 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 17:48:54 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,6 @@ class Server
 		int getServerSocketFd() const;											// Récupère le descripteur de socket du serveur
 		const std::string& getLocalIP() const;									// Récupère l'adresse IP locale
 		int getPort() const;													// Récupère le port du serveur;
-		fd_set getReadFds() const;												// Récupère l'ensemble des descripteurs surveillés
 		int getMaxFd();															// Récupère le descripteur maximum pour select()
 		const std::string& getServerPassword() const;							// Récupère le mot de passe du serveur
 		std::map<std::string, Channel*>& getChannels();							// Récupère la liste des canaux

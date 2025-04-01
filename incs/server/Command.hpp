@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CommandHandler.hpp                                 :+:      :+:    :+:   */
+/*   Command.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -22,15 +22,15 @@
 
 // =========================================================================================
 
-class CommandHandler
+class Command
 {
 	public : 
 		// =================================================================================
-		// === COMMAND HANDLER === CommandHandler.cpp ===
+		// === COMMAND HANDLER === Command.cpp ===
 
 		// === CONSTRUCTOR (INIT COMMAND HANDLERS MAP) / DESTRUCTOR ===
-		CommandHandler(Server& server, std::map<int, Client*>::iterator it);
-		~CommandHandler();
+		Command(Server& server, std::map<int, Client*>::iterator it);
+		~Command();
 
 		// =================================================================================
 		
@@ -61,7 +61,7 @@ class CommandHandler
 		std::map<std::string, Channel*>& _channels;
 
 		// === MAP : COMMANDS -> HANDLERS ===
-		std::map<std::string, void (CommandHandler::*)()> _fctMap;
+		std::map<std::string, void (Command::*)()> _fctMap;
 
 		// === CURRENT INPUT TO VECTOR + ITERATOR ===
 		std::vector<std::string> _vectorInput;
@@ -80,7 +80,7 @@ class CommandHandler
 		// =================================================================================
 
 		// =================================================================================
-		// === AUTHENTICATE COMMANDS : CommandHandler_Register.cpp ===
+		// === AUTHENTICATE COMMANDS : Command_Register.cpp ===
 
 		void _authenticate();
 		void _preRegister(const std::string& cmd, int toDo);
@@ -93,7 +93,7 @@ class CommandHandler
 		void _handleCapabilities();
 
 		// =================================================================================
-		// === CHANNEL COMMANDS : CommandHandler_Channel.cpp ===
+		// === CHANNEL COMMANDS : Command_Channel.cpp ===
 
 		void _inviteChannel();
 		void _joinChannel();
@@ -102,7 +102,7 @@ class CommandHandler
 		void _quitChannel();
 
 		// =================================================================================
-		// === MODE : CommandHandler_Mode.cpp ===
+		// === MODE : Command_Mode.cpp ===
 
 		// === MODE PARSER ===
 		void _handleMode();
@@ -120,14 +120,14 @@ class CommandHandler
 		bool _setChannelLimit(Channel *channel);
 
 		// =================================================================================
-		// === MESSAGE COMMANDS : CommandHandler_Message.cpp ===
+		// === MESSAGE COMMANDS : Command_Message.cpp ===
 
 		void _sendPrivateMessage();
 		void _sendToChannel(std::vector<std::string>& targets, std::string& message);
 		void _sendToClient(std::vector<std::string>& targets, std::string& message);
 
 		// =================================================================================
-		// === LOG COMMANDS : CommandHandler_Log.cpp ===
+		// === LOG COMMANDS : Command_Log.cpp ===
 
 		void _sendPong();
 		void _updateActivity();
@@ -138,7 +138,7 @@ class CommandHandler
 		void _quitServer();
 
 		// =================================================================================
-		// === FILE COMMANDS : CommandHandler_File.cpp ===
+		// === FILE COMMANDS : Command_File.cpp ===
 
 		void _handleFile();
 		void _sendFile(std::vector<std::string> args);

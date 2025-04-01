@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CommandHandler_Register.cpp                        :+:      :+:    :+:   */
+/*   Command_Register.cpp                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "CommandHandler.hpp"
+#include "Command.hpp"
 
 // === OTHER CLASSES ===
 #include "Utils.hpp"
@@ -53,12 +53,12 @@ using namespace bot_config;
  * 5. Sends a command prompt if the client is not fully authenticated.
  * 6. Authenticates the client and sends a greeting message if the client becomes fully authenticated.
  */
-void CommandHandler::_authenticate()
+void Command::_authenticate()
 {
 	std::string cmd = *_itInput;
 	std::string command_to_send = IrcHelper::commandToSend(*_client);
 	int toDo = IrcHelper::getCommand(*_client);
-	std::map<std::string, void (CommandHandler::*)()>::iterator itFunction = _fctMap.find(*_itInput);
+	std::map<std::string, void (Command::*)()>::iterator itFunction = _fctMap.find(*_itInput);
 
 	if (itFunction == _fctMap.end() || IrcHelper::isCommandIgnored(cmd, true)
 		|| (cmd == NICK && toDo != NICK_CMD) || (cmd == USER && toDo != USER_CMD))
@@ -107,7 +107,7 @@ void CommandHandler::_authenticate()
  *              - If cmd is "NICK" and toDo is not 1, sets the client's nickname command.
  *              - If cmd is "USER" and toDo is not 2, sets the client's username command.
  */
-void CommandHandler::_preRegister(const std::string& cmd, int toDo) {
+void Command::_preRegister(const std::string& cmd, int toDo) {
 	if (_vectorInput.begin() + 1 != _vectorInput.end())
 	{
 		std::vector<std::string> identCmd(_vectorInput.begin() + 1, _vectorInput.end());
@@ -130,7 +130,7 @@ void CommandHandler::_preRegister(const std::string& cmd, int toDo) {
  * 
  * @throws std::invalid_argument if more parameters are needed, the client is already registered, or the password is incorrect.
  */
-void CommandHandler::_isRightPassword()
+void Command::_isRightPassword()
 {
 	if (Utils::isEmptyOrInvalid(_itInput, _vectorInput))
 		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), PASS));
@@ -167,7 +167,7 @@ void CommandHandler::_isRightPassword()
  * 
  * @throws std::invalid_argument if the nickname is invalid, contains forbidden characters, or is already taken.
  */
-void CommandHandler::_setNicknameClient(void)
+void Command::_setNicknameClient(void)
 {
 	// Si le client a déjà donné un nickname via identification irssi, on le récupère
 	std::vector<std::string> identNickCmd = _client->getIdentNickCmd();
@@ -236,7 +236,7 @@ void CommandHandler::_setNicknameClient(void)
  *         if the username is already set, or if any of the provided arguments 
  *         are invalid.
  */
-void CommandHandler::_setUsernameClient(void)
+void Command::_setUsernameClient(void)
 {
 	// Si le client a déjà donné un username via identification irssi, on le récupère
 	std::vector<std::string> identUserCmd = _client->getIdentUsernameCmd();
@@ -279,7 +279,7 @@ void CommandHandler::_setUsernameClient(void)
  * @param itArg Const iterator to the vector of strings containing the username.
  * @throws std::invalid_argument if the username is invalid.
  */
-void CommandHandler::_usernameSettings(const std::vector<std::string>::iterator& itArg)
+void Command::_usernameSettings(const std::vector<std::string>::iterator& itArg)
 {
 	std::string username = *itArg;
 	if (IrcHelper::isValidName(username, name_type::USERNAME) == false)
@@ -303,7 +303,7 @@ void CommandHandler::_usernameSettings(const std::vector<std::string>::iterator&
  * @param itArg Iterator pointing to the current argument in the list of arguments.
  * @throws std::invalid_argument if the hostname is invalid.
  */
-void CommandHandler::_hostnameSettings(std::vector<std::string>::iterator& itArg)
+void Command::_hostnameSettings(std::vector<std::string>::iterator& itArg)
 {
 	std::string hostname = *++itArg;
 	if (IrcHelper::isValidName(hostname, name_type::HOSTNAME) == false)
@@ -337,7 +337,7 @@ void CommandHandler::_hostnameSettings(std::vector<std::string>::iterator& itArg
  *
  * @throws std::invalid_argument if the real name is invalid or improperly formatted.
  */
-void CommandHandler::_realNameSettings(std::vector<std::string>::iterator& itArg, const std::vector<std::string>& args)
+void Command::_realNameSettings(std::vector<std::string>::iterator& itArg, const std::vector<std::string>& args)
 {
 	std::string realName = Utils::stockVector(++itArg, args);
 
@@ -375,7 +375,7 @@ void CommandHandler::_realNameSettings(std::vector<std::string>::iterator& itArg
  * @throws std::invalid_argument if more parameters are needed or if the argument
  *         is not "LS" or "END".
  */
-void CommandHandler::_handleCapabilities()
+void Command::_handleCapabilities()
 {
 	std::string nickname = _client->isAuthenticated() ? _client->getNickname() : "*";
 	std::string arg = *_itInput;

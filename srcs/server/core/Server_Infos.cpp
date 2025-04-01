@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 08:33:56 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 17:49:06 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,20 +52,6 @@ const std::string& Server::getLocalIP() const
 int Server::getPort() const
 {
 	return _port;
-}
-
-/**
- * @brief Retrieves the set of file descriptors for reading.
- * 
- * This function returns a copy of the file descriptor set that is monitored
- * for read events. It can be used to check which file descriptors are ready
- * for reading.
- * 
- * @return fd_set The set of file descriptors for reading.
- */
-fd_set Server::getReadFds() const
-{
-	return _readFds;
 }
 
 /**
