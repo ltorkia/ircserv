@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 09:11:28 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 19:32:30 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -924,7 +924,6 @@ std::string MessageBuilder::msgChannelDestroyed(const std::string& channelName)
 
 
 // === FILES ===
-
 
 std::string MessageBuilder::msgFileUsage(const std::string& subCommand)
 {

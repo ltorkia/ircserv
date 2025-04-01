@@ -141,7 +141,8 @@ class Command
 		// === FILE COMMANDS : Command_File.cpp ===
 
 		void _handleFile();
-		void _sendFile(std::vector<std::string> args);
-		void _getFile(std::vector<std::string> args);
+		void _sendFile(std::vector<std::string>& args);
+		void _getFile(std::vector<std::string>& args);
 		std::string _getFilename(const std::string& path) const;
+		void _handleFileError(std::vector<std::string>& args, size_t& argsSize, const std::string& errorMessage);
 };

@@ -25,6 +25,12 @@
 using namespace file;
 using namespace server_messages;
 
+/**
+ * @note In irssi, simply typing 'DCC' triggers the automatic implementation of peer-to-peer file sharing using the DCC SEND protocol.
+ * For Netcat, however, we chose a more straightforward approach: local file transfer via environment variables, rather than a full DCC implementation. 
+ * This allows basic file transmission functionality but does not adhere strictly to the DCC protocol as defined for IRC clients.
+**/
+
 // =========================================================================================
 
 // === FILE DATA STRUCT ===
@@ -77,32 +83,19 @@ void Command::_handleFile()
 // ==== SEND FILE ===
 
 /**
- * @brief Handles the sending of files from one client to another using the DCC SEND protocol.
+ * @brief Sends a file based on the provided arguments.
  * 
- * This function processes a list of file paths provided in the `args` vector and attempts to send
- * each file to the specified receiver. If any errors occur during the process (e.g., file not found,
- * receiver does not exist), appropriate error messages are sent back to the sender.
+ * This function handles the process of sending a file from the client to another client.
+ * It performs the following steps:
+ * 1. Retrieves the receiver's information using the provided nickname.
+ * 2. Opens the specified file to be sent.
+ * 3. If the file opens successfully, it registers the file for transfer and sends a notification to both the sender and the receiver.
+ * 4. If any error occurs during file opening, an error message is sent to the client and the process continues with the next argument.
  * 
- * @param args A vector of strings where:
- *             - The first element is the nickname of the receiver.
- *             - The subsequent elements are file paths to be sent.
- * 
- * @throws std::invalid_argument If:
- *         - The number of arguments is less than 2.
- *         - The specified receiver does not exist.
- * 
- * The function performs the following steps:
- * 1. Validates the existence of the receiver.
- * 2. Iterates through the list of file paths:
- *    - If a file cannot be opened, an error message is sent to the sender, and the file is skipped.
- *    - If the file is valid, it is added to the server's file list, and a DCC SEND request is sent
- *      to the receiver.
- * 3. Sends appropriate success or error messages to the sender and receiver.
- * 
- * @note This function assumes that the server and client objects are properly initialized and that
- *       the `_server` and `_client` members are valid.
+ * @param args A vector of strings containing the arguments required for the file transfer.
+ *             The first element is the receiver's nickname, and the second element is the file path.
  */
-void Command::_sendFile(std::vector<std::string> args)
+void Command::_sendFile(std::vector<std::string>& args)
 {
 	size_t argsSize = args.size();
 	std::string receiver = args[0];
@@ -116,9 +109,7 @@ void Command::_sendFile(std::vector<std::string> args)
 		std::fstream infile(path.c_str(), std::fstream::in);
 		if (!infile)
 		{
-			_client->sendMessage(MessageBuilder::errorMsgOpenFile(path), NULL);
-			args.erase(args.begin() + 1);
-			argsSize = args.size();
+			_handleFileError(args, argsSize, MessageBuilder::errorMsgOpenFile(path));
 			continue;
 		}
 
@@ -137,33 +128,20 @@ void Command::_sendFile(std::vector<std::string> args)
 // ==== GET FILE ===
 
 /**
- * @brief Handles the retrieval of a file sent via DCC (Direct Client-to-Client).
+ * @brief Handles the retrieval of a file based on the provided arguments.
  * 
- * This function processes a request to retrieve a file from another client. It validates
- * the input arguments, checks the existence of the file, and ensures the sender and receiver
- * are correct. If all conditions are met, the file is transferred from the sender to the
- * receiver, and appropriate messages are sent to both clients.
+ * This function handles the process of retrieving a file sent by another client. The process includes:
+ * 1. Verifying the sender's nickname and ensuring the file exists.
+ * 2. Checking if the sender and receiver match the expected roles.
+ * 3. Opening the file for reading and writing.
+ * 4. If any errors occur during the file handling, such as file not found or failure to open the file, an error message is sent to the client.
+ * 5. If the file is successfully retrieved, it is copied from the source file to the target file.
+ * 6. After completion, notifications are sent to both the sender and receiver, and the file is removed from the server's file list.
  * 
- * @param args A vector of strings containing the command arguments. The first argument
- *             is the sender's nickname, and subsequent arguments are the names of the files
- *             to be retrieved.
- * 
- * @throws std::invalid_argument If the number of arguments is insufficient, the sender
- *                                does not exist, or the file does not meet the required
- *                                conditions (e.g., incorrect sender/receiver).
- * 
- * The function performs the following steps:
- * - Retrieves the sender's client file descriptor and checks if the sender exists.
- * - Iterates through the list of requested files:
- *   - Checks if the sender exists.
- *   - Checks if the file exists and is offered by the correct sender to the correct receiver.
- *   - Opens the file for reading and creates a new file for writing.
- *   - Copies the file content line by line.
- *   - Sends confirmation messages to both the sender and receiver.
- *   - Removes the file from the server's file list after successful transfer.
- *   - Handles errors such as file not found, inability to open the file, or write errors.
+ * @param args A vector of strings containing the arguments for the file retrieval command.
+ *             The first element is the sender's nickname, and the second element is the filename.
  */
-void Command::_getFile(std::vector<std::string> args)
+void Command::_getFile(std::vector<std::string>& args)
 {
 	size_t argsSize = args.size();
 	std::string sender = args[0];
@@ -178,9 +156,7 @@ void Command::_getFile(std::vector<std::string> args)
 		std::map<std::string, FileData>::iterator it = files.find(filename);
 		if (it == files.end())
 		{
-			_client->sendMessage(MessageBuilder::errorMsgNoFile(sender), NULL);
-			args.erase(args.begin() + 1);
-			argsSize = args.size();
+			_handleFileError(args, argsSize, MessageBuilder::errorMsgNoFile(sender));
 			continue;
 		}
 
@@ -191,19 +167,15 @@ void Command::_getFile(std::vector<std::string> args)
 		std::fstream infile(file.path.c_str(), std::fstream::in);
 		if (!infile)
 		{
-			_client->sendMessage(MessageBuilder::errorMsgOpenFile(file.path), NULL);
-			args.erase(args.begin() + 1);
-			argsSize = args.size();
+			_handleFileError(args, argsSize, MessageBuilder::errorMsgOpenFile(file.path));
 			continue;
 		}
 
 		std::fstream outfile(filename.c_str(), std::fstream::out);
 		if (!outfile)
 		{
-			_client->sendMessage(MessageBuilder::errorMsgWriteFile(file.path), NULL);
+			_handleFileError(args, argsSize, MessageBuilder::errorMsgWriteFile(file.path));
 			infile.close();
-			args.erase(args.begin() + 1);
-			argsSize = args.size();
 			continue;
 		}
 
@@ -241,4 +213,23 @@ std::string Command::_getFilename(const std::string& path) const
 {
 	size_t pos = path.find_last_of('/');
 	return path.substr(pos + 1);
+}
+
+/**
+ * @brief Handles file-related errors during command execution.
+ * 
+ * This function sends an error message to the client and adjusts the arguments
+ * list by removing the problematic argument. It also updates the size of the
+ * arguments list accordingly.
+ * 
+ * @param args A reference to the vector of arguments passed to the command.
+ * @param argsSize A reference to the size of the arguments vector, which will
+ *                 be updated after modifying the arguments list.
+ * @param errorMessage The error message to be sent to the client.
+ */
+void Command::_handleFileError(std::vector<std::string>& args, size_t& argsSize, const std::string& errorMessage)
+{
+	_client->sendMessage(errorMessage, NULL);
+	args.erase(args.begin() + 1);
+	argsSize = args.size();
 }

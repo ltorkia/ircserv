@@ -161,13 +161,13 @@ fcntl(fd, F_SETFL, O_NONBLOCK);
 ```
 The **bot** operates **independently from the server** and is treated like a **standard IRC client**. Upon execution, it automatically connects to the server by retrieving necessary information from the `.env` file, such as the **server password**. This ensures that the bot connects seamlessly to the server without needing manual configuration each time.
 
-**Interactive commands**:
+**Interactive commands**: Available both in channels and private messages with the bot.
 - `!funfact`: Returns a random tech-related fun fact.
 - `!age <YYYY-MM-DD>`: Calculates and displays the user's exact age in years, months, and days.
 - `!time`: Displays the current time.
 
 ### File Transfer Support (`DCC Protocol`) 📁:
-- **Direct peer-to-peer file sharing** between users is implemented correctly for `Irssi`, as required by the assignment, using the DCC SEND protocol.
+- **Direct peer-to-peer file sharing** between users is implemented correctly for `irssi`, as required by the assignment, using the DCC SEND protocol.
 - For `Netcat`, we opted for a local file transfer approach using environment variables instead of a full DCC implementation. This allows basic file transmission but does not strictly follow the DCC protocol as defined for IRC clients.
 
 ### Advanced Logging System 📑:
