@@ -6,7 +6,7 @@
 /*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
-/*   Updated: 2025/04/01 10:15:44 by ltorkia          ###   ########.fr       */
+/*   Updated: 2025/04/01 10:21:05 by ltorkia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,10 +120,8 @@ void CommandHandler::_applyChannelModes(std::string &mode, std::string &channelN
 			_client->sendMessage(MessageBuilder::ircInvalidModeParams(_client->getNickname(), channelName, "l", modeArgs['l']), NULL);
 	}
 	for (int i = 1; mode[i]; i++)
-	{
 		if (mode[i] != 'i' && mode[i] != 't' && mode[i] != 'k' && mode[i] != 'o' && mode[i] != 'l' && mode[i] != '-' && mode[i] != '+')
 			_client->sendMessage(MessageBuilder::ircUnknownMode(_client->getNickname(), mode[i]), NULL);
-	}
 }
 
 /**
