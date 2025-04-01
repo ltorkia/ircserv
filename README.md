@@ -165,6 +165,9 @@ fcntl(fd, F_SETFL, O_NONBLOCK);
 - `!age <YYYY-MM-DD>`: Calculates and displays the user's exact age in years, months, and days.
 - `!time`: Displays the current time.
 
+**Connection to the Server:**:
+- Upon startup, the bot automatically retrieves necessary connection information from the server's `.env` file. This includes the server password. This ensures that the bot connects seamlessly to the server without needing manual configuration each time.
+
 ### File Transfer Support (`DCC Protocol`) 📁:
 - **Direct peer-to-peer file sharing** between users is implemented correctly for `Irssi`, as required by the assignment, using the DCC SEND protocol.
 - For `Netcat`, we opted for a local file transfer approach using environment variables instead of a full DCC implementation. This allows basic file transmission but does not strictly follow the DCC protocol as defined for IRC clients.
