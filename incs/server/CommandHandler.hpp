@@ -127,6 +127,8 @@ class CommandHandler
 		// === FILE COMMANDS : CommandHandler_File.cpp ===
 
 		void _handleFile();
-		void _sendFile(std::vector<std::string> entry);
-		void _getFile(std::vector<std::string> entry);
+		void _sendFile(std::vector<std::string> args);
+		void _getFile(std::vector<std::string> args);
+		std::string _getFilename(const std::string& path) const;
+		size_t _getArgsSize() const;
 };

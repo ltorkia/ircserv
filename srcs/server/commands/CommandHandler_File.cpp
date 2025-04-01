@@ -18,15 +18,14 @@ using namespace file_cmd;
 // ========================================= PUBLIC ========================================
 
 File::File() {}
-File::File(std::string name, std::string path, std::string sender, std::string receiver ): _name(name), _path(path), _sender(sender), _receiver(receiver) {}
-File::File( const File &x ) {*this = x;}
+File::File(std::string name, std::string sender, std::string receiver ): _name(name), _sender(sender), _receiver(receiver) {}
 File::~File() {}
-File & File::operator=( const File &src )
+File::File(const File &x) {*this = x;}
+File & File::operator=(const File &src)
 {
 	if (this == &src)
 		return *this;
 	this->_name = src._name;
-	this->_path = src._path;
 	this->_sender = src._sender;
 	this->_receiver = src._receiver;
 	return *this;
@@ -35,34 +34,8 @@ File & File::operator=( const File &src )
 // === GETTERS ===
 
 std::string File::getFileName() const {return _name;}
-std::string File::getPath() const {return _path;}
 std::string File::getSender() const {return _sender;}
 std::string File::getReceiver() const {return _receiver;}
-
-
-// =========================================================================================
-
-// === REQUEST CLASS ===
-
-// ========================================= PUBLIC ========================================
-
-Request::Request(std::vector<std::string> arg, std::string cmd): _args(arg), _command(cmd) {};
-Request::Request(const Request& x ) {*this = x;};
-Request::~Request() {};
-Request& Request::operator=(const Request& src)
-{
-	if (this == &src)
-		return *this;
-	this->_args = src._args;
-	this->_command = src._command;
-	return *this;
-};
-
-// === GETTERS ===
-
-size_t Request::getArgsSize() const {return _args.size();}
-std::vector<std::string> Request::getArgs() const {return _args;}
-std::string Request::getCommand() const {return _command;}
 
 
 // =========================================================================================
@@ -74,71 +47,48 @@ std::string Request::getCommand() const {return _command;}
 void CommandHandler::_handleFile()
 {
 	std::vector<std::string> entry = Utils::getTokens(*_itInput, splitter::SENTENCE);
-	if (entry.front() == SEND_CMD)
-		_sendFile(entry);
-	else if (entry.front() == GET_CMD)
-		_getFile(entry);
+	Utils::toUpper(entry.front());
+	if (entry.front() != SEND_CMD && entry.front() != GET_CMD)
+		throw std::runtime_error(MessageBuilder::ircNeedMoreParams(_client->getNickname(), entry.front()));
+	
+	std::vector<std::string> args = Utils::getTokens(entry.back(), splitter::WORD);
+	if (args.empty() || args.size() < 2)
+		throw std::runtime_error(MessageBuilder::msgFileUsage(entry.front()));
+	
+	if (chdir(getenv("HOME")) != 0)
+		throw std::runtime_error("HOME not found");
+	
+	entry.front() == SEND_CMD ? _sendFile(args) : _sendFile(args);
 }
 
 
 // ==== SEND FILE ===
 
-/**
- * @brief Handles the SEND command to transfer a file to another client.
- *
- * This function processes the SEND command by parsing the input entry, validating the request,
- * and sending the file to the specified client. It performs the following steps:
- * 1. Tokenizes the last entry to extract the request parameters.
- * 2. Validates the number of arguments in the request.
- * 3. Iterates through the request arguments to send the file to the specified client.
- * 4. Checks if the target client exists and if the file can be opened.
- * 5. Sends the file to the target client and updates the server's file list.
- *
- * @param entry A vector of strings representing the command and its arguments.
- */
-void CommandHandler::_sendFile(std::vector<std::string> entry)
+void CommandHandler::_sendFile(std::vector<std::string> args)
 {
-	if (chdir(getenv("HOME")) != 0) 
-	{
-		std::cerr << "Erreur : Impossible de changer de répertoire !" << std::endl;
-		return ;
-	}
-
-	std::vector<std::string> req = Utils::getTokens(entry.back(), splitter::WORD);
-	if (req.empty())
-	{
-		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), SEND_CMD), NULL);
-		return ;
-	}
-	Request	request(req, SEND_CMD);
-	size_t argsSize = request.getArgsSize();
-	std::vector<std::string> args = request.getArgs();
-
+	size_t argsSize = _getArgsSize();
 	if (argsSize < 2)
-	{
-		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), SEND_CMD), NULL);
-		return ;
-	}
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD));
+	
+	std::string receiver = args[0];
+	int clientFd = _server.getClientByNickname(receiver, _client);
+	if (IrcHelper::clientExists(clientFd) == false)
+		throw std::invalid_argument(MessageBuilder::ircNoSuchNick(_client->getNickname(), receiver));
 
 	while (argsSize >= 2)
 	{
-		int clientFd = _server.getClientByNickname(args[0], _client);
-		if (IrcHelper::clientExists(clientFd) == false)
-		{
-			_client->sendMessage(MessageBuilder::ircNoSuchNick(_client->getNickname(), args[1]), NULL);
-			return ;
-		}
-		std::fstream ifs(args[1].c_str(), std::fstream::in);
+		std::string path = args[1];
+		std::fstream ifs(path.c_str(), std::fstream::in);
 		if (ifs.fail())
 		{
-			_client->sendMessage(MessageBuilder::errorMsgSendFile(args[1]), NULL);
-			return ;
+			_client->sendMessage(MessageBuilder::errorMsgSendFile(path), NULL);
+			continue;
 		}
-		size_t pos = args[1].find_last_of('/');
-		std::string filename = args[1].substr(pos + 1);
-		File file(filename, args[1], _client->getNickname(), args[0]);
+		std::string filename = _getFilename(path);
+		File file(filename, _client->getNickname(), receiver);
 		_files.insert(std::pair<std::string, File>(filename, file));
-		_client->sendMessage("DCC SEND request sent to " + args[0] + ": " + filename + eol::IRC, NULL);
+
+		_client->sendMessage("DCC SEND request sent to " + receiver + ": " + filename + eol::IRC, NULL);
 		_clients[clientFd]->sendMessage(MessageBuilder::msgSendFile(filename, _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
 		args.erase(args.begin() + 1);
 	}
@@ -147,75 +97,52 @@ void CommandHandler::_sendFile(std::vector<std::string> entry)
 
 // ==== GET FILE ===
 
-/**
- * @brief Handles the GET command to retrieve a file from another client.
- *
- * This function processes the GET command to retrieve a file that has been offered by another client.
- * It validates the request, checks if the file exists, and then transfers the file from the sender to the receiver.
- *
- * @param entry A vector of strings containing the command and its arguments.
- *
- * The function performs the following steps:
- * 1. Tokenizes the last entry in the command to extract the request parameters.
- * 2. Validates that the request has the necessary parameters.
- * 3. Checks if the specified file exists and if the sender and receiver match.
- * 4. Transfers the file from the sender to the receiver.
- * 5. Sends appropriate messages to the clients involved in the file transfer.
- */
-void	CommandHandler::_getFile(std::vector<std::string> entry)
+void	CommandHandler::_getFile(std::vector<std::string> args)
 {
-	if (chdir(getenv("HOME")) != 0)
-	{
-		std::cerr << "Erreur : Impossible de changer de répertoire !" << std::endl;
-		return ;
-	}
-	std::vector<std::string> req = Utils::getTokens(entry.back(), splitter::WORD);
-	if (req.empty())
-	{
-		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD), NULL);
-		return ;
-	}
-
-	Request	request(req, GET_CMD);
-	size_t argsSize = request.getArgsSize();
-	std::vector<std::string> args = request.getArgs();
+	size_t argsSize = _getArgsSize();
 	if (argsSize < 2)
-	{
-		_client->sendMessage(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD), NULL);
-		return ;
-	}
+		throw std::invalid_argument(MessageBuilder::ircNeedMoreParams(_client->getNickname(), GET_CMD));
+
+	std::string sender = args[0];
+	int clientFd = _server.getClientByNickname(sender, _client);
+	if (IrcHelper::clientExists(clientFd) == false)
+		throw std::invalid_argument(MessageBuilder::ircNoSuchNick(_client->getNickname(), args[1]));
+
 	while (argsSize >= 2)
 	{
-		int clientFd = _server.getClientByNickname(args[0], _client);
-		if (IrcHelper::clientExists(clientFd) == false)
+		std::string path = args[1];
+		if (_files.find(path) == _files.end())
 		{
-			_client->sendMessage(MessageBuilder::ircNoSuchNick(_client->getNickname(), args[1]), NULL);
+			_client->sendMessage("DCC no file offered by " + sender + eol::IRC, NULL);
 			return ;
 		}
-		if (_files.find(args[1]) == _files.end())
-		{
-			_client->sendMessage("DCC no file offered by " + args[0] + eol::IRC, NULL);
-			return ;
-		}
-		File file(_files[args[1]]);
+		File file(_files[path]);
 		std::string fileName = file.getFileName();
-		std::string path = file.getPath();
-		std::string sender = file.getSender();
-		std::string receiver = file.getReceiver();
+		std::string fileSender = file.getSender();
+		std::string fileReceiver = file.getReceiver();
 
-		if (receiver != _client->getNickname() || sender != args[0])
-		{
-			_client->sendMessage("DCC no file offered by " + args[0] + eol::IRC, NULL);
-			return ;
-		}
-		_clients[clientFd]->sendMessage(MessageBuilder::msgSendingFile(args[1], _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
-		std::fstream ofs(args[1].c_str(), std::fstream::out);
+		if (fileSender != sender || fileReceiver != _client->getNickname() || sender == _client->getNickname())
+			throw std::invalid_argument(MessageBuilder::ircNoSuchNick(_client->getNickname(), sender));
+
+		_clients[clientFd]->sendMessage(MessageBuilder::msgSendingFile(path, _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
+		std::fstream ofs(path.c_str(), std::fstream::out);
 		std::fstream ifs(path.c_str(), std::fstream::in);
 		if (ofs.is_open())
 			ofs << ifs.rdbuf();
-		_client->sendMessage("DCC received file " + fileName + " from " + sender + eol::IRC, NULL);
-		_clients[clientFd]->sendMessage("DCC sent file " + fileName + " for " + receiver + eol::IRC, _client);
-		_files.erase(args[1]);
+		_client->sendMessage("DCC received file " + fileName + " from " + fileSender + eol::IRC, NULL);
+		_clients[clientFd]->sendMessage("DCC sent file " + fileName + " for " + fileReceiver + eol::IRC, _client);
+		_files.erase(path);
 		args.erase(args.begin() + 1);
 	}
+}
+
+std::string CommandHandler::_getFilename(const std::string& path) const
+{
+	size_t pos = path.find_last_of('/');
+	return path.substr(pos + 1);
+}
+
+size_t CommandHandler::_getArgsSize() const
+{
+	return _vectorInput.size();
 }
