@@ -1,10 +1,22 @@
-#include "../../../incs/server/Channel.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel_Attributes.cpp                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:33:03 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "Channel.hpp"
 
 // === OTHER CLASSES ===
-#include "../../../incs/server/Client.hpp"
-#include "../../../incs/utils/MessageBuilder.hpp"
-#include "../../../incs/utils/IrcHelper.hpp"
-#include "../../../incs/config/bot_config.hpp"
+#include "Client.hpp"
+#include "MessageBuilder.hpp"
+#include "IrcHelper.hpp"
+#include "bot_config.hpp"
 
 using namespace bot_config;
 

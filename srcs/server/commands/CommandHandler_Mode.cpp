@@ -1,13 +1,25 @@
-#include "../../../incs/server/CommandHandler.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   CommandHandler_Mode.cpp                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:33:39 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../../incs/utils/Utils.hpp"
-#include "../../../incs/utils/IrcHelper.hpp"
-#include "../../../incs/utils/MessageBuilder.hpp"
+#include "Utils.hpp"
+#include "IrcHelper.hpp"
+#include "MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../../incs/config/irc_config.hpp"
-#include "../../../incs/config/commands.hpp"
+#include "irc_config.hpp"
+#include "commands.hpp"
 
 using namespace commands;
 using namespace error_display;

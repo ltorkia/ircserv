@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server_messages.hpp                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:50:47 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 #include <string>
@@ -11,7 +23,7 @@ namespace server_messages
 	// === EXCEPTIONS FOR ERROR SETTINGS ===
 	const std::string ERR_INVALID_ARGUMENTS 		= "./" + server::NAME + " <port> <password>";				// argc
 	const std::string ERR_NO_NETWORK 				= "No network interface available";
-	const std::string ERR_INVALID_PORT_NUMBER 		= "Invalid port number. Port must be between 1 and 65535"; 	// arg[1]
+	const std::string ERR_INVALID_PORT_NUMBER 		= "Invalid port number. Port must be between 1 and 65535";	// arg[1]
 	const std::string ERR_INVALID_PASSWORD 			= "Incorrect password format";								// arg[2]
 	const std::string ERR_SET_SIGNAL 				= "Failed to configure SIGINT signal";
 	const std::string ERR_SOCKET_CREATION 			= "Failed to create server socket";
@@ -24,6 +36,7 @@ namespace server_messages
 	const std::string ERR_ACCEPT_CLIENT 			= "Failed to accept client";
 	const std::string ERR_OPEN_FILE 				= "Failed to open file";
 	const std::string ERR_OPEN_ENV_FILE 			= "Failed to open environment file";
+	const std::string ERR_HOME_NOT_FOUND			= "HOME environment variable not set or inaccessible";
 	
 
 	// === NOTICE MESSAGES FOR CLIENTS ===

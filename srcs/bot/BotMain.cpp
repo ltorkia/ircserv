@@ -1,12 +1,24 @@
-#include "../../incs/bot/Bot.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   BotMain.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:32:52 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/utils/Utils.hpp"
+#include "Utils.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/bot_config.hpp"
-#include "../../incs/config/server_messages.hpp"
-#include "../../incs/config/colors.hpp"
+#include "bot_config.hpp"
+#include "server_messages.hpp"
+#include "colors.hpp"
 
 using namespace bot_config;
 using namespace server_messages;

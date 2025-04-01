@@ -1,7 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   CommandHandler.hpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:37:41 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 // === SERVER LIBRARIES ===
-#include "../config/server_libs.hpp"
+#include "server_libs.hpp"
 
 // === HIGH CLASS DEPENDENCY ===
 #include "Server.hpp"

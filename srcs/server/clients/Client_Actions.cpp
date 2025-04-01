@@ -1,13 +1,25 @@
-#include "../../../incs/server/Client.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client_Actions.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:33:10 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "Client.hpp"
 
 // === OTHER CLASSES ===
-#include "../../../incs/server/Channel.hpp"
-#include "../../../incs/utils/Utils.hpp"
-#include "../../../incs/utils/IrcHelper.hpp"
-#include "../../../incs/utils/MessageBuilder.hpp"
+#include "Channel.hpp"
+#include "Utils.hpp"
+#include "IrcHelper.hpp"
+#include "MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../../incs/config/irc_config.hpp"
+#include "irc_config.hpp"
 
 // =========================================================================================
 

@@ -1,13 +1,25 @@
-#include "../../../incs/server/CommandHandler.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   CommandHandler_Channel.cpp                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:33:23 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../../incs/utils/Utils.hpp"
-#include "../../../incs/utils/IrcHelper.hpp"
-#include "../../../incs/utils/MessageBuilder.hpp"
+#include "Utils.hpp"
+#include "IrcHelper.hpp"
+#include "MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../../incs/config/commands.hpp"
-#include "../../../incs/config/server_messages.hpp"
+#include "commands.hpp"
+#include "server_messages.hpp"
 
 using namespace commands;
 using namespace server_messages;

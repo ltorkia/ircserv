@@ -1,15 +1,29 @@
-#include "../../../incs/server/FileData.hpp"
-#include "../../../incs/server/CommandHandler.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   CommandHandler_File.cpp                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 09:18:54 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "FileData.hpp"
+#include "CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../../incs/utils/Utils.hpp"
-#include "../../../incs/utils/IrcHelper.hpp"
-#include "../../../incs/utils/MessageBuilder.hpp"
+#include "Utils.hpp"
+#include "IrcHelper.hpp"
+#include "MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../../incs/config/irc_config.hpp"
+#include "irc_config.hpp"
+#include "server_messages.hpp"
 
 using namespace file;
+using namespace server_messages;
 
 // =========================================================================================
 
@@ -54,7 +68,7 @@ void CommandHandler::_handleFile()
 		throw std::invalid_argument(MessageBuilder::msgFileUsage(entry.front()));
 	
 	if (chdir(getenv("HOME")) != 0)
-		throw std::runtime_error("HOME not found");
+		throw std::runtime_error(ERR_HOME_NOT_FOUND);
 	
 	entry.front() == SEND_CMD ? _sendFile(args) : _getFile(args);
 }
@@ -105,7 +119,7 @@ void CommandHandler::_sendFile(std::vector<std::string> args)
 		std::fstream infile(path.c_str(), std::fstream::in);
 		if (!infile)
 		{
-			_client->sendMessage(MessageBuilder::errorMsgSendFile(path), NULL);
+			_client->sendMessage(MessageBuilder::errorMsgOpenFile(path), NULL);
 			args.erase(args.begin() + 1);
 			argsSize = args.size();
 			continue;
@@ -114,7 +128,7 @@ void CommandHandler::_sendFile(std::vector<std::string> args)
 		std::string filename = _getFilename(path);
 		_server.addFile(filename, path, _client->getNickname(), receiver);
 
-		_client->sendMessage("DCC SEND request sent to " + receiver + ": " + filename + eol::IRC, NULL);
+		_client->sendMessage(MessageBuilder::msgRequestSent(filename, receiver), NULL);
 		_clients[clientFd]->sendMessage(MessageBuilder::msgSendFile(filename, _client->getNickname(), _client->getClientIp(), _client->getClientPort()), _client);
 		
 		args.erase(args.begin() + 1);
@@ -165,12 +179,12 @@ void CommandHandler::_getFile(std::vector<std::string> args)
 
 	while (argsSize >= 2)
 	{
-		std::string fileName = args[1];
+		std::string filename = args[1];
 		std::map<std::string, FileData> files = _server.getFiles();
-		std::map<std::string, FileData>::iterator it = files.find(fileName);
+		std::map<std::string, FileData>::iterator it = files.find(filename);
 		if (it == files.end())
 		{
-			_client->sendMessage("DCC no file offered by " + sender + eol::IRC, NULL);
+			_client->sendMessage(MessageBuilder::errorMsgNoFile(sender), NULL);
 			args.erase(args.begin() + 1);
 			argsSize = args.size();
 			continue;
@@ -183,16 +197,16 @@ void CommandHandler::_getFile(std::vector<std::string> args)
 		std::fstream infile(file.path.c_str(), std::fstream::in);
 		if (!infile)
 		{
-			_client->sendMessage("DCC can't open file " + file.path + eol::IRC, NULL);
+			_client->sendMessage(MessageBuilder::errorMsgOpenFile(file.path), NULL);
 			args.erase(args.begin() + 1);
 			argsSize = args.size();
 			continue;
 		}
 
-		std::fstream outfile(fileName.c_str(), std::fstream::out);
+		std::fstream outfile(filename.c_str(), std::fstream::out);
 		if (!outfile)
 		{
-			_client->sendMessage("DCC can't write file " + file.path + eol::IRC, NULL);
+			_client->sendMessage(MessageBuilder::errorMsgWriteFile(file.path), NULL);
 			infile.close();
 			args.erase(args.begin() + 1);
 			argsSize = args.size();
@@ -208,8 +222,8 @@ void CommandHandler::_getFile(std::vector<std::string> args)
 		infile.close();
 		outfile.close();
 		
-		_client->sendMessage("DCC received file " + fileName + " from " + file.sender + eol::IRC, NULL);
-		_clients[clientFd]->sendMessage("DCC sent file " + fileName + " for " + file.receiver + eol::IRC, _client);
+		_client->sendMessage(MessageBuilder::msgFileReceived(filename, file.sender), NULL);
+		_clients[clientFd]->sendMessage(MessageBuilder::msgFileSent(filename, file.receiver), _client);
 
 		// Suppression du fichier
 		_server.removeFile(it->first);

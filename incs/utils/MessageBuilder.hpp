@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   MessageBuilder.hpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 09:17:53 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 #include <iostream>			// gestion chaînes de caractères -> std::cout, std::cerr, std::string
@@ -111,7 +123,7 @@ class MessageBuilder
 		static std::string ircAway(const std::string& nickname);
 		static std::string ircWhois(const std::string& nickname, const std::string& targetNick, const std::string& username, const std::string& realname, const std::string& clientIp);
 		static std::string ircWhoisIdle(const std::string& nickname, const std::string& targetNick, time_t idleTime, time_t signonTime);
-		static std::string ircEndOfWhois(const std::string& nickname, const std::string& targetNick); 
+		static std::string ircEndOfWhois(const std::string& nickname, const std::string& targetNick);
 		static std::string ircWho(const std::string& nickname, const std::string& targetNick, const std::string& username, const std::string& realname, const std::string& clientIp, const std::string& channelName, bool isAway);
 		static std::string ircEndOfWho(const std::string& nickname, const std::string& channelName);
 		static std::string ircEndOfWhowas(const std::string& nickname, const std::string& targetNick);
@@ -166,10 +178,15 @@ class MessageBuilder
 		static std::string msgChannelDestroyed(const std::string& channelName);
 
 		// === FILES ===
-		static std::string msgSendFile(const std::string& filename, const std::string &client, const std::string &adr, const int &port);
-		static std::string errorMsgSendFile(const std::string& filename);
-		static std::string msgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int &port);
 		static std::string msgFileUsage(const std::string& subCommand);
+		static std::string msgSendFile(const std::string& filename, const std::string& sender, const std::string& adr, const int& port);
+		static std::string msgRequestSent(const std::string& filename, const std::string& receiver);
+		static std::string msgSendingFile(const std::string& filename, const std::string& receiver);
+		static std::string msgFileReceived(const std::string& filename, const std::string& sender);
+		static std::string msgFileSent(const std::string& filename, const std::string& receiver);
+		static std::string errorMsgOpenFile(const std::string& path);
+		static std::string errorMsgWriteFile(const std::string& path);
+		static std::string errorMsgNoFile(const std::string& sender);
 
 
 		// =========================================================================================

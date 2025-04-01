@@ -1,9 +1,21 @@
-#include "../../incs/utils/Utils.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Utils.cpp                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:34:20 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "Utils.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
-#include "../../incs/config/commands.hpp"
-#include "../../incs/config/server_messages.hpp"
+#include "irc_config.hpp"
+#include "commands.hpp"
+#include "server_messages.hpp"
 
 using namespace commands;
 using namespace server_messages;

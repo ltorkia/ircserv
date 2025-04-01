@@ -1,13 +1,25 @@
-#include "../../incs/utils/MessageBuilder.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   MessageBuilder.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 09:11:28 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "MessageBuilder.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/utils/Utils.hpp"
+#include "Utils.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/irc_config.hpp"
-#include "../../incs/config/irc_replies.hpp"
-#include "../../incs/config/commands.hpp"
-#include "../../incs/config/colors.hpp"
+#include "irc_config.hpp"
+#include "irc_replies.hpp"
+#include "commands.hpp"
+#include "colors.hpp"
 
 using namespace irc_replies;
 using namespace commands;
@@ -913,33 +925,68 @@ std::string MessageBuilder::msgChannelDestroyed(const std::string& channelName)
 
 // === FILES ===
 
-//+ _client->getNickname() + "souhaite vous envoyer ce fichier : " + filename + ". Pour l'accepter, merci d'utiliser la commande GET. Sinon, merci d'ignorer ce message."
-std::string MessageBuilder::msgSendFile(const std::string& filename, const std::string &client, const std::string &adr, const int &port)
-{
-	std::ostringstream stream;
-	stream << "📤 " << DCC << " SEND FROM " << client << " [" << adr << " " << port << "]: " << filename;
-	return stream.str();
-}
-
-std::string MessageBuilder::errorMsgSendFile(const std::string& filename)
-{
-	std::ostringstream stream;
-	stream << DCC << " can't open file /home/athiebau/" << filename << ": No such file or directory";
-	return stream.str();
-}
-
-std::string MessageBuilder::msgSendingFile(const std::string& filename, const std::string& receiver, const std::string& ip, const int& port)
-{
-	std::ostringstream stream;
-	stream << DCC << " sending file " << filename << " for " << receiver << " [" << ip << " port " << port << "]";
-	return stream.str();
-}
 
 std::string MessageBuilder::msgFileUsage(const std::string& subCommand)
 {
 	std::string clientType = subCommand == file::SEND_CMD ? "receiver" : "sender";
 	std::ostringstream stream;
 	stream << "Usage: DCC " << subCommand << " <" << clientType << "> <file_path>";
+	return stream.str();
+}
+
+std::string MessageBuilder::msgSendFile(const std::string& filename, const std::string& sender, const std::string& adr, const int& port)
+{
+	std::ostringstream stream;
+	stream << "📤 " << DCC << " SEND FROM " << sender << " [" << adr << " " << port << "]: " << filename;
+	return stream.str();
+}
+
+std::string MessageBuilder::msgRequestSent(const std::string& filename, const std::string& receiver)
+{
+	std::ostringstream stream;
+	stream << DCC << " SEND request sent to " << receiver << ": " << filename;
+	return stream.str();
+}
+
+std::string MessageBuilder::msgSendingFile(const std::string& filename, const std::string& receiver)
+{
+	std::ostringstream stream;
+	stream << DCC << " sending file " << filename << " for " << receiver;
+	return stream.str();
+}
+
+std::string MessageBuilder::msgFileReceived(const std::string& filename, const std::string& sender)
+{
+	std::ostringstream stream;
+	stream << DCC << " received file " << filename << " from " << sender;
+	return stream.str();
+}
+
+std::string MessageBuilder::msgFileSent(const std::string& filename, const std::string& receiver)
+{
+	std::ostringstream stream;
+	stream << DCC << " sent file " << filename << " for " << receiver;
+	return stream.str();
+}
+
+std::string MessageBuilder::errorMsgOpenFile(const std::string& path)
+{
+	std::ostringstream stream;
+	stream << DCC << " can't open file " << path << ": No such file or directory";
+	return stream.str();
+}
+
+std::string MessageBuilder::errorMsgWriteFile(const std::string& path)
+{
+	std::ostringstream stream;
+	stream << DCC << " can't write file " << path;
+	return stream.str();
+}
+
+std::string MessageBuilder::errorMsgNoFile(const std::string& sender)
+{
+	std::ostringstream stream;
+	stream << DCC << " no file offered by " << sender;
 	return stream.str();
 }
 

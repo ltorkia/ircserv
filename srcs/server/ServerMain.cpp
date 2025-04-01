@@ -1,8 +1,20 @@
-#include "../../incs/server/Server.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ServerMain.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:34:08 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "Server.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/server_messages.hpp"
-#include "../../incs/config/colors.hpp"
+#include "server_messages.hpp"
+#include "colors.hpp"
 
 using namespace server_messages;
 using namespace colors;

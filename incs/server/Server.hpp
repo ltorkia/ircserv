@@ -1,7 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:41:36 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 // === SERVER LIBRARIES ===
-#include "../config/server_libs.hpp"
+#include "server_libs.hpp"
 
 // === FILES STRUCT ===
 #include "FileData.hpp"
@@ -34,7 +46,7 @@ class Server
 		std::map<std::string, Channel*> _channels;								// Liste des canaux
 
 		// === FILES TO SEND ===
-		std::map<std::string, FileData>	_files; 								// Liste des fichiers à envoyer avec DCC SEND
+		std::map<std::string, FileData>	_files;									// Liste des fichiers à envoyer avec DCC SEND
 
 
 		// =================================================================================
@@ -67,9 +79,9 @@ class Server
 		// === CLIENT MANAGER === Server_Clients.cpp
 
 		void _acceptNewClient();												// Accepte une nouvelle connexion client
-		void _addClient(int clientFd); 											// Ajoute un client à la liste
+		void _addClient(int clientFd);											// Ajoute un client à la liste
 		void _checkActivity();													// Vérifie l'activité des clients
-		void _disconnectClient(int fd, const std::string& reason); 				// Déconnecte un client du serveur
+		void _disconnectClient(int fd, const std::string& reason);				// Déconnecte un client du serveur
 		void _deleteClient(std::map<int, Client*>::iterator it);				// Supprime un client de la liste
 		void _lateClientDeletion();												// Supprime les clients de la liste en différé
 	
@@ -97,32 +109,32 @@ class Server
 		// =================================================================================
 		// === SERVER INFOS GETTERS === Server_Infos.cpp
 
-		int getServerSocketFd() const; 																// Récupère le descripteur de socket du serveur
-		const std::string& getLocalIP() const; 														// Récupère l'adresse IP locale
-		int getPort() const; 																		// Récupère le port du serveur;
-		fd_set getReadFds() const; 																	// Récupère l'ensemble des descripteurs surveillés
-		int getMaxFd();																				// Récupère le descripteur maximum pour select()
-		const std::string& getServerPassword() const; 												// Récupère le mot de passe du serveur
-		std::map<std::string, Channel*>& getChannels(); 											// Récupère la liste des canaux
-		int getChannelCount() const; 																// Récupère le nombre de canaux
+		int getServerSocketFd() const;											// Récupère le descripteur de socket du serveur
+		const std::string& getLocalIP() const;									// Récupère l'adresse IP locale
+		int getPort() const;													// Récupère le port du serveur;
+		fd_set getReadFds() const;												// Récupère l'ensemble des descripteurs surveillés
+		int getMaxFd();															// Récupère le descripteur maximum pour select()
+		const std::string& getServerPassword() const;							// Récupère le mot de passe du serveur
+		std::map<std::string, Channel*>& getChannels();							// Récupère la liste des canaux
+		int getChannelCount() const;											// Récupère le nombre de canaux
 
 		// =================================================================================
 		// === CLIENT MANAGER === Server_Clients.cpp
 
 		// === GETTERS ===
-		std::map<int, Client*>& getClients(); 														// Récupère la liste des clients
-		int getTotalClientCount() const; 															// Récupère le nombre total de clients
-		int getClientCount(bool authenticated); 													// Récupère le nombre de clients authentifiés ou non
-		int getClientByNickname(const std::string& nickname, Client* currClient);					// Récupère le client par son pseudo
+		std::map<int, Client*>& getClients();															// Récupère la liste des clients
+		int getTotalClientCount() const;																// Récupère le nombre total de clients
+		int getClientCount(bool authenticated);															// Récupère le nombre de clients authentifiés ou non
+		int getClientByNickname(const std::string& nickname, Client* currClient);						// Récupère le client par son pseudo
 		
 		// === ACTIONS ===
-		void greetClient(Client* client); 															// Accueille un client
-		void broadcastToClients(const std::string &message); 										// Envoie un message à tous les clients connectés
-		void prepareClientToLeave(std::map<int, Client*>::iterator it, const std::string& reason);	// Prépare un client à quitter le serveur
+		void greetClient(Client* client);																// Accueille un client
+		void broadcastToClients(const std::string &message);											// Envoie un message à tous les clients connectés
+		void prepareClientToLeave(std::map<int, Client*>::iterator it, const std::string& reason);		// Prépare un client à quitter le serveur
 		
 		// === FILES TO SEND ===
-		std::map<std::string, FileData>& getFiles(); 													// Récupère la liste des fichiers à envoyer
+		std::map<std::string, FileData>& getFiles();													// Récupère la liste des fichiers à envoyer
 		void addFile(const std::string& filename, const std::string& path, const std::string& sender,
-																		const std::string& receiver); 	// Ajoute un fichier à la liste
-		void removeFile(const std::string& filename); 													// Supprime un fichier de la liste
+																		const std::string& receiver);	// Ajoute un fichier à la liste
+		void removeFile(const std::string& filename);													// Supprime un fichier de la liste
 };

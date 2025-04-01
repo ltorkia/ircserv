@@ -1,15 +1,27 @@
-#include "../../../incs/server/CommandHandler.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   CommandHandler_Register.cpp                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:33:43 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "CommandHandler.hpp"
 
 // === OTHER CLASSES ===
-#include "../../../incs/utils/Utils.hpp"
-#include "../../../incs/utils/IrcHelper.hpp"
-#include "../../../incs/utils/MessageBuilder.hpp"
+#include "Utils.hpp"
+#include "IrcHelper.hpp"
+#include "MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../../incs/config/commands.hpp"
-#include "../../../incs/config/server_messages.hpp"
-#include "../../../incs/config/colors.hpp"
-#include "../../../incs/config/bot_config.hpp"
+#include "commands.hpp"
+#include "server_messages.hpp"
+#include "colors.hpp"
+#include "bot_config.hpp"
 
 using namespace commands;
 using namespace auth_cmd;

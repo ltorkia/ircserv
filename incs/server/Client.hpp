@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:43:20 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #pragma once
 
 #include <iostream>				// gestion chaînes de caractères -> std::cout, std::cerr, std::string
@@ -79,8 +91,8 @@ class Client
 		
 		// === ACTIVITY INFOS ===
 		void setLastActivity();
-		void setIsAway(bool status); 										// Définit si le client est absent
-		void setAwayMessage(const std::string& message); 					// Définit le message d'absence du client
+		void setIsAway(bool status);										// Définit si le client est absent
+		void setAwayMessage(const std::string& message);					// Définit le message d'absence du client
 		void setErrorMsgTooLongSent(bool status);							// Définit si le message d'erreur d'un input trop long est déjà envoyé
 		void setPingSent(bool status);										// Définit si le serveur attend un PONG du client
 
@@ -108,7 +120,7 @@ class Client
 		// === ACTIVITY INFOS ===
 		time_t getSignonTime() const;										// Récupère le timestamp de connexion
 		time_t getLastActivity() const;										// Récupère le dernier moment actif du client
-		time_t getIdleTime() const; 										// Récupère le temps d'inactivité du client
+		time_t getIdleTime() const;											// Récupère le temps d'inactivité du client
 		bool isAway() const;												// Vérifie si le client est absent
 		const std::string& getAwayMessage() const;							// Récupère le message d'absence
 		bool errorMsgTooLongSent() const;									// Vérifie si le message d'erreur d'un input trop long est déjà envoyé
@@ -130,7 +142,7 @@ class Client
 		void joinChannel(const std::string& channelName, const std::string& password, std::map<std::string, Channel*>& channels);									// Rejoint un canal (creer et rejoindre ou rejoindre existant)
 		void createChannel(const std::string& channelName, const std::string& password, std::map<std::string, Channel*>& channels);									// Crée un canal
 		void addToChannel(Channel* channel, const std::string& password, const std::string& channelName, std::map<std::string, Channel*>& channels);				// Ajoute un client à un canal
-		void msgAfterJoin(Channel* channel, const std::string& channelName); 																						// Send les bons RPL IRC après un join channel
+		void msgAfterJoin(Channel* channel, const std::string& channelName);																						// Send les bons RPL IRC après un join channel
 		bool hasRightPassword(Channel* channel, const std::string& password);																						// Vérifie le mot de passe du canal
 		void passwordSetting(Channel* channel, const std::string& password);																						// Définit le mot de passe du canal
 		void isKickedFromChannel(Channel *channel, Client* kicker, const std::string& reason);																		// Est exclu d'un canal

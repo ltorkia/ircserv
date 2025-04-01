@@ -1,15 +1,27 @@
-#include "../../incs/bot/Bot.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Bot_Register.cpp                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:25:01 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/utils/Utils.hpp"
-#include "../../incs/utils/MessageBuilder.hpp"
+#include "Utils.hpp"
+#include "MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/bot_config.hpp"
-#include "../../incs/config/irc_config.hpp"
-#include "../../incs/config/server_messages.hpp"
-#include "../../incs/config/commands.hpp"
-#include "../../incs/config/colors.hpp"
+#include "bot_config.hpp"
+#include "irc_config.hpp"
+#include "server_messages.hpp"
+#include "commands.hpp"
+#include "colors.hpp"
 
 using namespace bot_config;
 using namespace server_messages;

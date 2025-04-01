@@ -31,11 +31,13 @@ CMD_DIR				=	commands
 SERVER_MAIN			=	ServerMain.cpp
 
 SERVER_FILES		=	Server.cpp						Server_Clients.cpp \
-						Server_Infos.cpp 				Server_Loop.cpp
+						Server_Infos.cpp				Server_Loop.cpp
 
-CHANNELS_FILES		=	Channel.cpp						Channel_Attributes.cpp			Channel_Actions.cpp
+CHANNELS_FILES		=	Channel.cpp						Channel_Attributes.cpp \
+						Channel_Actions.cpp
 
-CLIENTS_FILES		=	Client.cpp						Client_Attributes.cpp			Client_Actions.cpp
+CLIENTS_FILES		=	Client.cpp						Client_Attributes.cpp \
+						Client_Actions.cpp
 
 COMMON_UTILS_FILES	=	MessageBuilder.cpp				Utils.cpp
 
@@ -46,13 +48,14 @@ CMD_FILES			=	CommandHandler.cpp				CommandHandler_Register.cpp \
 						CommandHandler_Mode.cpp 		CommandHandler_Message.cpp \
 						CommandHandler_Log.cpp
 
-BOT_FILES			=	BotMain.cpp						Bot.cpp							Bot_Message.cpp \
-						Bot_Register.cpp				Bot_Parser.cpp					Bot_Command.cpp
+BOT_FILES			=	BotMain.cpp						Bot.cpp \
+						Bot_Message.cpp					Bot_Register.cpp \
+						Bot_Parser.cpp					Bot_Command.cpp
 
 #########################################################
 
 #-----> JOIN SOURCES FOR EACH PROGRAM OR COMMON USE
-COMMON_FILES 		= 	$(addprefix $(UTILS_DIR)/, $(COMMON_UTILS_FILES))
+COMMON_FILES		=	$(addprefix $(UTILS_DIR)/, $(COMMON_UTILS_FILES))
 
 MAIN_SERVER_FILES	=	$(addprefix $(SERVER_DIR)/, $(SERVER_MAIN)) \
 						$(addprefix $(SERVER_DIR)/, $(addprefix $(CORE_DIR)/, $(SERVER_FILES))) \
@@ -69,26 +72,26 @@ MAIN_BOT_FILES		=	$(addprefix $(BOT_DIR)/, $(BOT_FILES))
 #########################################################
 
 #-----> COMMON LIB
-COMMON_SRCS			= 	$(COMMON_FILES)
-COMMON_OBJS			= 	${COMMON_SRCS:%.cpp=${OBJS_DIR}/%.o}
-COMMON_DEPS			= 	${COMMON_OBJS:.o=.d}
+COMMON_SRCS			=	$(COMMON_FILES)
+COMMON_OBJS			=	${COMMON_SRCS:%.cpp=${OBJS_DIR}/%.o}
+COMMON_DEPS			=	${COMMON_OBJS:.o=.d}
 
 #-----> SERVEUR IRC
-SRCS				= 	$(MAIN_SERVER_FILES)
-OBJS				= 	${SRCS:%.cpp=${OBJS_DIR}/%.o}
-DEPS				= 	${OBJS:.o=.d}
+SRCS				=	$(MAIN_SERVER_FILES)
+OBJS				=	${SRCS:%.cpp=${OBJS_DIR}/%.o}
+DEPS				=	${OBJS:.o=.d}
 
 #-----> BOT
-SRCS_BOT			= 	$(MAIN_BOT_FILES)
-OBJS_BOT			= 	${SRCS_BOT:%.cpp=${OBJS_DIR}/%.o}
-DEPS_BOT			= 	${OBJS_BOT:.o=.d}
+SRCS_BOT			=	$(MAIN_BOT_FILES)
+OBJS_BOT			=	${SRCS_BOT:%.cpp=${OBJS_DIR}/%.o}
+DEPS_BOT			=	${OBJS_BOT:.o=.d}
 
 #########################################################
 
 #-----> INCLUDES
 INC_DIR				=	incs
 CONFIG_DIR			=	config
-INC_DIRS			= 	-I./$(INC_DIR)/$(SERVER_DIR) \
+INC_DIRS			=	-I./$(INC_DIR)/$(SERVER_DIR) \
 						-I./$(INC_DIR)/$(CMD_DIR) \
 						-I./$(INC_DIR)/$(BOT_DIR) \
 						-I./$(INC_DIR)/$(UTILS_DIR) \
@@ -97,21 +100,21 @@ INC_DIRS			= 	-I./$(INC_DIR)/$(SERVER_DIR) \
 #########################################################
 
 #-----> COMPILATION FLAGS
-CXX					= 	c++
-CXXFLAGS			= 	-Wall -Wextra -Werror -std=c++98 $(INC_DIRS)
+CXX					=	c++
+CXXFLAGS			=	-Wall -Wextra -Werror -std=c++98 $(INC_DIRS)
 CXXFLAGS_DEBUG		=	$(CXXFLAGS) -g3 -DDEBUG
 
 #-----> CLEANING
-RM					= 	rm -rf
+RM					=	rm -rf
 
 
 #########################################################
 #############            COLORS               ###########
 #########################################################
 
-GREEN				= \033[1;32m
-CYAN				= \033[1;36m
-RESET				= \033[0m
+GREEN				=	\033[1;32m
+CYAN				=	\033[1;36m
+RESET				=	\033[0m
 
 
 #########################################################

@@ -1,12 +1,24 @@
-#include "../../incs/bot/Bot.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Bot_Parser.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:32:42 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "Bot.hpp"
 
 // === OTHER CLASSES ===
-#include "../../incs/utils/Utils.hpp"
+#include "Utils.hpp"
 
 // === NAMESPACES ===
-#include "../../incs/config/bot_config.hpp"
-#include "../../incs/config/irc_config.hpp"
-#include "../../incs/config/commands.hpp"
+#include "bot_config.hpp"
+#include "irc_config.hpp"
+#include "commands.hpp"
 
 using namespace bot_config;
 

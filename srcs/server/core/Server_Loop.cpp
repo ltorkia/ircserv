@@ -1,15 +1,27 @@
-#include "../../../incs/server/Server.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server_Loop.cpp                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ltorkia <ltorkia@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/14 10:44:25 by ltorkia           #+#    #+#             */
+/*   Updated: 2025/04/01 08:34:02 by ltorkia          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "Server.hpp"
 
 // === OTHER CLASSES ===
-#include "../../../incs/server/Client.hpp"
-#include "../../../incs/server/CommandHandler.hpp"
-#include "../../../incs/utils/Utils.hpp"
-#include "../../../incs/utils/MessageBuilder.hpp"
+#include "Client.hpp"
+#include "CommandHandler.hpp"
+#include "Utils.hpp"
+#include "MessageBuilder.hpp"
 
 // === NAMESPACES ===
-#include "../../../incs/config/irc_config.hpp"
-#include "../../../incs/config/colors.hpp"
-#include "../../../incs/config/server_messages.hpp"
+#include "irc_config.hpp"
+#include "colors.hpp"
+#include "server_messages.hpp"
 
 using namespace server_messages;
 using namespace colors;
